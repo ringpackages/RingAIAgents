@@ -136,8 +136,6 @@ oTask {
 
 - [دليل المطور](DEVELOPER_GUIDE.md)
 - [توثيق الكلاسات](CLASSES.md)
-- [دليل المستخدم](USER_GUIDE.md)
-- [المساهمة](CONTRIBUTING.md)
 
 ## المساهمة
 
