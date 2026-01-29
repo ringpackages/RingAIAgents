@@ -3,6 +3,8 @@
     Combines all basic components in one place
 */
 
+
+
 # Load basic libraries
 load "sqlitelib.ring"
 load "ringThreadPro.ring"
@@ -40,6 +42,7 @@ Load "tools\DefaultTools.ring"
 # Initialize the system
 serverdebug = false # true
 aDebag = [:error, :info]
+
 
 if isMainSourceFile() {
    

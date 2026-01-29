@@ -25,7 +25,7 @@ class AddAgentDialog from QDialog
         this.oParent = oParent  # store parent window reference
         setWindowTitle("Add New Agent")
         setModal(true)
-        setFixedSize(600, 600)  # larger width and smaller height
+        setFixedSize(600, 700)  # larger width and smaller height
         initUI()
     }
 
@@ -211,7 +211,7 @@ class AddAgentDialog from QDialog
 
         # Connect signals
         oAddSkillButton.setclickevent("showAddSkillDialog()")
-        oAddTraitButton.setclickevent("howAddTraitDialog()")
+        oAddTraitButton.setclickevent("showAddTraitDialog()")
         oCancelButton.setclickevent("reject()")
         oCreateButton.setclickevent("createAgent()")
 

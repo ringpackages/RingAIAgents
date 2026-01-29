@@ -8,7 +8,7 @@ class Settings
     cSettingsFile = currentdir() + "/settings/settings.json"
 
     # Default settings
-    oDefaults = [
+    aDefaults = [
         :theme = "light",
         :language = "en",
         :updateInterval = 5000,
@@ -21,20 +21,20 @@ class Settings
     ]
 
     # Current settings
-    oSettings = []
+    aSettings = []
 
     func init {
-        oSettings = oDefaults
+        aSettings = aDefaults
     }
 
     func loadSetting {
         if fexists(cSettingsFile) {
             try {
                 cContent = read(cSettingsFile)
-                oSettings = json2list(cContent)
+                aSettings = json2list(cContent)
             catch
                 ? "Error loading settings: " + cCatchError
-                oSettings = oDefaults
+                aSettings = aDefaults
             }
         else
             # If settings file doesn't exist, create it with default settings
@@ -48,7 +48,7 @@ class Settings
             if not fexists(currentdir() + "/settings") {
                 system("mkdir " + currentdir() + "/settings")
             }
-            write(cSettingsFile, list2json(oSettings))
+            write(cSettingsFile, list2json(aSettings))
             return true
         catch
             ? "Error saving settings: " + cCatchError
@@ -57,14 +57,14 @@ class Settings
     }
 
     func getKey cKey {
-        if oSettings[cKey] != NULL {
-            return oSettings[cKey]
+        if aSettings[cKey] != NULL {
+            return aSettings[cKey]
         }
-        return oDefaults[cKey]
+        return aDefaults[cKey]
     }
 
     func setKey cKey, xValue {
-        oSettings[cKey] = xValue
+        aSettings[cKey] = xValue
         save()
     }
 
@@ -113,7 +113,7 @@ class SettingsDialog from QDialog
         oMainLayout.addWidget(oHeaderLabel)
 
         # Create tabs with styling
-        oTabs = new QTabWidget()
+        oTabs = new QTabWidget(this)
         oTabs.setStyleSheet("
             QTabWidget::pane {
                 border: 1px solid #bdc3c7;
@@ -157,8 +157,8 @@ class SettingsDialog from QDialog
         oThemeLayout.addWidget(oThemeLabel)
 
         oThemeCombo = new QComboBox(oGeneralTab) {
-            addItem("Light")
-            addItem("Dark")
+            addItem("Light", 0)
+            addItem("Dark", 1)
             setStyleSheet("padding: 8px; font-size: 14px; border: 1px solid #bdc3c7; border-radius: 4px;")
         }
         oThemeLayout.addWidget(oThemeCombo)
@@ -180,9 +180,9 @@ class SettingsDialog from QDialog
         oLangLayout.addWidget(oLangLabel)
 
         oLanguageCombo = new QComboBox(oGeneralTab) {
-            addItem("English")
-            addItem("Arabic")
-            addItem("French")
+            addItem("English", 0)
+            addItem("Arabic", 1)
+            addItem("French", 2)
             setStyleSheet("padding: 8px; font-size: 14px; border: 1px solid #bdc3c7; border-radius: 4px;")
         }
         oLangLayout.addWidget(oLanguageCombo)
@@ -337,10 +337,10 @@ class SettingsDialog from QDialog
         oLogLayout.addWidget(oLogLabel)
 
         oLogLevelCombo = new QComboBox(oAdvancedTab) {
-            addItem("Debug")
-            addItem("Info")
-            addItem("Warning")
-            addItem("Error")
+            addItem("Debug", 0)
+            addItem("Info", 1)
+            addItem("Warning", 2)
+            addItem("Error", 3)
             setStyleSheet("padding: 8px; font-size: 14px; border: 1px solid #bdc3c7; border-radius: 4px;")
         }
         oLogLayout.addWidget(oLogLevelCombo)
@@ -404,14 +404,14 @@ class SettingsDialog from QDialog
         oSettings.loadSetting()
 
         # Load values
-        oThemeCombo.setCurrentText(proper(oSettings.getKey("theme")))
-        oLanguageCombo.setCurrentText(proper(oSettings.getKey("language")))
+        oThemeCombo.setCurrentText(oSettings.getKey("theme"))
+        oLanguageCombo.setCurrentText(oSettings.getKey("language"))
         oUpdateIntervalSpin.setValue(oSettings.getKey("updateInterval"))
         oMaxAgentsSpin.setValue(oSettings.getKey("maxAgents"))
         oMaxCrewsSpin.setValue(oSettings.getKey("maxCrews"))
         oMaxTasksSpin.setValue(oSettings.getKey("maxTasksPerAgent"))
         oBackupIntervalSpin.setValue(oSettings.getKey("backupInterval"))
-        oLogLevelCombo.setCurrentText(proper(oSettings.getKey("logLevel")))
+        oLogLevelCombo.setCurrentText(oSettings.getKey("logLevel"))
         oNotificationsCheck.setChecked(oSettings.getKey("notifications"))
     }
 

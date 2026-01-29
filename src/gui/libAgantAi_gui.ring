@@ -24,3 +24,7 @@ Load "../core/reinforcement.ring" # does not depend on any other component
 Load "../core/flow.ring"       # depends on state
 Load "../core/agent.ring"      # depends on llm, task, memory, tools
 Load "../core/crew.ring"       # depends on agent
+
+# Initialize the system
+serverdebug = false # true
+aDebag = [:error, :info]

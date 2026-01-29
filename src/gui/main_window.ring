@@ -1234,7 +1234,7 @@ class MainWindow from qMainWindow {
     }
 
     func addCrew oCrewData {
-        oCrew = new Crew(oCrewData[:name])
+        oCrew = new Crew("oCrew",oCrewData[:name], oCrewData[:members][1])
         for agent in oCrewData[:members] {
             oCrew.addMember(agent)
         }
@@ -1259,10 +1259,10 @@ class MainWindow from qMainWindow {
     func updateAgentsList {
         oAgentsList.clear()
         for agent in aAgents {
-            oItem = new QTreeWidgetItem(oAgentsList)
+            oItem = new QTreeWidgetItem()
             oItem.setText(0, agent.getName())
             oItem.setText(1, agent.getRole())
-            oItem.setText(2, agent.getState())
+            oItem.setText(2, agent.getStatus())
             oItem.setText(3, "" + len(agent.getTaskHistory()))
             oItem.setText(4, "" + agent.getEnergyLevel())
             oItem.setText(5, "" + agent.getConfidenceLevel())
@@ -1272,7 +1272,7 @@ class MainWindow from qMainWindow {
     func updateCrewsList {
         oCrewsList.clear()
         for crew in aCrews {
-            oItem = new QTreeWidgetItem(oCrewsList)
+            oItem = new QTreeWidgetItem()
             oItem.setText(0, crew.getName())
             oItem.setText(1, "" + len(crew.getMembers()))
             oItem.setText(2, "" + len(crew.getActiveTasks()))
@@ -1283,7 +1283,7 @@ class MainWindow from qMainWindow {
     func updateTasksList {
         oTasksList.clear()
         for task in aTasks {
-            oItem = new QTreeWidgetItem(oTasksList)
+            oItem = new QTreeWidgetItem()
             oItem.setText(0, task.getId())
             oItem.setText(1, task.getName())
             if task.getAssignedTo() != NULL {
