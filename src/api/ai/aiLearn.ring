@@ -5,8 +5,8 @@
 */
 
 /*
-الدالة: aiLearn
-الوصف: تدريب نموذج الذكاء الاصطناعي
+Function: aiLearn
+Description: Train AI model
 */
 func aiLearn
     try {

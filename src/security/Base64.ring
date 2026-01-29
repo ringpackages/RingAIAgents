@@ -1,6 +1,6 @@
 /*
 Class: Base64
-Description: توفير دوال ترميز وفك ترميز Base64
+Description: Provides encoding and decoding functions for Base64
 */
 load "stdlibcore.ring"
 
@@ -14,25 +14,25 @@ if ismainsourcefile() {
 
 class Base64 {
     func init {
-        # جدول ترميز Base64
+        # Base64 encoding table
         cBase64Chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
     }
 
-    # تشفير البيانات بترميز Base64
+    # Encode data using Base64
     func encode cData {
         if cData = "" return "" ok
         
         cResult = ""
         aBytes = []
         
-        # تحويل النص إلى بايتات
+        # Convert text to bytes
         for i = 1 to len(cData)
             aBytes + ascii(substr(cData, i, 1))
         next
         
-        # معالجة كل 3 بايتات معاً
+        # Process every 3 bytes
         for i = 1 to len(aBytes) step 3
-            # تجميع البايتات
+            # Group bytes
             n1 = aBytes[i]
             n2 = 0
             n3 = 0
@@ -45,13 +45,13 @@ class Base64 {
                 n3 = aBytes[i + 2]
             ok
             
-            # تحويل 3 بايتات إلى 4 أحرف Base64
+            # Convert 3 bytes to 4 Base64 characters
             b1 = n1 >> 2
             b2 = ((n1 & 3) << 4) | (n2 >> 4)
             b3 = ((n2 & 15) << 2) | (n3 >> 6)
             b4 = n3 & 63
             
-            # إضافة الأحرف إلى النتيجة
+            # Add characters to result
             cResult += substr(cBase64Chars, b1 + 1, 1)
             cResult += substr(cBase64Chars, b2 + 1, 1)
             
@@ -71,14 +71,14 @@ class Base64 {
         return cResult
     }
 
-    # فك تشفير البيانات من ترميز Base64
+    # Decode data from Base64
     func decode cData {
         if cData = "" return "" ok
         
         cResult = ""
         aValues = []
         
-        # تحويل الأحرف إلى قيم
+        # Convert characters to values
         for i = 1 to len(cData)
             if substr(cData, i, 1) = "=" break ok
             
@@ -90,9 +90,9 @@ class Base64 {
             next
         next
         
-        # معالجة كل 4 قيم معاً
+        # Process every 4 values
         for i = 1 to len(aValues) step 4
-            # استخراج القيم
+            # Extract values
             n1 = aValues[i]
             n2 = 0
             n3 = 0
@@ -110,12 +110,12 @@ class Base64 {
                 n4 = aValues[i + 3]
             ok
             
-            # تحويل 4 قيم إلى 3 بايتات
+            # Convert 4 values to 3 bytes
             b1 = (n1 << 2) | (n2 >> 4)
             b2 = ((n2 & 15) << 4) | (n3 >> 2)
             b3 = ((n3 & 3) << 6) | n4
             
-            # إضافة البايتات إلى النتيجة
+            # Add bytes to result
             cResult += char(b1)
             
             if i + 2 <= len(aValues)
@@ -130,7 +130,7 @@ class Base64 {
         return cResult
     }
 
-    # تشفير ملف بترميز Base64
+    # Encode file using Base64
     func encodeFile cFilePath {
         if not fexists(cFilePath)
             raise("File not found: " + cFilePath)
@@ -139,7 +139,7 @@ class Base64 {
         return encode(read(cFilePath))
     }
 
-    # فك تشفير ملف من ترميز Base64
+    # Decode file from Base64
     func decodeToFile cBase64Data, cOutputPath {
         cData = decode(cBase64Data)
         write(cOutputPath, cData)

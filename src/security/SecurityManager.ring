@@ -4,10 +4,10 @@ load "jsonlib.ring" */
 
 /*
 Class: SecurityManager
-Description: المدير الرئيسي لأمان النظام
+Description: The main security manager for the system
 */
 class SecurityManager {
-    # المتغيرات الأساسية
+    # The basic variables
     
     
 
@@ -22,7 +22,7 @@ class SecurityManager {
         oCSRF = new CSRFProtection
         oXSS = new XSSProtection
         
-        # توليد مفتاح التشفير وvector التهيئة
+        # Generate encryption key and initialization vector
         cSecretKey = oEncryption.generateKey(32)  # AES-256
         cIV = oEncryption.generateIV(16)
     }
@@ -36,14 +36,14 @@ class SecurityManager {
     }
 
     func authenticate cUsername, cPassword, cMFACode {
-        # التحقق من صحة المدخلات
+        # Validate inputs
         if not oValidator.validateUsername(cUsername) return false ok
         if not oValidator.validatePassword(cPassword) return false ok
         
-        # المصادقة
+        # Authentication
         bResult = oAuth.authenticate(cUsername, cPassword, cMFACode)
         
-        # تسجيل محاولة المصادقة
+        # Log authentication attempt
         if bResult {
             oAudit.log("Authentication", cUsername, "Successful authentication")
         
@@ -99,13 +99,13 @@ class SecurityManager {
     }
 
     func checkIntrusion cIP, cRequest {
-        # تنظيف المدخلات
+        # Sanitize inputs
         cRequest = oValidator.sanitizeText(cRequest)
         
-        # التحقق من الاختراق
+        # Analyze for intrusion
         bResult = oIntrusion.analyze(cIP, cRequest)
         
-        # تسجيل النشاط المشبوه
+        # Log suspicious activity
         if not bResult {
             oAudit.log("Intrusion", cIP, "Suspicious activity detected: " + cRequest)
         }
@@ -113,7 +113,7 @@ class SecurityManager {
         return bResult
     }
     
-    # تنظيف الجلسات والتوكنات منتهية الصلاحية
+    # Clean up expired sessions and tokens
     func cleanupExpiredData {
         oSession.cleanExpiredSessions()
         oToken.cleanExpiredTokens()
@@ -137,7 +137,7 @@ class SecurityManager {
 
 /*
 Class: EncryptionManager
-Description: مدير التشفير
+Description: Encryption manager
 */
 /*class EncryptionManager {
     func encrypt cData, cKey, cIV {
@@ -167,7 +167,7 @@ Description: مدير التشفير
 
 /*
 Class: AuthenticationManager
-Description: مدير المصادقة
+Description: Authentication manager
 */
 class AuthenticationManager {
     
@@ -185,13 +185,13 @@ class AuthenticationManager {
 
     func validateCredentials cUsername, cPassword {
         cHashedPassword = hashPassword(cPassword)
-        # التحقق من قاعدة البيانات
-        # يجب تنفيذ الاتصال بقاعدة البيانات والتحقق من كلمة المرور
-        return true  # مؤقتاً
+        # The database check
+        # Should implement database connection and password verification
+        return true  # Temporary
     }
 
     func validateMFA cUsername, cMFACode {
-        # التحقق من رمز المصادقة الثنائية
+        # Validate MFA code
         return oMFA.verifyCode(cUsername, cMFACode)
     }
 
@@ -204,7 +204,7 @@ class AuthenticationManager {
     }
 
     func checkPermission cUser, cPermission {
-        # التحقق من صلاحيات المستخدم
+        # Check user permissions
         return oRBAC.checkPermission(cUser, cPermission)
     }
     private 
@@ -219,19 +219,19 @@ class AuthenticationManager {
 
 /*
 Class: AuditManager
-Description: مدير سجل المراجعة
+Description: Audit manager
 */
 class AuditManager {
     
 
     func init {
-        # إنشاء مجلد السجلات إذا لم يكن موجوداً
+        # Create log directory if it doesn't exist
         cLogDir = oConfig.cAuditLogPath
         if not dirExists(cLogDir) {
             system("mkdir -p " + cLogDir)
         }
         
-        # تحديد مسار ملف السجل
+        # Set log file path
         cLogFile = cLogDir + "audit_" + date() + ".log"
     }
 
@@ -244,24 +244,24 @@ class AuditManager {
     private func writeLog oLogEntry {
         cLogText = oLogEntry.toString() + nl
         
-        # تشفير السجل إذا كان مطلوباً
+        # Encrypt log if required
         if oConfig.bEncryptLogs {
             oEncryption = new EncryptionManager
             cKey = oEncryption.generateKey(32)
             cIV = oEncryption.generateIV(16)
             cLogText = oEncryption.encrypt(cLogText, cKey, cIV)
             
-            # حفظ مفتاح التشفير في ملف منفصل
+            #   Save encryption key in a separate file
             write(cLogFile + ".key", cKey + nl + cIV)
         }
         
-        write(cLogFile, cLogText, 1)  # الكتابة في نهاية الملف
+        write(cLogFile, cLogText, 1)  # Write to the end of the file
     }
     
-    # التحقق من وجود مجلد
+    # Check if directory exists
     private func dirExists cDir {
-        # يجب تنفيذ التحقق من وجود المجلد بشكل صحيح
-        return true  # مؤقتاً
+        # Must implement directory existence check
+        return true  # Temporary
     }
     private 
         cLogFile = "audit.log"
@@ -289,7 +289,7 @@ class LogEntry {
 
 /*
 Class: IntrusionPreventionManager
-Description: مدير منع الاختراق
+Description: Intrusion prevention manager
 */
 class IntrusionPreventionManager {
     
@@ -321,15 +321,15 @@ class IntrusionPreventionManager {
 
         aBlockedIPs = []
         nMaxAttempts = 5
-        nTimeWindow = 300  # 5 دقائق
+        nTimeWindow = 300  # 5 minutes
         aRequestLog = []
         oConfig
     
     func isIPBlocked cIP {
-        # التحقق من قائمة العناوين المحظورة المحلية
+        # Check local blocked IP list
         if find(aBlockedIPs, cIP) > 0 return true ok
         
-        # التحقق من قائمة العناوين المحظورة في التكوين
+        # Check blocked IP list in configuration
         if find(oConfig.aBlockedIPs, cIP) > 0 return true ok
         
         return false
@@ -339,7 +339,7 @@ class IntrusionPreventionManager {
         if not isIPBlocked(cIP) {
             aBlockedIPs + cIP
             
-            # تسجيل حظر العنوان
+            # Log IP block
             oAudit = new AuditManager
             oAudit.log("Security", "System", "IP blocked: " + cIP)
         }
@@ -357,18 +357,18 @@ class IntrusionPreventionManager {
     }
 
     func containsSuspiciousPatterns cRequest {
-        # التحقق من أنماط الاختراق المعروفة
+        # Check for known attack patterns
         for pattern in oConfig.aSuspiciousPatterns {
             if substr(lower(cRequest), lower(pattern)) > 0 {
                 return true
             }
         }
         
-        # التحقق من أنماط إضافية
-        if substr(cRequest, "../") > 0 return true  ok # محاولة الوصول إلى الدليل الأعلى
-        if substr(cRequest, "cmd=") > 0 return true  ok # محاولة تنفيذ أوامر
-        if substr(cRequest, "exec=") > 0 return true  ok # محاولة تنفيذ أوامر
-        if substr(cRequest, "system(") > 0 return true  ok # محاولة تنفيذ أوامر
+        # Check for additional patterns
+        if substr(cRequest, "../") > 0 return true  ok # Attempt to access parent directory
+        if substr(cRequest, "cmd=") > 0 return true  ok # Attempt to execute commands
+        if substr(cRequest, "exec=") > 0 return true  ok # Attempt to execute commands
+        if substr(cRequest, "system(") > 0 return true  ok # Attempt to execute commands
         
         return false
     }
@@ -376,20 +376,20 @@ class IntrusionPreventionManager {
     func logRequest cIP, cRequest {
         aRequestLog + [cRequest, cIP, date() + " " + time()]
         
-        # تنظيف سجل الطلبات القديمة
+        # Clean old requests
         cleanOldRequests()
     }
 
     func logSuspiciousActivity cIP, cRequest {
-        # تسجيل النشاط المشبوه
+        # Log suspicious activity
         oAudit = new AuditManager
         oAudit.log("Security", cIP, "Suspicious request: " + cRequest)
         
-        # إضافة العنوان إلى قائمة المراقبة
+        # Add IP to watchlist
         addToWatchlist(cIP)
     }
     
-    # تنظيف سجل الطلبات القديمة
+    # Clean old requests
     func cleanOldRequests {
         for i = len(aRequestLog) to 1 step -1 {
             if timeDiff(aRequestLog[i][3], date() + " " + time()) > nTimeWindow {
@@ -398,8 +398,8 @@ class IntrusionPreventionManager {
         }
     }
     
-    # إضافة عنوان IP إلى قائمة المراقبة
+    # Add IP to watchlist
     func addToWatchlist cIP {
-        # يمكن تنفيذ آلية لمراقبة عناوين IP المشبوهة
+        # Can implement watchlist functionality
     }
 }

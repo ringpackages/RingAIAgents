@@ -5,8 +5,8 @@
 */
 
 /*
-الدالة: configureAlerts
-الوصف: تكوين إعدادات التنبيهات
+function: configureAlerts
+description: Configure alerts
 */
 func configureAlerts
     try {

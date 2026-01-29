@@ -5,22 +5,22 @@
 */
 
 /*
-الدالة: showUsers
-الوصف: عرض قائمة المستخدمين
+function: showUsers
+description: Display the users list
 */
 import System.Web
 
 func showUsers
     oPage = New BootStrapWebPage {
         Title = "RingAI Users List"
-        # تحميل الستايلات المشتركة
+        # load the common styles
         loadCommonStyles(oPage)
-        # تحميل ستايلات خاصة بالصفحة
+        # load the page specific styles
         html("<link rel='stylesheet' href='/static/css/tables.css'>")
         html("<script src='/static/js/common.js'></script>")
         html("<script src='/static/js/users.js'></script>")
 
-        # إضافة الهيدر
+        # add the header
         getHeader(oPage)
 
         div {
@@ -178,7 +178,7 @@ func showUsers
             }
         }
 
-        # إضافة الفوتر
+        # add the footer
         getFooter(oPage)
 
         noOutput()

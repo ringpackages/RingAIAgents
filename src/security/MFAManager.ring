@@ -3,7 +3,7 @@ load "internetlib.ring" */
 
 /*
 Class: MFAManager
-Description: مدير المصادقة متعددة العوامل
+Description: Manager for multi-factor authentication
 */
 class MFAManager {
     
@@ -15,7 +15,7 @@ class MFAManager {
         oSMSService = new SMSService
     }
 
-    # إنشاء وإرسال رمز المصادقة
+    # Generate and send code
     func generateAndSendCode cUser, cMethod {
         cCode = generateCode()
         cExpiry = calculateExpiry()
@@ -33,7 +33,7 @@ class MFAManager {
         return true
     }
 
-    # التحقق من صحة الرمز
+    # Verify code
     func verifyCode cUser, cCode {
         for aCode in aActiveCodes {
             if aCode[1] = cUser and aCode[2] = cCode {
@@ -53,7 +53,7 @@ class MFAManager {
     oSMSService
     aActiveCodes = []
 
-    # توليد رمز عشوائي
+    # Generate random code
     func generateCode {
         cCode = ""
         for i = 1 to oConfig.nMFACodeLength {
@@ -62,36 +62,36 @@ class MFAManager {
         return cCode
     }
 
-    # حساب وقت انتهاء صلاحية الرمز
+    # Calculate expiry time
     func calculateExpiry {
         return date() + " " + time() + oConfig.nMFACodeExpiry
     }
 
-    # إرسال الرمز عبر البريد الإلكتروني
+    # Send code via email
     func sendEmailCode cUser, cCode {
-        cSubject = "رمز المصادقة"
-        cBody = "رمز المصادقة الخاص بك هو: " + cCode
+        cSubject = "MFACode"
+        cBody = "MFACode: " + cCode
         oEmailService.send(cUser, cSubject, cBody)
     }
 
-    # إرسال الرمز عبر الرسائل القصيرة
+    # Send code via SMS
     func sendSMSCode cUser, cCode {
-        cMessage = "رمز المصادقة: " + cCode
+        cMessage = "MFACode: " + cCode
         oSMSService.send(cUser, cMessage)
     }
 
-    # توليد رمز لتطبيق المصادقة
+    # Generate code for authenticator app
     func generateAuthenticatorCode cUser {
         cSecret = generateTOTPSecret()
         return generateQRCode(cUser, cSecret)
     }
 
-    # التحقق من انتهاء صلاحية الرمز
+    # Check if code has expired
     func isCodeExpired cExpiry {
         return timeDiff(cExpiry, date() + " " + time()) <= 0
     }
 
-    # إزالة الرمز المستخدم
+    # Remove used code
     func removeCode cUser {
         for i = 1 to len(aActiveCodes) {
             if aActiveCodes[i][1] = cUser {
@@ -104,13 +104,13 @@ class MFAManager {
 
 /*
 Class: EmailService
-Description: خدمة إرسال البريد الإلكتروني
+Description: Email service for sending emails
 SendEmail(cSMTPServer,cEmail,cPassword,
             cSender,cReceiver,cCC,cTitle,cContent)
 */
 class EmailService {
     func send cTo, cSubject, cBody {
-        # تنفيذ إرسال البريد
+        # Execute email sending
         SendEmail(oConfig.cSMTPServer, oConfig.cEmail, oConfig.cPassword,
             oConfig.cEmail, cTo, "", cSubject, cBody)
         return true
@@ -119,11 +119,11 @@ class EmailService {
 
 /*
 Class: SMSService
-Description: خدمة إرسال الرسائل القصيرة
+Description: SMS service for sending SMS messages
 */
 class SMSService {
     func send cTo, cMessage {
-        # تنفيذ إرسال الرسالة
+        # Execute SMS sending
         return true
     }
 }

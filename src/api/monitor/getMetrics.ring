@@ -5,8 +5,8 @@
 */
 
 /*
-الدالة: getMetrics
-الوصف: الحصول على مقاييس الأداء
+function: getMetrics
+description: Get metrics
 */
 func getMetrics
     try {

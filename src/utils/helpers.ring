@@ -16,10 +16,10 @@ if isMainSourceFile() {
 */
 
 /*
-الدالة: validateString
-الوصف: التحقق من أن المتغير هو نص
-المعاملات: cStr - المتغير المراد التحقق منه
-العائد: true إذا كان المتغير نصًا، false إذا لم يكن
+function validateString
+Description: Check if the variable is a string
+Parameters: cStr - The variable to check
+Return: true if the variable is a string, false if not
 */
 func validateString cStr
     if type(cStr) != "STRING"{
@@ -28,10 +28,10 @@ func validateString cStr
     return true
 
 /*
-الدالة: validateNumber
-الوصف: التحقق من أن المتغير هو رقم
-المعاملات: nNum - المتغير المراد التحقق منه
-العائد: true إذا كان المتغير رقمًا، false إذا لم يكن
+function validateNumber
+Description: Check if the variable is a number
+Parameters: nNum - The variable to check
+Return: true if the variable is a number, false if not
 */
 func validateNumber nNum
     if type(nNum) != "NUMBER"{
@@ -40,10 +40,10 @@ func validateNumber nNum
     return true
 
 /*
-الدالة: validateList
-الوصف: التحقق من أن المتغير هو قائمة
-المعاملات: aList - المتغير المراد التحقق منه
-العائد: true إذا كان المتغير قائمة، false إذا لم يكن
+function validateList
+Description: Check if the variable is a list
+Parameters: aList - The variable to check
+Return: true if the variable is a list, false if not
 */
 func validateList aList
     if type(aList) != "LIST"{
@@ -52,19 +52,19 @@ func validateList aList
     return true
 
 /*
-الدالة: isList
-الوصف: التحقق من أن المتغير هو قائمة (دالة مختصرة)
-المعاملات: aList - المتغير المراد التحقق منه
-العائد: true إذا كان المتغير قائمة، false إذا لم يكن
+function isList
+Description: Check if the variable is a list
+Parameters: aList - The variable to check
+Return: true if the variable is a list, false if not
 */
 func isList aList
     return type(aList) = "LIST"
 
 /*
-الدالة: validateObject
-الوصف: التحقق من أن المتغير هو كائن
-المعاملات: oObj - المتغير المراد التحقق منه
-العائد: true إذا كان المتغير كائنًا، false إذا لم يكن
+function validateObject
+Description: Check if the variable is an object
+Parameters: oObj - The variable to check
+Return: true if the variable is an object, false if not
 */
 func validateObject oObj
     if type(oObj) != "OBJECT"{
@@ -73,10 +73,10 @@ func validateObject oObj
     return true
 
 /*
-الدالة: validateBoolean
-الوصف: التحقق من أن المتغير هو قيمة منطقية (0 أو 1)
-المعاملات: bValue - المتغير المراد التحقق منه
-العائد: true إذا كان المتغير قيمة منطقية، false إذا لم يكن
+function validateBoolean
+Description: Check if the variable is a boolean
+Parameters: bValue - The variable to check
+Return: true if the variable is a boolean, false if not
 */
 func validateBoolean bValue
     if type(bValue) != "NUMBER" or (bValue != 0 and bValue != 1){
@@ -85,23 +85,27 @@ func validateBoolean bValue
     return true
 
 /*
-الدالة: sanitizeSQL
-الوصف: تنظيف النص قبل استخدامه في استعلامات SQL
+function sanitizeSQL
+Description: Sanitize text before using it in SQL queries
+Parameters: cText - The text to sanitize
+Return: The sanitized text
 */
 func sanitizeSQL cText
     if cText = NULL {
         return ""
     }
 
-    # استبدال الأحرف الخاصة
+    # Replace special characters
     cText = replaceString(cText, "'", "''")
     cText = replaceString(cText, "\\", "\\\\")
 
     return cText
 
 /*
-الدالة: replaceString
-الوصف: استبدال جميع حالات النص في سلسلة
+function replaceString
+Description: Replace all occurrences of a string in a string
+Parameters: cStr - The string to replace in, cOld - The string to replace, cNew - The string to replace with
+Return: The string with all occurrences of the old string replaced with the new string
 */
 func replaceString cStr, cOld, cNew
     cResult = ""
@@ -117,12 +121,10 @@ func replaceString cStr, cOld, cNew
     return cResult + cStr
 
 /*
-الدالة: join
-الوصف: دمج عناصر القائمة بفاصل محدد
-المعاملات:
-    - aList: القائمة المراد دمج عناصرها
-    - cSeparator: الفاصل بين العناصر
-العائد: نص يحتوي على عناصر القائمة مفصولة بالفاصل المحدد
+function join
+Description: Join list elements with a specified separator
+Parameters: aList - The list to join elements from, cSeparator - The separator between elements
+Return: A string containing the list elements separated by the specified separator
 */
 func join aList, cSeparator
     cResult = ""
@@ -135,25 +137,25 @@ func join aList, cSeparator
     return cResult
 
 /*
-الدالة: iif
-الوصف: دالة شرطية مختصرة (إذا-وإلا)
-المعاملات:
-    - condition: الشرط المراد اختباره
-    - value1: القيمة المرجعة إذا كان الشرط صحيحًا
-    - value2: القيمة المرجعة إذا كان الشرط خاطئًا
-العائد: value1 إذا كان الشرط صحيحًا، value2 إذا كان الشرط خاطئًا
+function iif
+Description: Short-circuit conditional function (if-else)
+Parameters:
+    - condition: The condition to test
+    - value1: The value to return if the condition is true
+    - value2: The value to return if the condition is false
+Return: value1 if the condition is true, value2 if the condition is false
 */
 func iif condition, value1, value2
     if condition return value1 else return value2 ok
     
 
 /*
-الدالة: timeDiff
-الوصف: حساب الفرق الزمني بالثواني بين طابعين زمنيين
-المعاملات:
-    - cTime1: الطابع الزمني الأول بتنسيق "MM/DD/YYYY HH:MM:SS"
-    - cTime2: الطابع الزمني الثاني بتنسيق "MM/DD/YYYY HH:MM:SS"
-العائد: الفرق الزمني بالثواني بين الطابعين الزمنيين
+function timeDiff
+Description: Calculate the time difference in seconds between two timestamps
+Parameters:
+    - cTime1: The first timestamp in "MM/DD/YYYY HH:MM:SS" format
+    - cTime2: The second timestamp in "MM/DD/YYYY HH:MM:SS" format
+Return: The time difference in seconds between the two timestamps
 */
 func timeDiff cTime1, cTime2
     # Split timestamps into date and time parts
@@ -183,11 +185,11 @@ func timeDiff cTime1, cTime2
     return (nJulian2 - nJulian1) * 86400 + (nSeconds2 - nSeconds1)
 
 /*
-الدالة: gregorian2julian
-الوصف: تحويل التاريخ الميلادي إلى يوم جوليان
-المعاملات:
-    - cDate: التاريخ الميلادي بتنسيق "MM/DD/YYYY"
-العائد: رقم اليوم الجوليان المقابل للتاريخ الميلادي
+function gregorian2julian
+Description: Convert a Gregorian date to a Julian day number
+Parameters:
+    - cDate: The Gregorian date in "MM/DD/YYYY" format
+Return: The Julian day number corresponding to the Gregorian date
 */
 func gregorian2julian cDate
     aDate = split(cDate, "/")
@@ -212,11 +214,11 @@ func gregorian2julian cDate
            nDay + nB - 1524.5
 
 /*
-الدالة: julian2gregorian
-الوصف: تحويل يوم جوليان إلى تاريخ ميلادي
-المعاملات:
-    - nJulian: رقم اليوم الجوليان
-العائد: التاريخ الميلادي بتنسيق "MM/DD/YYYY"
+function julian2gregorian
+Description: Convert a Julian day number to a Gregorian date
+Parameters:
+    - nJulian: The Julian day number
+Return: The Gregorian date in "MM/DD/YYYY" format
 */
 func julian2gregorian nJulian {
     nJulian = floor(nJulian + 0.5)
@@ -238,18 +240,18 @@ func julian2gregorian nJulian {
         nYear--
     }
     
-    # تنسيق التاريخ بالشكل MM/DD/YYYY
+    # Format the date as MM/DD/YYYY
     return padLeft(string(nMonth), "0", 2) + "/" + 
            padLeft(string(nDay), "0", 2) + "/" + 
            string(nYear)
 }
 
 /*
-الدالة: URLEncode
-الوصف: ترميز النص لاستخدامه في عناوين URL
-المعاملات:
-    - cStr: النص المراد ترميزه
-العائد: النص المرمز بتنسيق URL
+function URLEncode
+Description: Encode a string for use in URLs
+Parameters:
+    - cStr: The string to encode
+Return: The encoded string in URL format
 */
 func URLEncode cStr
     cResult = ""
@@ -264,12 +266,12 @@ func URLEncode cStr
     return cResult
 
 /*
-الدالة: assert
-الوصف: التحقق من صحة شرط واظهار رسالة ملونة
-المعاملات:
-    - bCondition: الشرط المراد التحقق منه
-    - cMessage: الرسالة المراد عرضها
-العائد: لا شيء، تعرض رسالة ملونة في وحدة التحكم
+function assert
+Description: Check the truth of a condition and display a colored message
+Parameters:
+    - bCondition: The condition to test
+    - cMessage: The message to display
+Return: Nothing, displays a colored message in the console
 */
 func assert(bCondition, cMessage)
     if not bCondition
@@ -279,23 +281,23 @@ func assert(bCondition, cMessage)
     ok
 
 /*
-الدالة: seeColored
-الوصف: عرض نص ملون في وحدة التحكم
-المعاملات:
-    - CfgColor: لون النص الأمامي
-    - bgColorolor: لون الخلفية
-    - text: النص المراد عرضه
-العائد: النص الملون
+function seeColored
+Description: Display a colored text in the console
+Parameters:
+    - CfgColor: The foreground color of the text
+    - bgColorolor: The background color of the text
+    - text: The text to display
+Return: The colored text
 */
 func seeColored CfgColor, bgColorolor, text
     cc_print(CfgColor | bgColorolor, text)
 
 /*
-الدالة: generateUniqueId
-الوصف: إنشاء معرف فريد
-المعاملات:
-    - cName: بادئة المعرف (مثل "agent_" أو "team_")
-العائد: معرف فريد بتنسيق UUID
+function generateUniqueId
+Description: Generate a unique identifier
+Parameters:
+    - cName: The prefix of the identifier (e.g. "agent_" or "team_")
+Return: A unique identifier in UUID format
 */
 func generateUniqueId cName
         cUUID =	"xxx_xxxx_4xxx_yxxx_xxxx"
@@ -311,12 +313,12 @@ func generateUniqueId cName
         return cName + "_" + cUUID
 
 /*
-الدالة: methodExists
-الوصف: التحقق من وجود دالة في كائن
-المعاملات:
-    - oObject: الكائن المراد التحقق منه
-    - cMethodName: اسم الدالة المراد التحقق من وجودها
-العائد: true إذا كانت الدالة موجودة، false إذا لم تكن
+function methodExists
+Description: Check if a method exists in an object
+Parameters:
+    - oObject: The object to check
+    - cMethodName: The name of the method to check
+Return: true if the method exists, false otherwise
 */
 func methodExists oObject, cMethodName
     if type(oObject) != "OBJECT" or type(cMethodName) != "STRING" {
@@ -328,13 +330,13 @@ func methodExists oObject, cMethodName
     return false
 
 /*
-الدالة: logger
-الوصف: تسجيل رسائل في وحدة التحكم بألوان مختلفة حسب نوع الرسالة
-المعاملات:
-    - cComponent: اسم المكون الذي يقوم بالتسجيل
-    - cMessage: الرسالة المراد تسجيلها
-    - cStatus: نوع الرسالة (:error, :warning, :success, :info, :save)
-العائد: لا شيء، تعرض رسالة ملونة في وحدة التحكم أو تحفظها في ملف
+function logger
+Description: Log messages in the console with different colors based on message type
+Parameters:
+    - cComponent: The name of the component that performs the logging
+    - cMessage: The message to log
+    - cStatus: The type of the message (:error, :warning, :success, :info, :save)
+Return: Nothing, displays a colored message in the console or saves it to a file
 */
 func logger cComponent, cMessage, cStatus
     if ServerDebug = false {
@@ -378,11 +380,11 @@ func logger cComponent, cMessage, cStatus
 
 
 /*
-الدالة: ToCode
-الوصف: تحويل قائمة أو كائن أو أي هيكل بيانات إلى تمثيل نصي منسق بالألوان
-المعاملات:
-    - aInput: هيكل البيانات المراد تحويله
-العائد: تمثيل نصي منسق بالألوان لهيكل البيانات
+function ToCode
+Description: Convert a list, object, or any data structure to a formatted string with colors
+Parameters:
+    - aInput: The data structure to convert
+Return: A formatted string with colors representing the data structure
 */
 func ToCode(aInput)
     cCode = cc_print(CC_FG_CYAN|CC_BG_BLACK,"[")
@@ -432,8 +434,11 @@ func ToCode(aInput)
 
 
 /*
-الدالة: safeJSON2List
-الوصف: تحليل JSON بشكل آمن مع معالجة الأخطاء
+function safeJSON2List
+Description: Safely parse JSON with error handling
+Parameters:
+    - cJSON: The JSON string to parse
+Return: The parsed list or NULL on error
 */
 func safeJSON2List cJSON
     try {
@@ -444,16 +449,16 @@ func safeJSON2List cJSON
             return NULL
         }
 
-        # تنظيف النص من أي أحرف غير مرئية
+        # Clean the text from any invisible characters
         cJSON = trim(cJSON)
 
-        # التحقق من أن النص يبدأ بـ { أو [
+        # Check if the text starts with { or [
         if not (left(cJSON, 1) = "{" or left(cJSON, 1) = "[") {
             ? logger("safeJSON2List", "JSON does not start with { or [: " + left(cJSON, 10), :error)
             return NULL
         }
 
-        # محاولة تحليل JSON
+        # Try to parse JSON
         aResult = JSON2List(cJSON)
 
         if isList(aResult) {
@@ -471,11 +476,14 @@ func safeJSON2List cJSON
 
 
 /*
-الدالة: sortByTimestamp
-الوصف: ترتيب قائمة حسب الطابع الزمني
+function sortByTimestamp
+Description: Sort a list by timestamp
+Parameters:
+    - aList: The list to sort
+Return: The sorted list
 */
 func sortByTimestamp aList
-    # استخدام خوارزمية الفرز السريع
+    # Using quicksort algorithm
     if len(aList) <= 1 {
         return aList
     }
@@ -495,7 +503,7 @@ func sortByTimestamp aList
         }
     }
 
-    # ترتيب تنازلي (الأحدث أولاً)
+    # Sort in descending order (newest first)
     aResult = sortByTimestamp(aGreater)
     for item in aEqual { add(aResult, item) }
     aTemp = sortByTimestamp(aLess)

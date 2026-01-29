@@ -5,26 +5,26 @@
 */
 
 /*
-الدالة: saveTasks
-الوصف: حفظ المهام في قاعدة البيانات
+function: saveTasks
+description: Save tasks to the database
 */
 func saveTasks
     try {
-        # التحقق من وجود مهام
+        # check if there are any tasks
         if len(aTasks) = 0 {
             return false
         }
 
-        # تحديد مسار قاعدة البيانات
+        # define the database path
         cDBPath = "G:\RingAIAgents\db\tasks.db"
 
-        # إنشاء قاعدة بيانات للمهام إذا لم تكن موجودة
+        # create the database if it doesn't exist
         if !fexists(cDBPath) {
             ? logger("saveTasks function", "Creating new database at: " + cDBPath, :info)
             oDatabase = sqlite_init()
             sqlite_open(oDatabase, cDBPath)
 
-            # إنشاء جدول المهام
+            # create the tasks table if it doesn't exist
             cSQL = "CREATE TABLE IF NOT EXISTS tasks (
                     id TEXT PRIMARY KEY,
                     title TEXT,
@@ -41,20 +41,20 @@ func saveTasks
                 )"
             sqlite_execute(oDatabase, cSQL)
 
-            # إغلاق قاعدة البيانات
+            # close the database
             sqlite_close(oDatabase)
         }
 
-        # فتح قاعدة البيانات
+        # open the database
         oDatabase = sqlite_init()
         sqlite_open(oDatabase, cDBPath)
 
-        # حفظ المهام الحالية - استخدام REPLACE INTO بدلاً من حذف ثم إضافة
+        # save the tasks to the database
         ? logger("saveTasks function", "Saving " + len(aTasks) + " tasks to database", :info)
         for i = 1 to len(aTasks) {
             oTask = aTasks[i]
 
-            # تجميع المهام الفرعية
+            # collect the subtasks
             aSubtasks = []
             for oSubtask in oTask.getSubtasks() {
                 add(aSubtasks, [
@@ -64,26 +64,26 @@ func saveTasks
                 ])
             }
 
-            # تحويل المهام الفرعية إلى JSON
+            # convert the subtasks to JSON
             cSubtasks = list2json(aSubtasks)
 
-            # تنظيف النصوص من علامات الاقتباس المزدوجة
+            # clean the texts from double quotes
             cTitle = substr(oTask.getTitle(), '"', '""')
             cDescription = substr(oTask.getDescription(), '"', '""')
             cContext = substr(oTask.getContext(), '"', '""')
 
-            # الحصول على معرف العميل المسند إليه المهمة
+            # get the assigned agent ID
             cAssignedTo = ""
             if oTask.getAssignedTo() != NULL {
                 cAssignedTo = oTask.getAssignedTo().getID()
             }
 
-            # تسجيل البيانات للتصحيح
+            # log the task data for debugging
             ? logger("saveTasks function", "Saving task: " + oTask.getId(), :info)
             ? logger("saveTasks function", "Title: " + cTitle, :info)
             ? logger("saveTasks function", "Status: " + oTask.getStatus(), :info)
 
-            # إضافة المهمة إلى قاعدة البيانات أو تحديثها إذا كانت موجودة
+            # add the task to the database or update it if it exists
             cSQL = "REPLACE INTO tasks (id, title, description, status, priority, assigned_to, start_time, due_time, context, progress, subtasks) VALUES (
                     '" + oTask.getId() + "',
                     '" + cTitle + "',
@@ -100,7 +100,7 @@ func saveTasks
             sqlite_execute(oDatabase, cSQL)
         }
 
-        # إغلاق قاعدة البيانات
+        # close the database
         sqlite_close(oDatabase)
 
         ? logger("saveTasks function", "Tasks saved successfully", :info)

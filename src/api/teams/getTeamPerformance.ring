@@ -5,8 +5,8 @@
 */
 
 /*
-الدالة: getTeamPerformance
-الوصف: الحصول على تقرير أداء الفريق
+function: getTeamPerformance
+description: Get team performance report
 */
 func getTeamPerformance
     try {
@@ -14,7 +14,7 @@ func getTeamPerformance
         if nID > 0 and nID <= len(aTeams) {
             oCrew = aTeams[nID]
 
-            # جمع إحصائيات الأداء
+            # collect the performance statistics
             aStats = oCrew.getPerformanceStats()
 
             ? logger("getTeamPerformance function", "Team performance retrieved successfully", :info)

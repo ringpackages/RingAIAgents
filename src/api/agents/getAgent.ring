@@ -5,18 +5,18 @@
 */
 
 /*
-الدالة: getAgent
-الوصف: الحصول على معلومات عميل محدد
+Function: getAgent
+Description: Get agent details
 */
 func getAgent
     try {
-        # التحقق من وجود معرف في المعلمات
+        # Check if agent ID exists in parameters
         cAgentID = ""
 
-        # طباعة معلومات الطلب للتصحيح
+        # Print request method for debugging
         ? "Request method: " + oServer.getRequestMethod()
 
-        # محاولة الحصول على المعرف من معلمات URL
+        # Try to get agent ID from URL parameters
         try {
             cAgentID = oServer.match(1)
             ? logger("getAgent function", "Using URL match parameter: " + cAgentID, :info)
@@ -24,7 +24,7 @@ func getAgent
             ? logger("getAgent function", "Error getting URL match parameter", :error)
         }
 
-        # إذا كان المعرف فارغًا، حاول الحصول عليه من معلمات الاستعلام
+        # If ID is empty, try to get it from query parameters
         if cAgentID = NULL or len(cAgentID) = 0 {
             try {
                 cAgentID = oServer.variable("agent_id")
@@ -36,16 +36,16 @@ func getAgent
             }
         }
 
-        # لا نحتاج إلى هذا القسم بعد الآن لأننا استخدمنا oServer.variable
+        # No longer needed since we use oServer.variable
 
-        # إذا كان المعرف لا يزال فارغًا، أرجع خطأ
+        # If ID is still empty, return error
         if cAgentID = NULL or len(cAgentID) = 0 {
             ? logger("getAgent function", "No agent_id found in any parameter", :error)
             oServer.setContent('{"status":"error","message":"No agent ID provided"}', "application/json")
             return
         }
 
-        # التحقق من وجود معرف صالح
+        # Check if ID is valid
         if cAgentID = NULL or len(cAgentID) = 0 {
             oServer.setContent('{"status":"error","message":"Empty agent ID provided"}', "application/json")
             return
@@ -53,11 +53,11 @@ func getAgent
 
         ? logger("getAgent function", "Getting agent with ID: " + cAgentID, :info)
 
-        # البحث عن العميل بالمعرف
+        # Search for agent by ID
         oAgent = NULL
         ? logger("getAgent function", "Searching for agent with ID: " + cAgentID + " in " + len(aAgents) + " agents", :info)
 
-        # تحويل المعرف إلى نص للمقارنة
+        # Convert ID to string for comparison
         cAgentID = string(cAgentID)
 
         for i = 1 to len(aAgents) {
@@ -72,12 +72,12 @@ func getAgent
         }
 
         if isObject(oAgent) {
-            # الحصول على المهارات
+            # Get skills
             cSkills = "[]"
             try {
                 aSkills = oAgent.getSkills()
                 if islist(aSkills) {
-                    # تحويل المهارات إلى قائمة من الكائنات التي تحتوي على خاصية name
+                    # Convert skills to list of objects containing name property
                     aFormattedSkills = []
                     for aSkill in aSkills {
                         if isList(aSkill) and aSkill[:name] != NULL {
@@ -87,11 +87,11 @@ func getAgent
                     cSkills = list2JSON(aFormattedSkills)
                 }
             catch
-                # تجاهل الأخطاء
+                # Ignore errors
                 ? logger("getAgent function", "Error getting skills: " + cCatchError, :error)
             }
 
-            # الحصول على السمات الشخصية
+            # Get personality traits
             cPersonality = []
             try {
                 aPersonality = oAgent.getPersonalityTraits()
@@ -99,10 +99,10 @@ func getAgent
                     cPersonality = list2JSON(aPersonality)
                 }
             catch
-                # تجاهل الأخطاء
+                # Ignore errors
             }
 
-            # الحصول على نموذج اللغة
+            # Get language model
             cLanguageModel = ""
             try {
                 cLanguageModel = oAgent.getLanguageModel()
@@ -110,7 +110,7 @@ func getAgent
                 cLanguageModel = "gemini-1.5-flash"
             }
 
-            # الحصول على مستوى الطاقة
+            # Get energy level
             nEnergy = 0
             try {
                 nEnergy = oAgent.getEnergyLevel()
@@ -118,7 +118,7 @@ func getAgent
                 nEnergy = 100
             }
 
-            # الحصول على مستوى الثقة
+            # Get confidence level
             nConfidence = 0
             try {
                 nConfidence = oAgent.getConfidenceLevel()

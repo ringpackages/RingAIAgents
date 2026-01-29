@@ -5,8 +5,8 @@
 */
 
 /*
-الدالة: login
-الوصف: تسجيل دخول المستخدم
+function: login
+description: User login
 */
 func login
     try {

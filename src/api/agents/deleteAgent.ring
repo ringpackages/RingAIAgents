@@ -5,18 +5,18 @@
 */
 
 /*
-الدالة: deleteAgent
-الوصف: حذف عميل
+Function: deleteAgent
+Description: Delete an agent
 */
 func deleteAgent
     try {
-        # التحقق من وجود معرف في المعلمات
+        # Check if agent ID exists in parameters
         cAgentID = ""
 
-        # طباعة معلومات الطلب للتصحيح
+        # Print request method for debugging
         ? "Request method: " + oServer.getRequestMethod()
 
-        # محاولة الحصول على المعرف من معلمات URL
+        # Try to get agent ID from URL parameters
         try {
             cAgentID = oServer.match(1)
             ? logger("deleteAgent function", "Using URL match parameter: " + cAgentID, :info)
@@ -24,7 +24,7 @@ func deleteAgent
             ? logger("deleteAgent function", "Error getting URL match parameter", :error)
         }
 
-        # إذا كان المعرف فارغًا، حاول الحصول عليه من معلمات الاستعلام
+        # If ID is empty, try to get it from query parameters
         if cAgentID = NULL or len(cAgentID) = 0 {
             try {
                 cAgentID = oServer.variable("agent_id")
@@ -36,14 +36,14 @@ func deleteAgent
             }
         }
 
-        # إذا كان المعرف لا يزال فارغًا، أرجع خطأ
+        # If ID is still empty, return error
         if cAgentID = NULL or len(cAgentID) = 0 {
             ? logger("deleteAgent function", "No agent_id found in any parameter", :error)
             oServer.setContent('{"status":"error","message":"No agent ID provided"}', "application/json")
             return
         }
 
-        # التحقق من وجود معرف صالح
+        # Check if ID is valid
         if cAgentID = NULL or len(cAgentID) = 0 {
             oServer.setContent('{"status":"error","message":"Empty agent ID provided"}', "application/json")
             return
@@ -51,11 +51,11 @@ func deleteAgent
 
         ? logger("deleteAgent function", "Deleting agent with ID: " + cAgentID, :info)
 
-        # البحث عن العميل بالمعرف
+        # Search for agent by ID
         nIndex = 0
         oAgentToDelete = NULL
 
-        # تحويل المعرف إلى نص للمقارنة
+        # Convert ID to string for comparison
         cAgentID = string(cAgentID)
 
         for i = 1 to len(aAgents) {
@@ -70,19 +70,19 @@ func deleteAgent
         }
 
         if isObject(oAgentToDelete) {
-            # إزالة العميل من المراقب
+            # Remove agent from monitor
             try {
                 if isObject(oMonitor) {
                     oMonitor.unregisterAgent(oAgentToDelete)
                 }
             catch
-                # تجاهل الأخطاء
+                # Ignore errors
             }
 
-            # حذف العميل
+            # Remove agent
             del(aAgents, nIndex)
 
-            # حفظ العملاء في قاعدة البيانات
+            # Save agents to database
             saveAgents()
 
             ? logger("deleteAgent function", "Agent deleted successfully", :info)

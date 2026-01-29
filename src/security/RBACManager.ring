@@ -1,6 +1,6 @@
 /*
 Class: RBACManager
-Description: مدير التحكم في الوصول المستند إلى الأدوار
+Description: Manager for access control based on roles
 */
 class RBACManager {
     
@@ -10,20 +10,20 @@ class RBACManager {
         loadRoles()
     }
 
-    # تحميل الأدوار من التكوين
+    # Load roles from configuration 
     func loadRoles {
         for role in oConfig.aRoles {
             addRole(role[1], role[2][:permissions], role[2][:level])
         }
     }
 
-    # إضافة دور جديد
+    # Add new role
     func addRole cRole, aPermissions, nLevel {
         aUserRoles + [cRole, nLevel]
         aRolePermissions + [cRole, aPermissions]
     }
 
-    # إضافة صلاحية لدور
+    # Add permission to role
     func addPermissionToRole cRole, cPermission {
         for i = 1 to len(aRolePermissions) {
             if aRolePermissions[i][1] = cRole {
@@ -34,7 +34,7 @@ class RBACManager {
         return false
     }
 
-    # التحقق من صلاحية المستخدم
+    # Check user permission
     func checkPermission cUser, cPermission {
         cRole = getUserRole(cUser)
         if cRole = "" return false ok
@@ -47,7 +47,7 @@ class RBACManager {
         return false
     }
 
-    # الحصول على مستوى صلاحية المستخدم
+    # Get user level
     func getUserLevel cUser {
         cRole = getUserRole(cUser)
         for role in aUserRoles {
@@ -64,18 +64,18 @@ class RBACManager {
     aUserRoles = []
     aRolePermissions = []
 
-    # الحصول على دور المستخدم
+    # Get user role
     func getUserRole cUser {
-        # يجب تنفيذ الاتصال بقاعدة البيانات
+        # Should implement database connection
             
-        return "user"  # مؤقتاً
+        return "user"  # temporary
     }
     
 }
 
 /*
 Class: Permission
-Description: كائن الصلاحية
+Description: Permission object
 */
 class Permission {
     cName
@@ -97,7 +97,7 @@ class Permission {
 
 /*
 Class: Role
-Description: كائن الدور
+Description: Role object
 */
 class Role {
     cName

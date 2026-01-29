@@ -6,16 +6,16 @@
 
 
 /*
-الدالة: getChatHistory
-الوصف: استرجاع تاريخ المحادثات من الذاكرة
+Function: getChatHistory
+Description: Get chat history from memory
 */
 func getChatHistory
     try {
-        # استخراج البيانات من الطلب
+        # Extract data from request
         nAgentId = 0
         cConversationId = NULL
 
-        # محاولة استخراج البيانات من معلمات الطلب
+        # Try extracting data from request parameters
         cAgentId = oServer["agent_id"]
         if cAgentId != NULL and cAgentId != "" {
             nAgentId = number(cAgentId)
@@ -25,7 +25,7 @@ func getChatHistory
         cConversationId = oServer["conversation_id"]
         ? logger("getChatHistory function", "Conversation ID from params: " + cConversationId, :info)
 
-        # إذا لم يتم العثور على البيانات في المعلمات، حاول استخراجها من جسم الطلب
+        # If data not found in parameters, try extracting from request body
         try {
             cBody = oServer["request"]
             ? logger("getChatHistory function", "Trying to get request content", :info)
@@ -34,12 +34,12 @@ func getChatHistory
                 ? logger("getChatHistory function", "Request body length: " + len(cBody), :info)
                 ? logger("getChatHistory function", "Request body: " + cBody, :info)
 
-                # محاولة تحليل البيانات كـ JSON
+                # Try parsing data as JSON
                 try {
-                    # تنظيف النص من أي أحرف غير مرئية
+                    # Clean text from any invisible characters
                     cBody = trim(cBody)
 
-                    # التحقق من أن النص يبدأ بـ { أو [
+                    # Check if text starts with { or [
                     if left(cBody, 1) = "{" or left(cBody, 1) = "[" {
                         aBody = JSON2List(cBody)
                         ? logger("getChatHistory function", "Body parsed as JSON", :info)
@@ -75,12 +75,12 @@ func getChatHistory
             ? logger("getChatHistory function", "Error getting request content: " + cCatchError, :error)
         }
 
-        # استرجاع المحادثات من الذاكرة
+        # Get conversations from memory
         aConversations = []
 
-        # استرجاع محادثة محددة بواسطة معرفها
+        # Get conversation by ID
         if cConversationId != NULL {
-            # استخدام دالة retrieveById للحصول على المحادثة
+            # Use retrieveById function to get the conversation
             aResult = oMemory.retrieveById(cConversationId)
 
             if aResult != NULL {
@@ -93,18 +93,18 @@ func getChatHistory
                     :response = aMetadata[:response]
                 ])
             }
-        # استرجاع المحادثات لعميل محدد أو جميع المحادثات
+        # Get conversations for a specific customer or all conversations
         else
-            # استخدام دالة retrieve للحصول على المحادثات
-            # نستخدم دالة retrieve بدلاً من retrieveByTag لأن الأخيرة تتطلب معلمتين
+            # Use retrieve function to get conversations
+            # We use retrieve instead of retrieveByTag because the latter requires two parameters
             aResults = oMemory.retrieve("chat", "", 50)
             ? logger("getChatHistory function", "Retrieved " + len(aResults) + " chat entries", :info)
 
-            # معالجة النتائج
+            # Process the results
             for aResult in aResults {
                 aMetadata = aResult[:metadata]
 
-                # التحقق من معرف العميل إذا كان محدداً
+                # Check if customer ID is specified
                 if nAgentId > 0 {
                     if aMetadata[:agent_id] = nAgentId {
                         add(aConversations, [
@@ -127,31 +127,31 @@ func getChatHistory
             }
         }
 
-        # ترتيب المحادثات حسب التاريخ (الأحدث أولاً)
+        # Sort conversations by date (newest first)
         aConversations = sortByTimestamp(aConversations)
 
-        # إنشاء كائن JSON للاستجابة
+        # Create JSON object for response
         aResponseObj = [
             :status = "success",
             :conversations = aConversations
         ]
 
-        # تحويل الكائن إلى سلسلة JSON
+        # Convert object to JSON string
         cResponseJson = list2JSON(aResponseObj)
 
-        # إرجاع النتائج
+        # Return results
         ? logger("getChatHistory function", "Chat history retrieved successfully", :info)
         oServer.setContent(cResponseJson, "application/json")
     catch
         ? logger("getChatHistory function", "Error retrieving chat history: " + cCatchError, :error)
 
-        # إنشاء كائن JSON للخطأ
+        # Create JSON object for error
         aErrorObj = [
             :status = "error",
             :message = cCatchError
         ]
 
-        # تحويل الكائن إلى سلسلة JSON
+        # Convert object to JSON string
         cErrorJson = list2JSON(aErrorObj)
 
         oServer.setContent(cErrorJson, "application/json")

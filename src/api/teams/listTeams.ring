@@ -5,8 +5,8 @@
 */
 
 /*
-الدالة: listTeams
-الوصف: الحصول على قائمة الفرق
+function: listTeams
+description: Get list of teams
 */
 func listTeams
     try {
@@ -15,11 +15,11 @@ func listTeams
 
         aTeamsList = []
 
-        # تجميع معلومات الفرق من المتغير العام aTeams
+        # collect team information from the global variable aTeams
         for i = 1 to len(aTeams) {
             oCrew = aTeams[i]
 
-            # تجميع المعلومات الأساسية
+            # collect the basic information
             aTeamInfo = [
                 :id = i,
                 :name = oCrew.getName(),
@@ -30,43 +30,43 @@ func listTeams
             add(aTeamsList, aTeamInfo)
         }
 
-        # إذا لم يكن هناك فرق، إنشاء فرق افتراضية
+        # create default teams if no teams are found
         if len(aTeamsList) = 0 and len(aAgents) > 0 {
             ? logger("listTeams function", "No teams found, creating default teams", :info)
 
-            # إنشاء فريق التطوير
+            # create the development team
             oDevTeam = new Crew("Development Team", "Build software")
 
-            # تعيين قائد الفريق (العميل الأول)
+            # set the team leader (first customer)
             oDevTeam.setLeader(aAgents[1])
 
-            # إضافة أعضاء الفريق
+            # add team members
             for i = 2 to len(aAgents) {
                 oDevTeam.addMember(aAgents[i])
             }
 
-            # إضافة الفريق إلى القائمة العامة
+            # add the team to the general list
             add(aTeams, oDevTeam)
 
-            # إضافة الفريق إلى قائمة الاستجابة
+            # add the team to the response list
             add(aTeamsList, [
                 :id = 1,
                 :name = oDevTeam.getName(),
                 :objective = oDevTeam.getObjective()
             ])
 
-            # إنشاء فريق الدعم
+            # create the support team
             oSupportTeam = new Crew("Support Team", "Help users")
 
-            # تعيين قائد الفريق (العميل الأول)
+            # set the team leader (first customer)
             if len(aAgents) >= 1 {
                 oSupportTeam.setLeader(aAgents[1])
             }
 
-            # إضافة الفريق إلى القائمة العامة
+            # add the team to the general list
             add(aTeams, oSupportTeam)
 
-            # إضافة الفريق إلى قائمة الاستجابة
+            # add the team to the response list
             add(aTeamsList, [
                 :id = 2,
                 :name = oSupportTeam.getName(),
@@ -74,7 +74,7 @@ func listTeams
             ])
         }
 
-        # تحويل القائمة إلى JSON
+        # convert the list to JSON
         cJSON = '{"teams":' + list2json(aTeamsList) + '}'
 
         ? logger("listTeams function", "Teams list retrieved successfully", :info)

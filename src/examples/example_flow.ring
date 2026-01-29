@@ -2,73 +2,73 @@ Load "G:\RingAIAgents\src\libAgentAi.ring"
 
 
 
-# مثال للاستخدام
+# Example usage
 func main {
-    # تدفق معالجة النصوص
+    # Text processing flow
     oTextFlow = new TextGenerationFlow()
 
-    # تدفق المهام
+    # Task flow
     oTaskFlow = new TaskFlow()
 
-    # تدفق متوازي
+    # Parallel flow
     oParallelFlow = new ParallelFlow()
 
-    ? "=== بدء تنفيذ التدفقات ==="
+    ? "=== Starting flow execution ==="
 
-    ? "--- تدفق النصوص ---"
+    ? "--- Text flow ---"
     oTextFlow.execute()
-    ? "النتيجة: " + oTextFlow.oState.getText("result")
+    ? "Result: " + oTextFlow.oState.getText("result")
 
-    ? "--- تدفق المهام ---"
+    ? "--- Task flow ---"
     oTaskFlow.execute()
-    ? "حالة المهمة: "
+    ? "Task status: "
     see oTaskFlow.oState.getList("task")
 
-    ? "--- تدفق متوازي ---"
+    ? "--- Parallel flow ---"
     oParallelFlow.execute()
-    ? "المجموع النهائي: " + oParallelFlow.oState.getNumber("total")
+    ? "Final total: " + oParallelFlow.oState.getNumber("total")
 
-    ? "--- تدفق معالجة البيانات ---"
+    ? "--- Data processing flow ---"
     oDataFlow = new DataProcessingFlow()
     oDataFlow.execute()
-    ? "نتيجة المعالجة: " + oDataFlow.oState.getNumber("result")
+    ? "Processing result: " + oDataFlow.oState.getNumber("result")
     if len(oDataFlow.oState.getList("errors")) > 0 {
         ? "سجل الأخطاء:"
         ? oDataFlow.oState.getText("error_log")
     }
 
-    ? "--- تدفق سير العمل ---"
+    ? "--- Workflow flow ---"
     aWorkflowFlow = new WorkflowFlow()
     aWorkflowFlow.execute()
-    ? "حالة سير العمل النهائية:"
+    ? "Final workflow status:"
     see aWorkflowFlow.oState.getList("workflow")
 }
 
 
 
 /*
-الكلاس: TextGenerationFlow
-الوصف: مثال لتدفق يقوم بتوليد وتحليل النصوص
+Class: TextGenerationFlow
+Description: Example flow that generates and analyzes text
 */
 class TextGenerationFlow from Flow {
 
     func init {
         super.init()
-        # تسجيل الدوال
+        # Registering methods
         registerMethod("generatetext")
         //registerMethod("analyzetext")
         //registerMethod("formatresults")
 
-        # بدء التدفق
+        # Starting the flow
         start("generatetext")
     }
 
     func generatetext {
-        oState.setText("text", "مرحباً بكم في نظام تدفقات الرينج!")
+        oState.setText("text", "Welcome to the Ring Flows System!")
         ctext = oState.getText("text")
         emit("text_generated", ctext)
 
-        # إنشاء ثريد للتحليل
+        # Creating thread for analysis
         oThreads.createThread(1, super +".analyzetext(ctext)")
         oThreads.setThreadName(1, "TextAnalysis")
     }
@@ -78,21 +78,21 @@ class TextGenerationFlow from Flow {
         oState.setNumber("word_count", nWords)
         emit("analysis_complete", nWords)
 
-        # إنشاء ثريد للتنسيق
+        # Creating thread for formatting
         oThreads.createThread(2, super +".formatresults(" + nWords + ")")
         oThreads.setThreadName(2, "ResultFormat")
     }
 
     func formatresults nCount {
-        cResult = "تم تحليل النص: عدد الكلمات = " + nCount
+        cResult = "Text analysis result: Number of words = " + nCount
         oState.setText("result", cResult)
         emit("formatting_complete", cResult)
     }
 }
 
 /*
-الكلاس: TaskFlow
-الوصف: مثال لتدفق يدير المهام مع شروط متعددة
+Class: TaskFlow
+Description: Example flow that manages tasks with multiple conditions
 */
 class TaskFlow from Flow {
 
@@ -104,14 +104,14 @@ class TaskFlow from Flow {
 
     func createTask {
         oTask = [
-            :title = "مهمة جديدة",
-            :priority = "عالي",
-            :status = "جديد"
+            :title = "New Task",
+            :priority = "High",
+            :status = "New"
         ]
         oState.setList("task", oTask)
         emit("task_created", oTask)
 
-        # تنفيذ متوازي للمهام
+        # Executing tasks in parallel
         oThreads.createThread(1, super +".assignTask(oTask)")
         oThreads.createThread(2, super +".validateTask(oTask)")
         oThreads.setThreadName(1, "TaskAssignment")
@@ -119,7 +119,7 @@ class TaskFlow from Flow {
     }
 
     func assignTask oTask {
-        oTask[:assignee] = "أحمد"
+        oTask[:assignee] = "John Doe"
         oState.setList("task", oTask)
         emit("task_assigned", oTask)
     }
@@ -133,8 +133,8 @@ class TaskFlow from Flow {
 }
 
 /*
-الكلاس: ParallelFlow
-الوصف: مثال لتدفق يعمل بشكل متوازي
+Class: ParallelFlow
+Description: Example flow that executes operations in parallel
 */
 class ParallelFlow from Flow {
 
@@ -145,27 +145,27 @@ class ParallelFlow from Flow {
     }
 
     func startParallel {
-        # تنفيذ العمليات بشكل متوازي
+        # Executing operations in parallel
         oThreads.createThread(1, super +".process1()")
         oThreads.createThread(2, super +".process2()")
         oThreads.setThreadName(1, "Process1")
         oThreads.setThreadName(2, "Process2")
 
-        # انتظار اكتمال العمليات
+        # Waiting for completion of operations
         oThreads.joinAllThreads()
 
-        # دمج النتائج
+        # Combining results
         combineResults()
     }
 
     func process1 {
-        # محاكاة معالجة
+        # Simulating processing
         oState.setNumber("result1", 10)
         emit("process1_complete", 10)
     }
 
     func process2 {
-        # محاكاة معالجة
+        # Simulating processing
         oState.setNumber("result2", 20)
         emit("process2_complete", 20)
     }
@@ -178,8 +178,8 @@ class ParallelFlow from Flow {
 }
 
 /*
-الكلاس: DataProcessingFlow
-الوصف: مثال لتدفق يقوم بمعالجة البيانات مع التعامل مع الأخطاء
+Class: DataProcessingFlow
+Description: Example flow that processes data and handles errors
 */
 class DataProcessingFlow from Flow {
 
@@ -194,11 +194,11 @@ class DataProcessingFlow from Flow {
             aData = [1, 2, "three", 4, 5]
             oState.setList("raw_data", aData)
 
-            # إنشاء ثريد للتحقق من البيانات
+            # Creating thread for data validation
             oThreads.createThread(1, super +".validateData(aData)")
             oThreads.setThreadName(1, "DataValidation")
         catch
-            emit("data_error", "خطأ في تحميل البيانات: " + cCatchError)
+            emit("data_error", "Error loading data: " + cCatchError)
         }
     }
 
@@ -206,29 +206,29 @@ class DataProcessingFlow from Flow {
         aValidData = []
         aErrors = []
 
-        # قفل الوصول للبيانات المشتركة
+        #   Locking the mutex
         oThreads.lockMutex(nMutexId)
 
         for item in aData {
             if type(item) = "NUMBER" {
                 add(aValidData, item)
             else
-                add(aErrors, "قيمة غير صالحة: " + item)
+                add(aErrors, "Invalid value: " + item)
             }
         }
 
         oState.setList("valid_data", aValidData)
         oState.setList("errors", aErrors)
 
-        # تحرير القفل
+        # Unlocking the mutex
         oThreads.unlockMutex(nMutexId)
 
         if len(aErrors) > 0 {
-            # معالجة الأخطاء في ثريد منفصل
+            # Handling errors in a separate thread
             oThreads.createThread(2, super +".handleErrors(aErrors)")
             oThreads.setThreadName(2, "ErrorHandler")
         else
-            # معالجة البيانات الصحيحة في ثريد منفصل
+            # Processing valid data in a separate thread
             oThreads.createThread(3, super +".processData(aValidData)")
             oThreads.setThreadName(3, "DataProcessor")
         }
@@ -244,7 +244,7 @@ class DataProcessingFlow from Flow {
     }
 
     func handleErrors aErrors {
-        cErrorLog = "تم اكتشاف " + len(aErrors) + " أخطاء:"
+        cErrorLog = "Detected " + len(aErrors) + " errors:"
         for error in aErrors {
             cErrorLog += nl + "- " + error
         }
@@ -254,8 +254,8 @@ class DataProcessingFlow from Flow {
 }
 
 /*
-الكلاس: WorkflowFlow
-الوصف: مثال لتدفق يدير سير العمل مع حالات مختلفة
+    Class: WorkflowFlow
+    Description: Example flow that manages workflows with different states
 */
 class WorkflowFlow from Flow {
 
@@ -270,7 +270,7 @@ class WorkflowFlow from Flow {
             :status = "new",
             :steps = ["review", "approve", "implement"],
             :currentStep = 1,
-            :assignee = "مدير المشروع"
+            :assignee = "John Doe"
         ]
         oState.setList("workflow", aWorkflow)
         emit("workflow_initialized", aWorkflow)
@@ -289,7 +289,7 @@ class WorkflowFlow from Flow {
     func approve aWorkflow {
         listen(or_(["review_complete", "review_rejected"]), "approve")
 
-        # محاكاة قرار الموافقة
+        # Simulating approval decision
         if random(2) = 1 {
             aWorkflow[:status] = "approved"
             aWorkflow[:currentStep] = 2

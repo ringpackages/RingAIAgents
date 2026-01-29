@@ -3,7 +3,7 @@ load "jsonlib.ring" */
 
 /*
 Class: TokenManager
-Description: مدير توكنات JWT
+Description: Manager JWT tokens
 */
 class TokenManager {
     
@@ -12,28 +12,28 @@ class TokenManager {
         oBase64 = new Base64()
         oHmac = new Hmac()
 
-        # تحديد مفتاح التوقيع
+        # Set the signing key
         cSigningKey = oConfig.cJWTSigningKey
         if cSigningKey = "" {
             cSigningKey = randbytes(32)
         }
         
-        # تحديد مدة صلاحية التوكن (بالثواني)
+        # Set token expiry duration (in seconds)
         nTokenExpiry = oConfig.nJWTExpiry
         
-        # تهيئة قائمة التوكنات الملغاة
+        # Initialize list of revoked tokens
         aRevokedTokens = []
     }
     
-    # إنشاء توكن JWT
+    # Create JWT token
     func createToken cUserId, cUserRole, aCustomClaims {
-        # إنشاء الرأس (Header)
+        # Create header
         aHeader = [
             :alg = "HS256",
             :typ = "JWT"
         ]
         
-        # إنشاء البيانات (Payload)
+        # Create payload
         aPayload = [
             :sub = cUserId,
             :role = cUserRole,
@@ -41,31 +41,31 @@ class TokenManager {
             :exp = timestamp() + nTokenExpiry
         ]
         
-        # إضافة البيانات المخصصة
+        # Add custom claims
         if type(aCustomClaims) = "LIST" {
             for claim in aCustomClaims {
                 aPayload[claim[1]] = claim[2]
             }
         }
         
-        # تشفير الرأس والبيانات
+        # Encode header and payload
         cEncodedHeader = this.oBase64.encode(list2json(aHeader))
         cEncodedPayload = this.oBase64.encode(list2json(aPayload))
         cEncodedSignature = this.oBase64.encode(this.oHmac.hmac_sha256(cEncodedHeader + "." + cEncodedPayload, cSigningKey))
-        # إنشاء التوقيع
+        # Create signature
         cSignature = createSignature(cEncodedHeader + "." + cEncodedPayload)
         
-        # إنشاء التوكن
+        # Create token
         cToken = cEncodedHeader + "." + cEncodedPayload + "." + cEncodedSignature
         
         return cToken
     }
     
-    # التحقق من صحة التوكن
+    # Validate JWT token
     func validateToken cToken {
         if cToken = "" return false ok
         
-        # تقسيم التوكن إلى أجزاء
+        # Split token into parts
         aTokenParts = split(cToken, ".")
         if len(aTokenParts) != 3 return false ok
         
@@ -73,24 +73,24 @@ class TokenManager {
         cEncodedPayload = aTokenParts[2]
         cSignature = aTokenParts[3]
         
-        # التحقق من التوقيع
+        # Verify signature
         cExpectedSignature = createSignature(cEncodedHeader + "." + cEncodedPayload)
         if cSignature != cExpectedSignature return false ok
         
-        # فك تشفير البيانات
+        # Decrypt data
         cDecodedPayload = this.oBase64.decode(cEncodedPayload)
         aPayload = json2list(cDecodedPayload)
         
-        # التحقق من انتهاء صلاحية التوكن
+        # Check if token has expired
         if ComperTimeTemp(aPayload[:exp], "<", timestamp()) return false ok
         
-        # التحقق من عدم إلغاء التوكن
+        # Check if token has been revoked
         if isTokenRevoked(cToken) return false ok
         
         return aPayload
     }
     
-    # إلغاء التوكن
+    # Revoke token
     func revokeToken cToken {
         if not isTokenRevoked(cToken) {
             aRevokedTokens + cToken
@@ -99,28 +99,28 @@ class TokenManager {
         return false
     }
     
-    # التحقق من إلغاء التوكن
+    # Check if token has been revoked
     func isTokenRevoked cToken {
         return find(aRevokedTokens, cToken) > 0
     }
     
-    # تنظيف التوكنات منتهية الصلاحية
+    # Clean expired tokens
     func cleanExpiredTokens {
         for i = len(aRevokedTokens) to 1 step -1 {
             cToken = aRevokedTokens[i]
             
-            # تقسيم التوكن إلى أجزاء
+            # Split token into parts
             aTokenParts = split(cToken, ".")
             if len(aTokenParts) != 3 {
                 del(aRevokedTokens, i)
                 loop
             }
             
-            # فك تشفير البيانات
+            # Decrypt data
             cDecodedPayload = this.oBase64.decode(aTokenParts[2])
             aPayload = json2list(cDecodedPayload)
             
-            # التحقق من انتهاء صلاحية التوكن
+            # Check if token has expired
             if aPayload[:exp] < timestamp() {
                 del(aRevokedTokens, i)
             }
@@ -135,12 +135,12 @@ class TokenManager {
     aRevokedTokens
     oBase64
     oHmac
-    # إنشاء التوقيع
+    # Create signature
     func createSignature cData {
         return this.oBase64.encode(this.oHmac.hmac_sha256(cData, cSigningKey))
     }
     
-    # الحصول على الطابع الزمني الحالي
+    # Get current timestamp
     func timestamp {
         aTimeList = timelist()
         cDate = aTimeList[6] + "/" + aTimeList[8] + "/" + aTimeList[19]  # MM/DD/YYYY
@@ -150,7 +150,7 @@ class TokenManager {
         return cDate + " " + cTime
     }
 
-    # المقارنة بين الأوقات
+    # Compare times
     func ComperTimeTemp cTime1, operation, cTime2 {
         nSeconds1 = Time2Seconds(cTime1)
         nSeconds2 = Time2Seconds(cTime2)
@@ -165,25 +165,25 @@ class TokenManager {
         }
     }
 
-    # تحويل الوقت إلى ثواني
+    # Convert time to seconds
     func Time2Seconds cTime {
         try {
             if cTime = NULL return 0 ok
             
-            # تقسيم التاريخ والوقت
+            # Split date and time
             aDateTime = split(cTime, " ")
             if len(aDateTime) != 2 return 0 ok
             
-            # تحويل التاريخ إلى يوم جوليان
+            # Convert date to Julian day
             nJulianDate = gregorian2julian(aDateTime[1])
             
-            # تحويل الوقت إلى ثواني
+            # Convert time to seconds
             aTime = split(aDateTime[2], ":")
             if len(aTime) != 3 return 0 ok
             
-            nSeconds = number(aTime[1]) * 3600 +  # ساعات
-                      number(aTime[2]) * 60 +     # دقائق
-                      number(aTime[3])            # ثواني
+            nSeconds = number(aTime[1]) * 3600 +  # hours
+                      number(aTime[2]) * 60 +     # minutes
+                      number(aTime[3])            # seconds
             
             return (nJulianDate * 86400) + nSeconds
         catch
@@ -191,7 +191,7 @@ class TokenManager {
         }
     }
 
-    # دالة مساعدة لإضافة أصفار في بداية النص
+    # Helper function to add leading zeros to the text
     func padLeft cStr, cPadChar, nWidth {
         while len(cStr) < nWidth {
             cStr = cPadChar + cStr

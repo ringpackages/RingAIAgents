@@ -2,28 +2,28 @@
 
 /*
 Class: PasswordPolicy
-Description: سياسات كلمات المرور القوية
+Description: Password policies
 */
 class PasswordPolicy {
     
     func init {
         oConfig = new SecurityConfig
         
-        # تحميل إعدادات كلمة المرور من التكوين
+        # Load password settings from configuration
         nMinLength = oConfig.nMinPasswordLength
         bRequireSpecialChars = oConfig.bRequireSpecialChars
         bRequireNumbers = oConfig.bRequireNumbers
         bRequireUpperCase = oConfig.bRequireUpperCase
         
-        # تعيين قائمة الأحرف الخاصة
+        # Set list of special characters
         cSpecialChars = "!@#$%^&*()_+-=[]{}|;:,.<>?/"
     }
     
-    # التحقق من قوة كلمة المرور
+    # Validate password strength
     func validatePassword cPassword {
         if cPassword = "" return false
         
-        # التحقق من الطول
+        # Check length
         if len(cPassword) < nMinLength {
             return [
                 :valid = false,
@@ -31,7 +31,7 @@ class PasswordPolicy {
             ]
         }
         
-        # التحقق من وجود أحرف خاصة
+        # Check for special characters
         if bRequireSpecialChars and not containsSpecialChars(cPassword) {
             return [
                 :valid = false,
@@ -39,7 +39,7 @@ class PasswordPolicy {
             ]
         }
         
-        # التحقق من وجود أرقام
+        # Check for numbers
         if bRequireNumbers and not containsNumbers(cPassword) {
             return [
                 :valid = false,
@@ -47,7 +47,7 @@ class PasswordPolicy {
             ]
         }
         
-        # التحقق من وجود أحرف كبيرة
+        # Check for uppercase letters
         if bRequireUpperCase and not containsUpperCase(cPassword) {
             return [
                 :valid = false,
@@ -61,16 +61,16 @@ class PasswordPolicy {
         ]
     }
     
-    # حساب قوة كلمة المرور (من 0 إلى 100)
+    # Calculate password strength (from 0 to 100)
     func calculateStrength cPassword {
         if cPassword = "" return 0
         
         nScore = 0
         
-        # الطول
+        # Length
         nScore += min(len(cPassword) * 4, 40)
         
-        # الأحرف الكبيرة
+        # Uppercase letters
         if containsUpperCase(cPassword) {
             nUpperCount = 0
             for i = 1 to len(cPassword) {
@@ -82,7 +82,7 @@ class PasswordPolicy {
             nScore += min(nUpperCount * 2, 10)
         }
         
-        # الأحرف الصغيرة
+        # Lowercase letters
         if containsLowerCase(cPassword) {
             nLowerCount = 0
             for i = 1 to len(cPassword) {
@@ -94,7 +94,7 @@ class PasswordPolicy {
             nScore += min(nLowerCount * 2, 10)
         }
         
-        # الأرقام
+        # Numbers
         if containsNumbers(cPassword) {
             nNumberCount = 0
             for i = 1 to len(cPassword) {
@@ -106,7 +106,7 @@ class PasswordPolicy {
             nScore += min(nNumberCount * 4, 20)
         }
         
-        # الأحرف الخاصة
+        # Special characters
         if containsSpecialChars(cPassword) {
             nSpecialCount = 0
             for i = 1 to len(cPassword) {
@@ -118,47 +118,47 @@ class PasswordPolicy {
             nScore += min(nSpecialCount * 6, 30)
         }
         
-        # التنوع
+        # Diversity
         nUnique = len(uniqueChars(cPassword))
         nScore += min(nUnique * 2, 10)
         
-        # تقليل النقاط للتكرار
+        # Reduce points for repetition
         nDeduction = calculateRepetitionDeduction(cPassword)
         nScore -= nDeduction
         
-        # تقليل النقاط للأنماط المعروفة
+        # Reduce points for known patterns
         nDeduction = calculatePatternDeduction(cPassword)
         nScore -= nDeduction
         
-        # ضمان أن النتيجة بين 0 و 100
+        # Ensure result is between 0 and 100
         nScore = max(0, min(nScore, 100))
         
         return nScore
     }
     
-    # تجزئة كلمة المرور باستخدام ملح عشوائي
+    # Hash password using random salt
     func hashPassword cPassword {
-        # توليد ملح عشوائي
+        # Generate random salt
         cSalt = randbytes(16)
         cSaltHex = ""
         
-        # تحويل الملح إلى سلسلة سداسية عشرية
+        # Convert salt to hexadecimal string
         for i = 1 to len(cSalt) {
             byte = ascii(cSalt[i])
             cSaltHex += substr("0123456789abcdef", (byte / 16) + 1, 1)
             cSaltHex += substr("0123456789abcdef", (byte % 16) + 1, 1)
         }
         
-        # حساب التجزئة
+        # Calculate hash
         cHash = sha256(cPassword + cSalt)
         
-        # إرجاع الملح والتجزئة معًا
+        # Return salt and hash
         return "$sha256$" + cSaltHex + "$" + cHash
     }
     
-    # التحقق من صحة كلمة المرور
+    # Verify password
     func verifyPassword cPassword, cStoredHash {
-        # تقسيم التجزئة المخزنة
+        # Split stored hash
         aParts = split(cStoredHash, "$")
         
         if len(aParts) != 4 {
@@ -169,7 +169,7 @@ class PasswordPolicy {
         cSaltHex = aParts[3]
         cHash = aParts[4]
         
-        # تحويل الملح من سلسلة سداسية عشرية إلى بايتات
+        # Convert salt from hexadecimal string to bytes
         cSalt = ""
         for i = 1 to len(cSaltHex) step 2 {
             cHexPair = substr(cSaltHex, i, 2)
@@ -188,7 +188,7 @@ class PasswordPolicy {
             cSalt += char(nByte)
         }
         
-        # حساب التجزئة
+        # Calculate hash
         cComputedHash = ""
         
         if cAlgorithm = "sha256" {
@@ -201,7 +201,7 @@ class PasswordPolicy {
             return false
         }
         
-        # التحقق من تطابق التجزئة
+        # Verify hash
         return cComputedHash = cHash
     }
     
@@ -214,7 +214,7 @@ class PasswordPolicy {
     bRequireUpperCase
     cSpecialChars
     
-    # التحقق من وجود أحرف خاصة
+    # Check for special characters
     func containsSpecialChars cText {
         for i = 1 to len(cText) {
             c = substr(cText, i, 1)
@@ -225,7 +225,7 @@ class PasswordPolicy {
         return false
     }
     
-    # التحقق من وجود أرقام
+    # Check for numbers
     func containsNumbers cText {
         for i = 1 to len(cText) {
             c = substr(cText, i, 1)
@@ -236,7 +236,7 @@ class PasswordPolicy {
         return false
     }
     
-    # التحقق من وجود أحرف كبيرة
+    # Check for uppercase letters
     func containsUpperCase cText {
         for i = 1 to len(cText) {
             c = substr(cText, i, 1)
@@ -247,7 +247,7 @@ class PasswordPolicy {
         return false
     }
     
-    # التحقق من وجود أحرف صغيرة
+    # Check for lowercase letters
     func containsLowerCase cText {
         for i = 1 to len(cText) {
             c = substr(cText, i, 1)
@@ -258,7 +258,7 @@ class PasswordPolicy {
         return false
     }
     
-    # الحصول على الأحرف الفريدة
+    # Get unique characters
     func uniqueChars cText {
         aChars = []
         for i = 1 to len(cText) {
@@ -270,11 +270,11 @@ class PasswordPolicy {
         return aChars
     }
     
-    # حساب خصم التكرار
+    # Calculate repetition deduction
     func calculateRepetitionDeduction cPassword {
         nDeduction = 0
         
-        # البحث عن التكرارات
+        # Search for repetitions
         for i = 1 to len(cPassword) - 1 {
             c = substr(cPassword, i, 1)
             cNext = substr(cPassword, i + 1, 1)
@@ -287,11 +287,11 @@ class PasswordPolicy {
         return nDeduction
     }
     
-    # حساب خصم الأنماط
+    # Calculate pattern deduction
     func calculatePatternDeduction cPassword {
         nDeduction = 0
         
-        # البحث عن أنماط معروفة
+        # Search for known patterns
         aPatterns = [
             "123", "234", "345", "456", "567", "678", "789", "890",
             "abc", "bcd", "cde", "def", "efg", "fgh", "ghi", "hij",

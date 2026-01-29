@@ -5,22 +5,22 @@
 */
 
 /*
-الدالة: showChat
-الوصف: عرض واجهة الشات
+function: showChat
+description: Display the chat interface
 */
 import System.Web
 
 func showChat
     oPage = new BootStrapWebPage {
         Title = "RingAI Chat Interface"
-        # تحميل الستايلات المشتركة
+        # load common styles
         loadCommonStyles(oPage)
-        # تحميل ستايلات خاصة بالصفحة
+        # load page specific styles
         html("<link rel='stylesheet' href='/static/css/chat.css'>")
         html("<script src='/static/js/common.js'></script>")
         html("<script src='/static/js/chat.js'></script>")
 
-        # إضافة الهيدر
+        # add header
         getHeader(oPage)
 
         div {
@@ -37,7 +37,7 @@ func showChat
                     }
                 }
 
-                # قسم اختيار العميل والتحكم
+                # add agent selection and control section
                 div {
                     classname = "row mb-3"
                     div {
@@ -50,22 +50,22 @@ func showChat
                                 classname = "form-control"
                                 option { value = "0" text("Default AI Assistant") }
 
-                                # التحقق من وجود عملاء
+                                # check if agents list exists and is not empty
                                 if isList(aAgents) and len(aAgents) > 0 {
                                     ? logger("showChat function", "Number of agents: " + len(aAgents), :info)
 
-                                    # طباعة معلومات عن كل عميل
+                                    # print information about each agent
                                     for i = 1 to len(aAgents) {
                                         ? logger("showChat function", "Agent " + i + " type: " + type(aAgents[i]), :info)
                                         if isObject(aAgents[i]) {
                                             ? logger("showChat function", "Agent " + i + " class: " + classname(aAgents[i]), :info)
                                             ? logger("showChat function", "Checking agent " + i, :info)
 
-                                            # طباعة قائمة بجميع الدوال المتاحة في العميل
+                                            # print list of available methods for the agent
                                             aMethods = methods(aAgents[i])
                                            /// ? logger("showChat function", "Agent " + i + " methods: " + list2str(aMethods), :info)
 
-                                            # لغة الرينج ليست حساسة لحالة الأحرف، لذلك نتحقق من وجود الدوال بأحرف صغيرة
+                                            # check if the agent has the required methods
                                             if methodExists(aAgents[i], "getname") and methodExists(aAgents[i], "getrole") and methodExists(aAgents[i], "getid") {
                                                 cName = aAgents[i].getname()
                                                 cRole = aAgents[i].getrole()
@@ -90,7 +90,7 @@ func showChat
                                 else
                                     ? logger("showChat function", "No agents found or agents list is not valid, adding default agents", :warning)
 
-                                    # إضافة وكلاء افتراضيين للقائمة المنسدلة
+                                    # add default agents to the dropdown list
                                     option {
                                         value = "agent_default_1"
                                         name = "Default Assistant"
@@ -129,7 +129,7 @@ func showChat
                     }
                 }
 
-                # واجهة الشات الرئيسية
+                # add the chat interface
                 div {
                     classname = "row"
                     div {
@@ -201,7 +201,7 @@ func showChat
                     }
                 }
 
-                # قسم تاريخ المحادثات
+                # add the chat history section
                 div {
                     classname = "row mt-4"
                     div {
@@ -223,10 +223,10 @@ func showChat
             }
         }
 
-        # إضافة الفوتر
+        # add the footer
         getFooter(oPage)
 
-        # إضافة سكريبت لتحميل تاريخ المحادثات
+        # add the script to load chat history
         html("<script>
             $(document).ready(function() {
                 // Load chat history

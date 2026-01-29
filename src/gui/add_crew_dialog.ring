@@ -1,6 +1,6 @@
 /*
-الكلاس: AddCrewDialog
-الوصف: نافذة حوار لإضافة فريق جديد
+the class: AddCrewDialog
+the description: a dialog for adding a new crew
 */
 class AddCrewDialog from QDialog
 
@@ -12,18 +12,18 @@ class AddCrewDialog from QDialog
 
     # Data
     aSelectedMembers = []
-    oParent  # مرجع للنافذة الأم
+    oParent  # parent window reference
 
     func init oParent {
         super.init(oParent)
-        this.oParent = oParent  # تخزين مرجع للنافذة الأم
+        this.oParent = oParent  # store parent window reference
         setWindowTitle("Add New Crew")
         setModal(true)
-        setFixedSize(600, 600)  # عرض أكبر وطول أقل
+        setFixedSize(600, 600)  # larger width and smaller height
         initUI()
     }
 
-    # دالة للحصول على النافذة الأم
+    # function to get the parent window
     func getParent {
         return this.oParent
     }
@@ -32,7 +32,7 @@ class AddCrewDialog from QDialog
         # Create main layout
         oMainLayout = new QVBoxLayout()
         oMainLayout.setSpacing(8)
-        oMainLayout.setContentsMargins(15, 10, 15, 10)  # تقليل الهوامش
+        oMainLayout.setContentsMargins(15, 10, 15, 10)  # reduce margins
 
         # Header
         oHeaderLabel = new QLabel(this) {

@@ -2,175 +2,175 @@ load "G:\RingAIAgents\src\security\EncryptionManager.ring"
 
 
 /*
-    اختبار وظائف التشفير والتوقيع
+    Testing encryption and signature functions
 */
 func main {
-    ? "=== اختبار وظائف التشفير والتوقيع ==="
+    ? "=== Testing encryption and signature functions ==="
     
-    # اختبار التشفير وفك التشفير باستخدام AES
+    # Testing AES encryption and decryption
     testAESEncryption()
     
-    # اختبار توليد مفاتيح RSA
+    # Testing RSA key generation
     testRSAKeyGeneration()
     
-    # اختبار التشفير وفك التشفير باستخدام RSA
+    # Testing RSA encryption and decryption
     testRSAEncryption()
     
-    # اختبار توقيع البيانات والتحقق من التوقيع باستخدام RSA
+    # Testing RSA signature and verification
     testRSASignature()
     
-    # اختبار تشفير الملفات وفك تشفيرها
+    # Testing file encryption and decryption
     testFileEncryption()
     
-    # اختبار توقيع الملفات والتحقق من التوقيع
+    # Testing file signature and verification
     testFileSignature()
     
-    ? "=== تم اكتمال الاختبارات بنجاح ==="
+    ? "=== Testing completed successfully ==="
 }
 
-# اختبار التشفير وفك التشفير باستخدام AES
+# Testing AES encryption and decryption
 func testAESEncryption {
-    ? "اختبار التشفير وفك التشفير باستخدام AES..."
+    ? "Testing AES encryption and decryption..."
     
     oEncryption = new EncryptionManager()
     
-    # توليد مفتاح وvector تهيئة
+    # Generate AES key and initialization vector
     cKey = oEncryption.generateKey(32)
     cIV = oEncryption.generateIV(16)
     
-    assert(len(cKey) = 32, "اختبار توليد مفتاح AES")
-    assert(len(cIV) = 16, "اختبار توليد vector تهيئة")
+    assert(len(cKey) = 32, "Testing AES key generation")
+    assert(len(cIV) = 16, "Testing AES initialization vector generation")
     
-    # اختبار التشفير وفك التشفير
-    cData = "بيانات سرية للاختبار"
+    # Testing encryption and decryption
+    cData = "Secret data for testing"
     cEncrypted = oEncryption.encrypte(cData, cKey, cIV)
     cDecrypted = oEncryption.decrypte(cEncrypted, cKey, cIV)
     
-    assert(cDecrypted = cData, "اختبار التشفير وفك التشفير باستخدام AES")
+    assert(cDecrypted = cData, "Testing AES encryption and decryption")
     
-    ? "  تم اختبار التشفير وفك التشفير باستخدام AES بنجاح"
+    ? "  Testing AES encryption and decryption completed successfully"
 }
 
-# اختبار توليد مفاتيح RSA
+# Testing RSA key generation
 func testRSAKeyGeneration {
-    ? "اختبار توليد مفاتيح RSA..."
+    ? "Testing RSA key generation..."
     
     oEncryption = new EncryptionManager
     
-    # توليد زوج مفاتيح RSA
+    # Generate RSA key pair
     aKeyPair = oEncryption.generateRSAKeyPair(2048)
     
-    assert(len(aKeyPair[:private_key]) > 0, "اختبار توليد المفتاح الخاص")
-    assert(len(aKeyPair[:public_key]) > 0, "اختبار توليد المفتاح العام")
+    assert(len(aKeyPair[:private_key]) > 0, "Testing RSA private key generation")
+    assert(len(aKeyPair[:public_key]) > 0, "Testing RSA public key generation")
     
-    # حفظ المفاتيح في ملفات مؤقتة للاختبارات اللاحقة
+    # Save the keys in temporary files for later tests
     write("temp_private_key.pem", aKeyPair[:private_key])
     write("temp_public_key.pem", aKeyPair[:public_key])
     
-    ? "  تم اختبار توليد مفاتيح RSA بنجاح"
+    ? "  Testing RSA key generation completed successfully"
 }
 
-# اختبار التشفير وفك التشفير باستخدام RSA
+# Testing RSA encryption and decryption
 func testRSAEncryption {
-    ? "اختبار التشفير وفك التشفير باستخدام RSA..."
+    ? "Testing RSA encryption and decryption..."
     
     oEncryption = new EncryptionManager
     
-    # قراءة المفاتيح من الملفات المؤقتة
+    # Read the keys from temporary files
     cPrivateKeyPEM = read("temp_private_key.pem")
     cPublicKeyPEM = read("temp_public_key.pem")
     
-    # اختبار التشفير وفك التشفير
-    cData = "بيانات سرية للاختبار باستخدام RSA"
+    # Testing encryption and decryption
+    cData = "Secret data for testing using RSA"
     cEncrypted = oEncryption.encryptRSA(cData, cPublicKeyPEM)
     cDecrypted = oEncryption.decryptRSA(cEncrypted, cPrivateKeyPEM)
     
-    assert(cDecrypted = cData, "اختبار التشفير وفك التشفير باستخدام RSA")
+    assert(cDecrypted = cData, "Testing RSA encryption and decryption")
     
-    ? "  تم اختبار التشفير وفك التشفير باستخدام RSA بنجاح"
+    ? "  Testing RSA encryption and decryption completed successfully"
 }
 
-# اختبار توقيع البيانات والتحقق من التوقيع باستخدام RSA
+# Testing RSA signature and verification
 func testRSASignature {
-    ? "اختبار توقيع البيانات والتحقق من التوقيع باستخدام RSA..."
+    ? "Testing RSA signature and verification..."
     
     oEncryption = new EncryptionManager
     
-    # قراءة المفاتيح من الملفات المؤقتة
+    # Read the keys from temporary files
     cPrivateKeyPEM = read("temp_private_key.pem")
     cPublicKeyPEM = read("temp_public_key.pem")
     
-    # اختبار التوقيع والتحقق من التوقيع
-    cData = "بيانات للتوقيع باستخدام RSA"
+    # Testing signature and verification
+    cData = "Data for testing using RSA"
     cSignature = oEncryption.signRSA(cData, cPrivateKeyPEM)
     bVerified = oEncryption.verifyRSA(cData, cSignature, cPublicKeyPEM)
     
-    assert(bVerified, "اختبار التوقيع والتحقق من التوقيع باستخدام RSA")
+    assert(bVerified, "Testing RSA signature and verification")
     
-    # اختبار التحقق من توقيع بيانات مختلفة
-    cModifiedData = cData + " (تم تعديلها)"
+    # Testing signature verification with modified data
+    cModifiedData = cData + " (modified data)"
     bVerified = oEncryption.verifyRSA(cModifiedData, cSignature, cPublicKeyPEM)
     
-    assert(not bVerified, "اختبار التحقق من توقيع بيانات مختلفة")
+    assert(not bVerified, "Testing signature verification with modified data")
     
-    ? "  تم اختبار توقيع البيانات والتحقق من التوقيع باستخدام RSA بنجاح"
+    ? "  Testing RSA signature and verification completed successfully"
 }
 
-# اختبار تشفير الملفات وفك تشفيرها
+# Testing file encryption and decryption
 func testFileEncryption {
-    ? "اختبار تشفير الملفات وفك تشفيرها..."
+    ? "Testing file encryption and decryption..."
     
     oEncryption = new EncryptionManager
     
-    # قراءة المفاتيح من الملفات المؤقتة
+    # Read the keys from temporary files
     cPrivateKeyPEM = read("temp_private_key.pem")
     cPublicKeyPEM = read("temp_public_key.pem")
     
-    # إنشاء ملف اختبار
-    cTestData = "هذا ملف اختبار لتشفير الملفات وفك تشفيرها باستخدام AES و RSA."
+    # Create test file
+    cTestData = "This is a test file to encrypt and decrypt using AES and RSA."
     write("test_file.txt", cTestData)
     
-    # تشفير الملف
+    # Encrypt the file
     oEncryption.encryptFile("test_file.txt", "test_file.enc", cPublicKeyPEM)
     
-    # فك تشفير الملف
+    # Decrypt the file
     oEncryption.decryptFile("test_file.enc", "test_file_decrypted.txt", cPrivateKeyPEM)
     
-    # التحقق من صحة فك التشفير
+    # Validate the decrypted file
     cDecryptedData = read("test_file_decrypted.txt")
-    assert(cDecryptedData = cTestData, "اختبار تشفير الملفات وفك تشفيرها")
+    assert(cDecryptedData = cTestData, "Testing file encryption and decryption")
     
-    ? "  تم اختبار تشفير الملفات وفك تشفيرها بنجاح"
+    ? "  Testing file encryption and decryption completed successfully"
 }
 
-# اختبار توقيع الملفات والتحقق من التوقيع
+# Testing file signature and verification
 func testFileSignature {
-    ? "اختبار توقيع الملفات والتحقق من التوقيع..."
+    ? "Testing file signature and verification..."
     
     oEncryption = new EncryptionManager
     
-    # قراءة المفاتيح من الملفات المؤقتة
+    # Read the keys from temporary files
     cPrivateKeyPEM = read("temp_private_key.pem")
     cPublicKeyPEM = read("temp_public_key.pem")
     
-    # توقيع ملف الاختبار
+    # Sign the test file
     oEncryption.signFile("test_file.txt", "test_file.sig", cPrivateKeyPEM)
     
-    # التحقق من توقيع الملف
+    # Verify the file signature
     bVerified = oEncryption.verifyFileSignature("test_file.txt", "test_file.sig", cPublicKeyPEM)
-    assert(bVerified, "اختبار توقيع الملفات والتحقق من التوقيع")
+    assert(bVerified, "Testing file signature and verification")
     
-    # تعديل الملف
+    # Modify the file
     cModifiedData = read("test_file.txt") + " (تم تعديله)"
     write("test_file_modified.txt", cModifiedData)
     
-    # التحقق من توقيع الملف المعدل
+    # Verify the modified file signature
     bVerified = oEncryption.verifyFileSignature("test_file_modified.txt", "test_file.sig", cPublicKeyPEM)
-    assert(not bVerified, "اختبار التحقق من توقيع ملف معدل")
+    assert(not bVerified, "Testing file signature and verification with modified file")
     
-    ? "  تم اختبار توقيع الملفات والتحقق من التوقيع بنجاح"
+    ? "  Testing file signature and verification completed successfully"
     
-    # تنظيف الملفات المؤقتة
+    # Clean up temporary files
     remove("temp_private_key.pem")
     remove("temp_public_key.pem")
     remove("test_file.txt")
@@ -180,13 +180,13 @@ func testFileSignature {
     remove("test_file_modified.txt")
 }
 
-# دالة مساعدة للتأكيد
+# Helper function for assertion
 func assert condition, message {
     if condition {
         ? "  ✓ " + message
     else
         ? "  ✗ " + message
-        raise("فشل الاختبار: " + message)
+        raise("Testing failed: " + message)
     }
 }
 

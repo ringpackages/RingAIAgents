@@ -15,236 +15,233 @@ load "G:\RingAIAgents\src\security\MFAManager.ring"
 load "G:\RingAIAgents\src\security\RBACManager.ring"
 
 
-/*
-    اختبار نظام الأمان
+/*  
+    Testing security system
 */
 func main {
-    ? "=== اختبار نظام الأمان ==="
+    ? "=== Testing security system ==="
     
-    # اختبار مدير الأمان
+    # Testing security manager
     testSecurityManager()
     
-    # اختبار التشفير
+    # Testing encryption
     testEncryption()
     
-    # اختبار المصادقة
+    # Testing authentication
     testAuthentication()
     
-    # اختبار الجلسات
+    # Testing sessions
     testSessions()
     
-    # اختبار التوكنات
+    # Testing tokens
     testTokens()
     
-    # اختبار التحقق من صحة المدخلات
+    # Testing input validation
     testInputValidation()
     
-    # اختبار الحماية من CSRF
+    # Testing CSRF protection
     testCSRFProtection()
     
-    # اختبار الحماية من XSS
+    # Testing XSS protection
     testXSSProtection()
     
-    # اختبار منع الاختراق
+    # Testing intrusion prevention
     testIntrusionPrevention()
     
-    ? "=== تم اكتمال الاختبارات بنجاح ==="
+    ? "=== Testing security system completed successfully ==="
 }
 
-# اختبار مدير الأمان
+# Testing security manager
 func testSecurityManager {
-    ? "اختبار مدير الأمان..."
+    ? "Testing security manager..."
     
     oSecurity = new SecurityManager
     
-    # اختبار التشفير وفك التشفير
-    cData = "بيانات سرية للاختبار"
+    # Testing encryption and decryption
+    cData = "Confidential data for testing"
     cEncrypted = oSecurity.encryptData(cData)
     cDecrypted = oSecurity.decryptData(cEncrypted)
     
-    assert(cDecrypted = cData, "اختبار التشفير وفك التشفير")
+    assert(cDecrypted = cData, "Testing encryption and decryption")
     
-    ? "  تم اختبار مدير الأمان بنجاح"
+    ? "  Testing security manager completed successfully"
 }
 
-# اختبار التشفير
+# Testing encryption
 func testEncryption {
-    ? "اختبار التشفير..."
+    ? "Testing encryption..."
     
     oEncryption = new EncryptionManager
     
-    # توليد مفتاح وvector تهيئة
+    # Testing key and IV generation
     cKey = oEncryption.generateKey(32)
     cIV = oEncryption.generateIV(16)
     
-    assert(len(cKey) = 32, "اختبار توليد المفتاح")
-    assert(len(cIV) = 16, "اختبار توليد vector التهيئة")
+    assert(len(cKey) = 32, "Testing key generation")
+    assert(len(cIV) = 16, "Testing IV generation")
     
-    # اختبار التشفير وفك التشفير
-    cData = "بيانات سرية للاختبار"
+    # Testing encryption and decryption
+    cData = "Confidential data for testing"
     cEncrypted = oEncryption.encrypt(cData, cKey, cIV)
     cDecrypted = oEncryption.decrypt(cEncrypted, cKey, cIV)
     
-    assert(cDecrypted = cData, "اختبار التشفير وفك التشفير")
+    assert(cDecrypted = cData, "Testing encryption and decryption")
     
-    ? "  تم اختبار التشفير بنجاح"
+    ? "  Testing encryption completed successfully"
 }
 
-# اختبار المصادقة
+# Testing authentication
 func testAuthentication {
-    ? "اختبار المصادقة..."
+    ? "Testing authentication..."
     
     oAuth = new AuthenticationManager
     
-    # اختبار تجزئة كلمة المرور
+    # Testing password hashing
     cPassword = "P@ssw0rd123"
     cHashed = oAuth.hashPassword(cPassword)
     
-    assert(len(cHashed) > 0, "اختبار تجزئة كلمة المرور")
+    assert(len(cHashed) > 0, "Testing password hashing")
     
-    ? "  تم اختبار المصادقة بنجاح"
+    ? "  Testing authentication completed successfully"
 }
 
-# اختبار الجلسات
+# Testing sessions
 func testSessions {
-    ? "اختبار الجلسات..."
+    ? "Testing sessions..."
     
     oSession = new SessionManager
     
-    # إنشاء جلسة
+    #   Testing session creation
     cUserId = "user123"
     cUserRole = "admin"
     cUserIP = "192.168.1.1"
     
     cSessionToken = oSession.createSession(cUserId, cUserRole, cUserIP)
-    assert(len(cSessionToken) > 0, "اختبار إنشاء الجلسة")
+    assert(len(cSessionToken) > 0, "Testing session creation")
     
-    # التحقق من صحة الجلسة
+    # Testing session validation
     aSessionData = oSession.validateSession(cSessionToken)
-    assert(type(aSessionData) = "LIST", "اختبار التحقق من صحة الجلسة")
-    assert(aSessionData[:user_id] = cUserId, "اختبار بيانات الجلسة")
+    assert(type(aSessionData) = "LIST", "Testing session validation")
+    assert(aSessionData[:user_id] = cUserId, "Testing session data")
     
-    # تدمير الجلسة
+    # Testing session destruction
     cSessionId = split(cSessionToken, ".")[1]
-    assert(oSession.destroySession(cSessionId), "اختبار تدمير الجلسة")
+    assert(oSession.destroySession(cSessionId), "Testing session destruction")
     
-    ? "  تم اختبار الجلسات بنجاح"
+    ? "  Testing sessions completed successfully"
 }
 
-# اختبار التوكنات
+# Testing tokens
 func testTokens {
-    ? "اختبار التوكنات..."
+    ? "Testing tokens..."
     
     oToken = new TokenManager
     
-    # إنشاء توكن
+    # Testing token creation
     cUserId = "user123"
     cUserRole = "admin"
     aCustomClaims = [["app", "ringai"], ["device", "desktop"]]
     
     cToken = oToken.createToken(cUserId, cUserRole, aCustomClaims)
-    assert(len(cToken) > 0, "اختبار إنشاء التوكن")
+    assert(len(cToken) > 0, "Testing token creation")
     
-    # التحقق من صحة التوكن
+    # Testing token validation
     aTokenData = oToken.validateToken(cToken)
-    assert(type(aTokenData) = "LIST", "اختبار التحقق من صحة التوكن")
-    assert(aTokenData[:sub] = cUserId, "اختبار بيانات التوكن")
+    assert(type(aTokenData) = "LIST", "Testing token validation")
+    assert(aTokenData[:sub] = cUserId, "Testing token data")
     
-    # إلغاء التوكن
-    assert(oToken.revokeToken(cToken), "اختبار إلغاء التوكن")
-    assert(not oToken.validateToken(cToken), "اختبار التحقق من إلغاء التوكن")
+    # Testing token revocation
+    assert(oToken.revokeToken(cToken), "Testing token revocation")
+    assert(not oToken.validateToken(cToken), "Testing token revocation")
     
-    ? "  تم اختبار التوكنات بنجاح"
+    ? "  Testing tokens completed successfully"
 }
 
-# اختبار التحقق من صحة المدخلات
+# Testing input validation
 func testInputValidation {
-    ? "اختبار التحقق من صحة المدخلات..."
+    ? "Testing input validation..."
     
     oValidator = new InputValidator
     
-    # اختبار التحقق من صحة البريد الإلكتروني
-    assert(oValidator.validateEmail("user@example.com"), "اختبار بريد إلكتروني صحيح")
-    assert(not oValidator.validateEmail("invalid-email"), "اختبار بريد إلكتروني غير صحيح")
+    # Testing email validation
+    assert(oValidator.validateEmail("user@example.com"), "Testing valid email")
+    assert(not oValidator.validateEmail("invalid-email"), "Testing invalid email")
     
-    # اختبار التحقق من صحة كلمة المرور
-    assert(oValidator.validatePassword("P@ssw0rd123"), "اختبار كلمة مرور صحيحة")
-    assert(not oValidator.validatePassword("weak"), "اختبار كلمة مرور ضعيفة")
+    # Testing password validation
+    assert(oValidator.validatePassword("P@ssw0rd123"), "Testing valid password")
+    assert(not oValidator.validatePassword("weak"), "Testing weak password")
     
-    # اختبار التحقق من صحة النص
-    assert(oValidator.validateText("نص عادي للاختبار"), "اختبار نص عادي")
-    assert(not oValidator.validateText("<script>alert('XSS')</script>"), "اختبار نص يحتوي على XSS")
+    # Testing text validation
+    assert(oValidator.validateText("Normal text"), "Testing valid text")
+    assert(not oValidator.validateText("<script>alert('XSS')</script>"), "Testing text with XSS")
     
-    # اختبار تنظيف النص
+    # Testing text sanitization
     cDirtyText = "<script>alert('XSS')</script>"
     cCleanText = oValidator.sanitizeText(cDirtyText)
-    assert(substr(cCleanText, "<script>") = 0, "اختبار تنظيف النص")
+    assert(substr(cCleanText, "<script>") = 0, "Testing text sanitization")
     
-    ? "  تم اختبار التحقق من صحة المدخلات بنجاح"
+    ? "  Testing input validation completed successfully"
 }
 
-# اختبار الحماية من CSRF
+# Testing CSRF protection
 func testCSRFProtection {
-    ? "اختبار الحماية من CSRF..."
+    ? "Testing CSRF protection..."
     
     oCSRF = new CSRFProtection
     
-    # إنشاء توكن CSRF
+    # Testing token generation
     cSessionId = "session123"
     cToken = oCSRF.generateToken(cSessionId)
-    assert(len(cToken) > 0, "اختبار إنشاء توكن CSRF")
+    assert(len(cToken) > 0, "Testing token generation")
     
-    # التحقق من صحة التوكن
-    assert(oCSRF.validateToken(cToken, cSessionId), "اختبار التحقق من صحة توكن CSRF")
+    # Testing token validation
+    assert(oCSRF.validateToken(cToken, cSessionId), "Testing token validation")
     
-    # إنشاء حقل نموذج
+    # Testing form field creation
     cFormField = oCSRF.createFormField(cSessionId)
-    assert(substr(cFormField, "csrf_token") > 0, "اختبار إنشاء حقل نموذج")
+    assert(substr(cFormField, "csrf_token") > 0, "Testing form field creation")
     
-    ? "  تم اختبار الحماية من CSRF بنجاح"
+    ? "  Testing CSRF protection completed successfully"
 }
 
-# اختبار الحماية من XSS
+# Testing XSS protection
 func testXSSProtection {
-    ? "اختبار الحماية من XSS..."
+    ? "Testing XSS protection..."
     
     oXSS = new XSSProtection
     
-    # اختبار تنظيف النص
+    # Testing text sanitization
     cDirtyText = "<script>alert('XSS')</script>"
     cCleanText = oXSS.sanitize(cDirtyText)
-    assert(substr(cCleanText, "<script>") = 0, "اختبار تنظيف النص")
+    assert(substr(cCleanText, "<script>") = 0, "Testing text sanitization")
     
-    ? "  تم اختبار الحماية من XSS بنجاح"
+    ? "  Testing XSS protection completed successfully"
 }
 
-# اختبار منع الاختراق
+# Testing intrusion prevention
 func testIntrusionPrevention {
-    ? "اختبار منع الاختراق..."
+    ? "Testing intrusion prevention..."
     
     oIntrusion = new IntrusionPreventionManager
     
-    # اختبار التحقق من أنماط مشبوهة
-    assert(oIntrusion.containsSuspiciousPatterns("<script>alert('XSS')</script>"), "اختبار نمط مشبوه")
-    assert(not oIntrusion.containsSuspiciousPatterns("نص عادي للاختبار"), "اختبار نص عادي")
+    # Testing suspicious patterns detection
+    assert(oIntrusion.containsSuspiciousPatterns("<script>alert('XSS')</script>"), "Testing suspicious patterns detection")
+    assert(not oIntrusion.containsSuspiciousPatterns("Normal text"), "Testing normal text")
     
-    # اختبار حظر عنوان IP
+    # Testing IP blocking
     cIP = "192.168.1.100"
     oIntrusion.blockIP(cIP)
-    assert(oIntrusion.isIPBlocked(cIP), "اختبار حظر عنوان IP")
+    assert(oIntrusion.isIPBlocked(cIP), "Testing IP blocking")
     
-    ? "  تم اختبار منع الاختراق بنجاح"
+    ? "  Testing intrusion prevention completed successfully"
 }
 
-# دالة مساعدة للتأكيد
+# Testing helper function
 func assert condition, message {
     if condition
         ? "  ✓ " + message
     else
         ? "  ✗ " + message
-        raise("فشل الاختبار: " + message)
+        raise("Failed test: " + message)
     ok
 }
-
-# تشغيل الاختبارات
-

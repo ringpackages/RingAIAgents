@@ -5,12 +5,12 @@
 */
 
 /*
-الدالة: updateTeam
-الوصف: تحديث معلومات فريق
+function: updateTeam
+description: Update team information
 */
 func updateTeam
     try {
-        # محاولة الحصول على المعرف من معلمات URL
+        # try to get the team ID from the URL
         cTeamID = ""
         try {
             cTeamID = oServer.match(1)
@@ -19,13 +19,13 @@ func updateTeam
             ? logger("updateTeam function", "Error getting URL match parameter", :error)
         }
 
-        # التحقق من وجود معرف صالح
+        # check if the team ID is valid
         if cTeamID = NULL or len(cTeamID) = 0 {
             oServer.setContent('{"status":"error","message":"No team ID provided"}', "application/json")
             return
         }
 
-        # البحث عن الفريق بالمعرف
+        # search for the team by ID
         oCrew = NULL
 
         for i = 1 to len(aTeams) {
@@ -37,7 +37,7 @@ func updateTeam
 
         if oCrew != NULL {
 
-            # تحديث المعلومات الأساسية
+            # update the basic information
             cName = oServer.variable("name")
             cObjective = oServer.variable("objective")
 
@@ -47,11 +47,11 @@ func updateTeam
             oCrew.setName(cName)
             oCrew.setObjective(cObjective)
 
-            # تحديث القائد
+            # update the leader
             cLeaderId = oServer.variable("leader_id")
             ? logger("updateTeam function", "Leader ID: " + cLeaderId, :info)
 
-            # البحث عن العميل بالمعرف
+            # search for the leader by ID
             for i = 1 to len(aAgents) {
                 if aAgents[i].getID() = cLeaderId {
                     oCrew.setLeader(aAgents[i])
@@ -60,7 +60,7 @@ func updateTeam
                 }
             }
 
-            # حفظ التغييرات في قاعدة البيانات
+            # save the changes to the database
             if saveTeams() {
                 ? logger("updateTeam function", "Team updated and saved successfully", :info)
                 oServer.setContent('{"status":"success","message":"Team updated successfully"}',

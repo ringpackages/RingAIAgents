@@ -1,8 +1,8 @@
 
 
 /*
-الكلاس: Settings
-الوصف: إدارة إعدادات النظام
+the class: Settings
+the description: manage system settings
 */
 class Settings
     cSettingsFile = currentdir() + "/settings/settings.json"
@@ -70,8 +70,8 @@ class Settings
 
 
 /*
-الكلاس: SettingsDialog
-الوصف: نافذة حوار لتعديل إعدادات النظام
+the class: SettingsDialog
+the description: settings dialog to modify system settings
 */
 class SettingsDialog from QDialog
 

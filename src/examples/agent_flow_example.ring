@@ -1,96 +1,96 @@
 Load "G:\RingAIAgents\src\libAgentAi.ring"
 
 /*
-المثال: تدفق العمل مع الوكلاء والفرق
-الوصف: مثال يوضح كيفية استخدام التدفقات مع الوكلاء والفرق في نظام RingAI Agents
+Example: Workflow with agents and teams
+Description: Example shows how to use workflows with agents and teams in RingAI Agents system
 */
 
 odevteam = null
 
 
-# مثال استخدام
+# Example usage
 func main {
-    ? "=== بدء مثال تدفق العمل مع الوكلاء والفرق ==="
+    ? "=== Starting workflow with agents and teams ==="
      
-    # إنشاء نظام العملاء
+    # Creating system
     oSystem = new AgentAI()
 
-    # إنشاء الوكلاء
-    oFrontendDev = oSystem.createAgent("مطور واجهة المستخدم", "متخصص في تطوير واجهات المستخدم")
-    oFrontendDev.setRole("مطور واجهة المستخدم")
+    # Creating agents
+    oFrontendDev = oSystem.createAgent("Frontend Developer", "Specialized in frontend development")
+    oFrontendDev.setRole("Frontend Developer")
     oFrontendDev.addSkill("JavaScript", 90)
     oFrontendDev.addSkill("React", 85)
     oFrontendDev.addSkill("CSS", 80)
 
-    oBackendDev = oSystem.createAgent("مطور الخلفية", "متخصص في تطوير الخوادم")
-    oBackendDev.setRole("مطور الخلفية")
+    oBackendDev = oSystem.createAgent("Backend Developer", "Specialized in backend development")
+    oBackendDev.setRole("Backend Developer")
     oBackendDev.addSkill("Python", 90)
     oBackendDev.addSkill("Node.js", 85)
     oBackendDev.addSkill("Databases", 80)
 
-    oDesigner = oSystem.createAgent("مصمم", "متخصص في تصميم واجهات المستخدم")
-    oDesigner.setRole("مصمم")
+    oDesigner = oSystem.createAgent("Designer", "Specialized in UI/UX design")
+    oDesigner.setRole("Designer")
     oDesigner.addSkill("UI/UX", 95)
     oDesigner.addSkill("Photoshop", 85)
     oDesigner.addSkill("Figma", 90)
 
-    oProjectManager = oSystem.createAgent("مدير المشروع", "مسؤول عن إدارة المشروع وتنسيق العمل")
-    oProjectManager.setRole("مدير المشروع")
+    oProjectManager = oSystem.createAgent("Project Manager", "Responsible for project management and coordination")
+    oProjectManager.setRole("Project Manager")
     oProjectManager.addSkill("Project Management", 95)
     oProjectManager.addSkill("Communication", 90)
     oProjectManager.addSkill("Leadership", 85)
 
-    # إنشاء فريق التطوير
-    oDevTeam = oSystem.createTeam("oDevTeam", "فريق التطوير", oProjectManager)
+    # Creating development team
+    oDevTeam = oSystem.createTeam("oDevTeam", "Development Team", oProjectManager)
     oDevTeam.addMember(oFrontendDev)
     oDevTeam.addMember(oBackendDev)
     oDevTeam.addMember(oDesigner)
 
-    # إنشاء المهام
-    oLoginTask = oSystem.createTask("تنفيذ وظيفة تسجيل الدخول")
+    # Creating tasks
+    oLoginTask = oSystem.createTask("Implement login functionality")
     oLoginTask.setPriority(8)
 
-    oDashboardTask = oSystem.createTask("إنشاء واجهة لوحة التحكم")
+    oDashboardTask = oSystem.createTask("Create dashboard interface")
     oDashboardTask.setPriority(7)
 
-    oDesignTask = oSystem.createTask("تصميم واجهة المستخدم")
+    oDesignTask = oSystem.createTask("Design user interface")
     oDesignTask.setPriority(9)
 
-    # إنشاء تدفق العمل للمشروع
+    # Creating project workflow
     oProjectFlow = new ProjectWorkflow(oDevTeam)
 
-    # تنفيذ تدفق العمل
-    ? "--- بدء تدفق العمل للمشروع ---"
+    # Executing project workflow
+    ? "--- Starting project workflow ---"
     oProjectFlow.execute()
-    ? "حالة المشروع: " + oProjectFlow.oState.getText("project_status")
+    ? "Project status: " + oProjectFlow.oState.getText("project_status")
 
-    # إنشاء تدفق للمهام
+    # Creating task assignment workflow
     oTaskFlow = new TaskAssignmentFlow(oDevTeam, [oLoginTask, oDashboardTask, oDesignTask])
 
-    # تنفيذ تدفق المهام
-    ? "--- بدء تدفق المهام ---"
+    # Executing task assignment workflow
+    ? "--- Starting task assignment workflow ---"
     oTaskFlow.execute()
-    ? "حالة المهام: "
+    ? "Task status: "
     see oTaskFlow.oState.getList("assignments")
 
-    # إنشاء تدفق للتعاون
+    # Creating collaboration workflow
     oCollaborationFlow = new CollaborationFlow(oDevTeam)
 
-    # تنفيذ تدفق التعاون
-    ? "--- بدء تدفق التعاون ---"
+    # Executing collaboration workflow
+    ? "--- Starting collaboration workflow ---"
     oCollaborationFlow.execute()
-    ? "نتائج التعاون: " + oCollaborationFlow.oState.getText("collaboration_result")
+    ? "Collaboration result: " + oCollaborationFlow.oState.getText("collaboration_result")
 
-    # إنشاء تدفق للتقييم
+    # Creating evaluation workflow
     oEvaluationFlow = new EvaluationFlow(oDevTeam)
 
-    # تنفيذ تدفق التقييم
-    ? "--- بدء تدفق التقييم ---"
+    # Executing evaluation workflow
+    ? "--- Starting evaluation workflow ---"
     oEvaluationFlow.execute()
-    ? "نتائج التقييم: "
+    ? "Evaluation results: "
     see oEvaluationFlow.oState.getList("evaluation_results")
 
-    ? "=== انتهاء المثال ==="
+    ? "=== Example finished ==="
 }
 
 /*
@@ -112,55 +112,55 @@ class ProjectWorkflow from Flow {
     }
 
     func startproject {
-        oState.setText("project_status", "بدء المشروع")
+        oState.setText("project_status", "Starting project")
         emit("project_started", null)
 
-        # تحديد أهداف المشروع
+        # Defining project goals
         defineProjectGoals()
     }
 
     func defineProjectGoals {
-        oState.setText("project_goals", "إنشاء نظام تسجيل دخول وواجهة لوحة تحكم")
-        oState.setText("project_status", "تم تحديد الأهداف")
+        oState.setText("project_goals", "Create a login system and control panel interface.")
+        oState.setText("project_status", "Goals defined")
         emit("goals_defined", null)
 
-        # تخطيط المشروع
+        # Planning project
         planProject()
     }
 
     func planProject {
-        # إنشاء خطة المشروع
+        # Creating project plan
         aProjectPlan = [
-            :phases = ["تصميم", "تطوير", "اختبار", "نشر"],
-            :timeline = "4 أسابيع",
-            :resources = ["مطورين", "مصممين", "مختبرين"]
+            :phases = ["Design", "Development", "Testing", "Deployment"],
+            :timeline = "4 weeks",
+            :resources = ["Developers", "Designers", "Testers"]
         ]
 
         oState.setList("project_plan", aProjectPlan)
-        oState.setText("project_status", "تم التخطيط")
+        oState.setText("project_status", "Project planned")
         emit("project_planned", aProjectPlan)
 
-        # إعلام الفريق بالخطة
-        oTeam.broadcast("تم الانتهاء من خطة المشروع. يرجى مراجعة المهام المسندة إليكم.")
+        # Informing the team about the plan
+        oTeam.broadcast("Project plan completed. Please review the assigned tasks.")
 
-        # بدء تنفيذ المشروع
+        # Starting project execution
         startExecution()
     }
 
     func startExecution {
-        oState.setText("project_status", "قيد التنفيذ")
+        oState.setText("project_status", "Project execution started")
         emit("execution_started", null)
 
-        # محاكاة تقدم المشروع
+        # Simulating project progress
         oState.setNumber("progress", 25)
         emit("progress_updated", 25)
 
-        # تحديث حالة المشروع
+        # Updating project status
         updateProjectStatus()
     }
 
     func updateProjectStatus {
-        oState.setText("project_status", "مستمر - 25% مكتمل")
+        oState.setText("project_status", "Project execution in progress - 25% completed")
         emit("status_updated", oState.getText("project_status"))
     }
 }
@@ -185,10 +185,10 @@ class TaskAssignmentFlow from Flow {
     }
 
     func starttaskassignment {
-        oState.setText("assignment_status", "بدء توزيع المهام")
+        oState.setText("assignment_status", "Starting task assignment")
         emit("assignment_started", null)
 
-        # توزيع المهام بناءً على المهارات
+        # Assigning tasks based on skills
         assignTasksBySkill()
     }
 
@@ -196,7 +196,7 @@ class TaskAssignmentFlow from Flow {
         aAssignments = []
         aMembers = oTeam.getMembers()
 
-        # محاكاة توزيع المهام بناءً على المهارات
+        # Simulating task assignment based on skills
         for i = 1 to len(aTasks) {
             oTask = aTasks[i]
             oAgent = findBestAgentForTask(oTask, aMembers)
@@ -208,25 +208,25 @@ class TaskAssignmentFlow from Flow {
                     :priority = oTask.getPriority()
                 ])
 
-                # إسناد المهمة للوكيل
+                # Assigning the task to the agent
                 oTeam.assignTask(oTask, oAgent)
             }
         }
 
         oState.setList("assignments", aAssignments)
-        oState.setText("assignment_status", "تم توزيع المهام")
+        oState.setText("assignment_status", "Tasks assigned")
         emit("tasks_assigned", aAssignments)
 
-        # إعلام الفريق بالمهام
+        # Informing the team about the tasks
         notifyTeamMembers()
     }
 
     func notifyTeamMembers {
-        oTeam.broadcast("تم توزيع المهام على أعضاء الفريق. يرجى مراجعة المهام المسندة إليكم.")
+        oTeam.broadcast("Tasks assigned to team members. Please review the assigned tasks.")
         emit("team_notified", null)
     }
 
-    # دالة مساعدة لإيجاد أفضل وكيل للمهمة
+    # Helper function to find the best agent for a task
     func findBestAgentForTask oTask, aAgents {
         nHighestScore = 0
         oBestAgent = null
@@ -242,12 +242,12 @@ class TaskAssignmentFlow from Flow {
         return oBestAgent
     }
 
-    # دالة مساعدة لحساب درجة ملاءمة الوكيل للمهمة
+    # Helper function to calculate agent task score
     func calculateAgentTaskScore oAgent, oTask {
         nScore = 0
         cTaskDesc = lower(oTask.getDescription())
 
-        # فحص مهارات الوكيل
+        # Checking agent skills
         for aSkill in oAgent.getSkills() {
             cSkillName = lower(aSkill[:name])
             if substr(cTaskDesc, cSkillName) {
@@ -255,20 +255,20 @@ class TaskAssignmentFlow from Flow {
             }
         }
 
-        # مراعاة دور الوكيل
-        if oAgent.getRole() = "مدير المشروع" and substr(cTaskDesc, "إدارة") {
+        # Considering agent role
+        if oAgent.getRole() = "Project Manager" and substr(cTaskDesc, "Management") {
             nScore += 50
         }
 
-        if oAgent.getRole() = "مطور واجهة المستخدم" and (substr(cTaskDesc, "واجهة") or substr(cTaskDesc, "تصميم")) {
+        if oAgent.getRole() = "User Interface Developer" and (substr(cTaskDesc, "Interface") or substr(cTaskDesc, "Design")) {
             nScore += 30
         }
 
-        if oAgent.getRole() = "مطور الخلفية" and substr(cTaskDesc, "تسجيل") {
+        if oAgent.getRole() = "Backend Developer" and substr(cTaskDesc, "login") {
             nScore += 40
         }
 
-        if oAgent.getRole() = "مصمم" and substr(cTaskDesc, "تصميم") {
+        if oAgent.getRole() = "Designer" and substr(cTaskDesc, "design") {
             nScore += 50
         }
 
@@ -277,9 +277,6 @@ class TaskAssignmentFlow from Flow {
 }
 
 /*
-الكلاس: CollaborationFlow
-الوصف: تدفق للتعاون بين أعضاء الفريق
-*/
 class CollaborationFlow from Flow {
 
     oTeam = null
@@ -294,23 +291,23 @@ class CollaborationFlow from Flow {
     }
 
     func startcollaboration {
-        oState.setText("collaboration_status", "بدء التعاون")
-        emit("collaboration_started", "تم بدء جلسة تعاون بين أعضاء فريق التطوير." + oTeam.getName() )
+        oState.setText("collaboration_status", "Starting collaboration")
+        emit("collaboration_started", "Collaboration session started between team members." + oTeam.getName() )
 
-        # إنشاء جلسة تعاون
+        # Creating collaboration session
         createCollaborationSession()
     }
 
     func createCollaborationSession {
-        # محاكاة جلسة تعاون
+        # Simulating collaboration session
         aSession = [
-            :topic = "تكامل واجهة المستخدم مع الخلفية",
+            :topic = "User interface integration with backend",
             :participants = [],
             :date = TimeList()[5],
-            :duration = "60 دقيقة"
+            :duration = "60 minutes"
         ]
 
-        # إضافة المشاركين
+        # Adding participants
         aMembers = oTeam.getMembers()
         for oMember in aMembers {
             add(aSession[:participants], oMember.getName())
@@ -319,52 +316,49 @@ class CollaborationFlow from Flow {
         oState.setList("collaboration_session", aSession)
         emit("session_created", aSession)
 
-        # محاكاة نتائج التعاون
+        # Simulating collaboration results
         simulateCollaboration()
     }
 
     func simulateCollaboration {
-        # محاكاة تبادل المعلومات بين أعضاء الفريق
+        # Simulating information exchange between team members
         aMembers = oTeam.getMembers()
 
-        # التأكد من وجود أعضاء كافيين في الفريق
+        # Ensure there are enough team members
         if len(aMembers) >= 4 {
             oFrontendDev = null
             oBackendDev = null
 
-            # البحث عن الأعضاء حسب الدور
+            # Search for team members based on roles
             for oMember in aMembers {
-                if oMember.getRole() = "مطور واجهة المستخدم" {
+                if oMember.getRole() = "Frontend Developer" {
                     oFrontendDev = oMember
                 }
-                if oMember.getRole() = "مطور الخلفية" {
+                if oMember.getRole() = "Backend Developer" {
                     oBackendDev = oMember
                 }
             }
 
-            # تبادل المعلومات إذا وجدنا الأعضاء
+            # Exchange information if we have the members
             if oFrontendDev != null and oBackendDev != null {
-                # تبادل المعلومات
+                # Exchange information
                 oFrontendDev.learn("API Integration", "Learned how to integrate with backend APIs")
                 oBackendDev.learn("UI Requirements", "Understood the UI requirements for the login system")
 
-                # تسجيل الملاحظات
+                # Logging observations
                 oFrontendDev.observe("Backend team is using JWT for authentication")
                 oBackendDev.observe("Frontend team needs detailed API documentation")
             }
         }
 
-        # تحديث حالة التعاون
-        oState.setText("collaboration_result", "تم تبادل المعلومات بنجاح بين فريق الواجهة وفريق الخلفية")
-        oState.setText("collaboration_status", "مكتمل")
+        # Update collaboration status
+        oState.setText("collaboration_result", "Information exchange completed between frontend and backend teams")
+        oState.setText("collaboration_status", "Completed")
         emit("collaboration_completed", oState.getText("collaboration_result"))
     }
 }
 
 /*
-الكلاس: EvaluationFlow
-الوصف: تدفق لتقييم أداء الفريق
-*/
 class EvaluationFlow from Flow {
 
     oTeam = null
@@ -378,10 +372,10 @@ class EvaluationFlow from Flow {
     }
 
     func startevaluation {
-        oState.setText("evaluation_status", "بدء التقييم")
+        oState.setText("evaluation_status", "Starting evaluation")
         emit("evaluation_started", null)
 
-        # جمع بيانات الأداء
+        # Collecting performance data
         collectPerformanceData()
     }
 
@@ -389,7 +383,7 @@ class EvaluationFlow from Flow {
         aMembers = oTeam.getMembers()
         aPerformanceData = []
 
-        # محاكاة جمع بيانات الأداء
+        # Simulating performance data collection
         for oMember in aMembers {
             aPerformance = [
                 :name = oMember.getName(),
@@ -406,7 +400,7 @@ class EvaluationFlow from Flow {
         oState.setList("performance_data", aPerformanceData)
         emit("data_collected", aPerformanceData)
 
-        # تحليل البيانات
+        # Analyzing data
         analyzePerformanceData()
     }
 
@@ -414,26 +408,26 @@ class EvaluationFlow from Flow {
         aPerformanceData = oState.getList("performance_data")
         aEvaluationResults = []
 
-        # محاكاة تحليل البيانات
+        # Simulating data analysis
         for aData in aPerformanceData {
-            # حساب درجة التقييم الإجمالية
+            # Calculating overall score
             nOverallScore = (aData[:performance_score] * 0.5) +
                            (aData[:energy_level] / 20) +
                            (aData[:confidence_level] / 2)
 
-            # تحديد مستوى الأداء
+            # Determining performance level
             cPerformanceLevel = ""
             if nOverallScore >= 8
-                cPerformanceLevel = "ممتاز"
+                cPerformanceLevel = "Excellent"
             elseif nOverallScore >= 6
-                cPerformanceLevel = "جيد جداً"
+                cPerformanceLevel = "Very Good"
             elseif nOverallScore >= 4
-                cPerformanceLevel = "جيد"
+                cPerformanceLevel = "Good"
             else
-                cPerformanceLevel = "بحاجة إلى تحسين"
+                cPerformanceLevel = "Needs Improvement"
             ok
 
-            # إنشاء نتيجة التقييم
+            # Creating evaluation result
             aEvaluation = [
                 :name = aData[:name],
                 :role = aData[:role],
@@ -443,7 +437,7 @@ class EvaluationFlow from Flow {
                 :areas_for_improvement = []
             ]
 
-            # تحديد نقاط القوة ومجالات التحسين
+            # Determining strengths and areas for improvement
             for aSkill in aData[:skills] {
                 if aSkill[:proficiency] >= 85 {
                     add(aEvaluation[:strengths], aSkill[:name])
@@ -456,10 +450,10 @@ class EvaluationFlow from Flow {
         }
 
         oState.setList("evaluation_results", aEvaluationResults)
-        oState.setText("evaluation_status", "مكتمل")
+        oState.setText("evaluation_status", "Completed")
         emit("evaluation_completed", aEvaluationResults)
 
-        # تقديم التوصيات
+        # Providing recommendations
         provideRecommendations()
     }
 
@@ -467,25 +461,25 @@ class EvaluationFlow from Flow {
         aEvaluationResults = oState.getList("evaluation_results")
         aRecommendations = []
 
-        # محاكاة تقديم التوصيات
+        # Simulating recommendations
         for aResult in aEvaluationResults {
             aRecommendation = [
                 :name = aResult[:name],
                 :recommendations = []
             ]
 
-            # إضافة توصيات بناءً على مجالات التحسين
+            # Adding recommendations based on areas for improvement
             for cArea in aResult[:areas_for_improvement] {
-                add(aRecommendation[:recommendations], "تحسين مهارات " + cArea)
+                add(aRecommendation[:recommendations], "Improve skills in " + cArea)
             }
 
-            # إضافة توصيات عامة
+            # Adding general recommendations
             if aResult[:overall_score] < 6 {
-                add(aRecommendation[:recommendations], "حضور دورات تدريبية في مجال التخصص")
+                add(aRecommendation[:recommendations], "Attend training courses in the field of expertise")
             }
 
             if aResult[:energy_level] < 70 {
-                add(aRecommendation[:recommendations], "تحسين مستوى الطاقة من خلال توزيع المهام بشكل أفضل")
+                add(aRecommendation[:recommendations], "Improve energy level by distributing tasks more evenly")
             }
 
             add(aRecommendations, aRecommendation)

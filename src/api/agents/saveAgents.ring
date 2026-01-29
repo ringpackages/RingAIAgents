@@ -5,25 +5,25 @@
 */
 
 /*
-الدالة: saveAgents
-الوصف: حفظ العملاء في قاعدة البيانات
+Function: saveAgents
+Description: Save agents to database
 */
 func saveAgents
     try {
-        # التحقق من وجود عملاء
+        # Check if agents exist
         if len(aAgents) = 0 {
             return false
         }
 
-        # تحديد مسار قاعدة البيانات
+        # Determine database path
         cDBPath = "G:\RingAIAgents\db\agents.db"
 
-        # إنشاء قاعدة بيانات للعملاء إذا لم تكن موجودة
+        # Create database if it doesn't exist
         if !fexists(cDBPath) {
             oDatabase = sqlite_init()
             sqlite_open(oDatabase, cDBPath)
 
-            # إنشاء جدول العملاء
+            # Create agents table if it doesn't exist
             cSQL = "CREATE TABLE IF NOT EXISTS agents (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     name TEXT,
@@ -36,32 +36,32 @@ func saveAgents
                 )"
             sqlite_execute(oDatabase, cSQL)
 
-            # إغلاق قاعدة البيانات
+            # Close database
             sqlite_close(oDatabase)
         }
 
-        # فتح قاعدة البيانات
+        # Open database
         oDatabase = sqlite_init()
         sqlite_open(oDatabase, cDBPath)
 
-        # حذف جميع العملاء الموجودين
+        # Delete all existing agents
         sqlite_execute(oDatabase, "DELETE FROM agents")
 
-        # حفظ العملاء الحاليين
+        # Save current agents
         for i = 1 to len(aAgents) {
             oAgent = aAgents[i]
 
-            # تحويل المهارات والسمات الشخصية إلى JSON
+            # Convert skills and personality traits to JSON
             cSkills = "[]"
             try {
                 aSkills = oAgent.getSkills()
 
-                # التحقق من أن aSkills هي قائمة وليست فارغة
+                # Check if aSkills is a list and not empty
                 if islist(aSkills) and len(aSkills) > 0 {
-                    # طباعة المهارات للتصحيح
+                    # Print skills for debugging
                     ? logger("saveAgents function", "Skills for agent " + oAgent.getName() + ": " + list2str(aSkills), :info)
 
-                    # تحويل المهارات إلى JSON
+                    # Convert skills to JSON
                     try {
                         cSkills = listTojson(aSkills, 0)
                         ? logger("saveAgents function", "Skills JSON: " + cSkills, :info)
@@ -73,7 +73,7 @@ func saveAgents
                     ? logger("saveAgents function", "No skills found or empty skills list for agent: " + oAgent.getName(), :info)
                 }
             catch
-                # تجاهل الأخطاء
+                # Ignore errors
                 ? logger("saveAgents function", "Error getting skills: " + cCatchError, :error)
             }
 
@@ -84,10 +84,10 @@ func saveAgents
                     cPersonality = listToJSON(aPersonality, 0)
                 }
             catch
-                # تجاهل الأخطاء
+                # Ignore errors
             }
 
-            # الحصول على هدف العميل
+            # Get agent goal
             cGoal = ""
             try {
                 cGoal = oAgent.getGoal()
@@ -95,7 +95,7 @@ func saveAgents
                 cGoal = "General purpose agent"
             }
 
-            # الحصول على نموذج اللغة
+            # Get language model
             cLanguageModel = ""
             try {
                 cLanguageModel = oAgent.getLanguageModel()
@@ -103,7 +103,7 @@ func saveAgents
                 cLanguageModel = "gemini-1.5-flash"
             }
 
-            # إضافة العميل إلى قاعدة البيانات
+            # Add agent to database
             cSQL = "INSERT INTO agents (name, role, goal, skills, personality, language_model) VALUES (
                     '" + oAgent.getName() + "',
                     '" + oAgent.getRole() + "',
@@ -115,7 +115,7 @@ func saveAgents
             sqlite_execute(oDatabase, cSQL)
         }
 
-        # إغلاق قاعدة البيانات
+        # Close database
         sqlite_close(oDatabase)
 
         return true

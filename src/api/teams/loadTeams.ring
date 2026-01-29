@@ -5,39 +5,39 @@
 */
 
 /*
-الدالة: loadTeams
-الوصف: تحميل الفرق المتاحة
+function: loadTeams
+description: Load available teams
 */
 func loadTeams
     try {
-        # مسح قائمة الفرق الحالية
+        # clear the current teams list
         aTeams = []
 
-        # تحديد مسار قاعدة البيانات
+        # define the database path
         cDBPath = "G:/RingAIAgents/db/teams.db"
 
-        # التحقق من وجود قاعدة بيانات للفرق
+        # check if the database exists
         if fexists(cDBPath) {
             ? logger("loadTeams function", "Loading teams from database: " + cDBPath, :info)
-            # فتح قاعدة البيانات
+            # open the database
             oDatabase = sqlite_init()
             sqlite_open(oDatabase, cDBPath)
 
-            # استرجاع الفرق
+            # retrieve the teams
             cSQL = "SELECT * FROM teams"
             aResults = sqlite_execute(oDatabase, cSQL)
 
-            # تسجيل نتائج الاستعلام
+            # log the query results
             ? logger("loadTeams function", "SQL query executed: " + cSQL, :info)
             ? logger("loadTeams function", "Number of teams found: " + iif(type(aResults) = "LIST", len(aResults), 0), :info)
 
-            # معالجة النتائج
+            # process the results
             if type(aResults) = "LIST" and len(aResults) > 0 {
-                # تسجيل تفاصيل كل فريق
+                # log the details of each team
                 for nTeamIndex = 1 to len(aResults) {
                     aResult = aResults[nTeamIndex]
                     ? logger("loadTeams function", "Processing team " + nTeamIndex + " of " + len(aResults) + ": " + aResult[:name], :info)
-                    # البحث عن القائد
+                    # find the leader
                     oLeader = NULL
                     ? logger("loadTeams function", "Looking for leader with ID: " + aResult[:leader_id], :info)
                     for i = 1 to len(aAgents) {
@@ -50,36 +50,36 @@ func loadTeams
                         }
                     }
 
-                    # إذا لم يتم العثور على القائد، استخدم العميل الأول
+                    # use the first customer if no leader is found
                     if oLeader = NULL and len(aAgents) > 0 {
                         oLeader = aAgents[1]
                     }
 
-                    # إنشاء فريق جديد
+                    # create a new team
                     if oLeader != NULL {
                         oCrew1 = new Crew("oCrew1 ", aResult[:name], oLeader)
 
-                        # تعيين المعرف والهدف
+                        # set the ID and objective
                         oCrew1.setId(aResult[:id])
 
-                        # تسجيل الهدف للتصحيح
+                        # log the objective for debugging
                         ? logger("loadTeams function", "Loading objective for team " + aResult[:id] + ": " + aResult[:objective], :info)
 
-                        # تعيين الهدف
+                        # set the objective
                         oCrew1.setObjective(aResult[:objective])
 
-                        # إضافة الأعضاء
+                        # add the members
                         try {
                             cMembersStr = aResult[:members]
                             ? logger("loadTeams function", "Members string: " + cMembersStr, :info)
 
-                            # تنظيف سلسلة الأعضاء وتحويلها إلى تنسيق JSON صحيح
+                            # clean the members string and convert it to a valid JSON format
                             cMembersStr = trim(cMembersStr)
                             if left(cMembersStr, 1) != "[" {
                                 cMembersStr = "[" + cMembersStr + "]"
                             }
 
-                            # محاولة تحليل JSON
+                            # try to parse the JSON
                             ? logger("loadTeams function", "Cleaned members JSON: " + cMembersStr, :info)
                             aMemberIds = JSON2List(cMembersStr)
 
@@ -87,13 +87,13 @@ func loadTeams
                                 ? logger("loadTeams function", "Number of members: " + len(aMemberIds), :info)
 
                                 for cMemberId in aMemberIds {
-                                    # تجنب إضافة القائد مرة أخرى
+                                    # avoid adding the leader again
                                     if cMemberId = oLeader.getId() {
                                         ? logger("loadTeams function", "Skipping leader: " + cMemberId, :info)
                                         loop
                                     }
 
-                                    # البحث عن العضو وإضافته
+                                    # find the member and add it
                                     for i = 1 to len(aAgents) {
                                         if aAgents[i].getId() = cMemberId {
                                             ? logger("loadTeams function", "Adding member: " + aAgents[i].getName() + " with ID: " + cMemberId, :info)
@@ -109,10 +109,10 @@ func loadTeams
                             ? logger("loadTeams function", "Error parsing members: " + cCatchError, :error)
                         }
 
-                        # إضافة الفريق إلى القائمة
+                        # add the team to the list
                         add(aTeams, oCrew1)
 
-                        # تسجيل الفريق في المراقب
+                        # register the team with the monitor
                         try {
                             oMonitor.registerCrew(oCrew1)
                         catch
@@ -122,47 +122,47 @@ func loadTeams
                 }
             }
 
-            # إغلاق قاعدة البيانات
+            # close the database
             sqlite_close(oDatabase)
         }
 
-        # إذا لم يتم تحميل أي فرق، إنشاء فرق افتراضية
+        # create default teams if no teams are loaded
         if len(aTeams) = 0 and len(aAgents) > 0 {
             ? logger("loadTeams function", "No teams loaded, creating default teams", :info)
 
-            # إنشاء فريق التطوير
+            # create the development team
             oDevTeam = new Crew("oDevTeam", "Development Team", aAgents[1])
             oDevTeam.setObjective("Build software")
 
-            # إضافة أعضاء الفريق
+            # add team members
             for i = 2 to min(len(aAgents), 4) {
                 oDevTeam.addMember(aAgents[i])
             }
 
-            # إضافة الفريق إلى القائمة العامة
+            # add the team to the general list
             add(aTeams, oDevTeam)
 
-            # تسجيل الفريق في المراقب
+            # register the team with the monitor
             try {
                 oMonitor.registerCrew(oDevTeam)
             catch
                 ? logger("loadTeams function", "Error registering dev team with monitor: " + cCatchError, :error)
             }
 
-            # إنشاء فريق الدعم إذا كان هناك عملاء كافيين
+            # create the support team if there are enough customers
             if len(aAgents) >= 5 {
                 oSupportTeam = new Crew("oSupportTeam", "Support Team", aAgents[5])
                 oSupportTeam.setObjective("Help users")
 
-                # إضافة أعضاء الفريق
+                # add team members
                 for i = 6 to min(len(aAgents), 8) {
                     oSupportTeam.addMember(aAgents[i])
                 }
 
-                # إضافة الفريق إلى القائمة العامة
+                # add the team to the general list
                 add(aTeams, oSupportTeam)
 
-                # تسجيل الفريق في المراقب
+                # register the team with the monitor
                 try {
                     oMonitor.registerCrew(oSupportTeam)
                 catch
@@ -170,7 +170,7 @@ func loadTeams
                 }
             }
 
-            # حفظ الفرق الافتراضية
+            # save the default teams
             saveTeams()
         }
 

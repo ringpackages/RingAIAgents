@@ -5,8 +5,8 @@
 */
 
 /*
-الدالة: aiAnalyze
-الوصف: تحليل البيانات باستخدام الذكاء الاصطناعي
+Function: aiAnalyze
+Description: Data analysis using artificial intelligence
 */
 func aiAnalyze
     try {

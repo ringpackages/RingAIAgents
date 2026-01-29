@@ -5,8 +5,8 @@
 */
 
 /*
-الدالة: updateTaskProgress
-الوصف: تحديث تقدم المهمة
+function: updateTaskProgress
+description: Update task progress
 */
 func updateTaskProgress
     try {
@@ -14,12 +14,12 @@ func updateTaskProgress
         if nID > 0 and nID <= len(aTasks) {
             oTask = aTasks[nID]
 
-            # تحديث التقدم
+            #   update the progress
             nProgress = number(oServer["progress"])
             if nProgress >= 0 and nProgress <= 100 {
                 oTask.setProgress(nProgress)
 
-                # تحديث الحالة تلقائياً
+                # update the status automatically
                 if nProgress = 100
                     oTask.setStatus("Completed")
                 elseif nProgress > 0

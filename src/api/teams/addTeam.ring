@@ -5,12 +5,12 @@
 */
 
 /*
-الدالة: addTeam
-الوصف: إنشاء فريق جديد
+function: addTeam
+description: Create a new team
 */
 func addTeam
     try {
-        # الحصول على معلومات الفريق
+        # get the team information
         cName = oServer.variable("name")
         cObjective = oServer.variable("objective")
         cLeaderId = oServer.variable("leader_id")
@@ -19,10 +19,10 @@ func addTeam
         ? logger("addTeam function", "Objective: " + cObjective, :info)
         ? logger("addTeam function", "Leader ID: " + cLeaderId, :info)
 
-        # تعيين القائد وإنشاء الفريق
+        # set the leader and create the team
         for i = 1 to len(aAgents) {
             if aAgents[i].getID() = cLeaderId {
-                # إنشاء الفريق
+                # create the team
                 oCrew = new Crew(cName, aAgents[i])
 
                 ? logger("addTeam function", "Leader set to: " + aAgents[i].getName(), :info)
@@ -30,7 +30,7 @@ func addTeam
             }
         }
 
-        # إضافة الأعضاء
+        # add the members
         cMemberIds = oServer.variable("member_ids")
         if len(cMemberIds) > 0 {
             try {
@@ -51,10 +51,10 @@ func addTeam
             }
         }
 
-        # تسجيل الفريق
+        # register the team
         add(aTeams, oCrew)
         oMonitor.registerCrew(oCrew)
-        # حفظ الفريق في قاعدة البيانات
+        # save the team to the database
         if saveTeams() {
             ? logger("addTeam function", "Team created and saved successfully", :info)
             oServer.setContent('{"status":"success","message":"Team created successfully","id":"' +

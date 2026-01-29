@@ -5,12 +5,12 @@
 */
 
 /*
-الدالة: updateTask
-الوصف: تحديث معلومات مهمة
+function: updateTask
+description: Update task information
 */
 func updateTask
     try {
-        # محاولة الحصول على المعرف من معلمات URL
+        # try to get the task ID from the URL
         cTaskID = ""
         try {
             cTaskID = oServer.match(1)
@@ -19,13 +19,13 @@ func updateTask
             ? logger("updateTask function", "Error getting URL match parameter", :error)
         }
 
-        # التحقق من وجود معرف صالح
+        # check if the task ID is valid
         if cTaskID = NULL or len(cTaskID) = 0 {
             oServer.setContent('{"status":"error","message":"No task ID provided"}', "application/json")
             return
         }
 
-        # البحث عن المهمة بالمعرف
+        # search for the task by ID
         oTask = NULL
 
         for i = 1 to len(aTasks) {
@@ -38,16 +38,16 @@ func updateTask
         if oTask != NULL {
             ? logger("updateTask function", "Updating task: " + oTask.getTitle(), :info)
 
-            # تحديث المعلومات
+            # update the task information
             oTask.setTitle(oServer.variable("title"))
             oTask.setDescription(oServer.variable("description"))
             oTask.setPriority(number(oServer.variable("priority")))
 
-            # تحديث العميل المسؤول
+            # update the assigned agent
             cAgentId = oServer.variable("agent_id")
             ? logger("updateTask function", "Agent ID: " + cAgentId, :info)
 
-            # البحث عن العميل بالمعرف
+            # search for the agent by ID
             for i = 1 to len(aAgents) {
                 if aAgents[i].getID() = cAgentId {
                     oTask.assignTo(aAgents[i])
@@ -56,7 +56,7 @@ func updateTask
                 }
             }
 
-            # حفظ التغييرات في قاعدة البيانات
+            # save the changes to the database
             if saveTasks() {
                 ? logger("updateTask function", "Task updated and saved successfully", :info)
                 oServer.setContent('{"status":"success","message":"Task updated successfully"}',

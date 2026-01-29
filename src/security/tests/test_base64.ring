@@ -1,64 +1,64 @@
 load "G:\RingAIAgents\src\security\Base64.ring"
 
 /*
-    اختبار دوال Base64
+    Testing Base64 functions
 */
 func main {
-    ? "=== اختبار دوال Base64 ==="
+    ? "=== Testing Base64 functions ==="
 
-    # إنشاء كائن Base64
+    # Create Base64 object
     oBase64 = new Base64()
 
-    # اختبار تشفير وفك تشفير نص عادي
+    # Testing text encryption and decryption
     testBase64(oBase64, "Hello, World!")
 
-    # اختبار تشفير وفك تشفير نص عربي
+    # Testing text encryption and decryption
     testBase64(oBase64, "مرحباً بالعالم!")
 
-    # اختبار تشفير وفك تشفير بيانات ثنائية
+    # Testing binary encryption and decryption
     testBase64Binary(oBase64)
 
-    # اختبار حالات خاصة
+    # Testing special cases
     testBase64SpecialCases(oBase64)
 
-    ? "=== تم اكتمال الاختبارات بنجاح ==="
+    ? "=== Testing completed successfully ==="
 }
 
-# اختبار تشفير وفك تشفير نص
+# Testing text encryption and decryption
 func testBase64 oBase64, cText {
-    ? "اختبار تشفير وفك تشفير: " + cText
+    ? "Testing text encryption and decryption: " + cText
 
-    # تشفير النص
+    # Encrypt the text
     cEncoded = oBase64.encode(cText)
-    ? "  النص المشفر: " + cEncoded
+    ? "  Encoded text: " + cEncoded
 
-    # فك تشفير النص
+    # Decrypt the text
     cDecoded = oBase64.decode(cEncoded)
-    ? "  النص بعد فك التشفير: " + cDecoded
+    ? "  Decoded text: " + cDecoded
 
-    # التحقق من صحة فك التشفير
-    assert(cDecoded = cText, "اختبار تشفير وفك تشفير النص")
+    # Validate the decoded text
+    assert(cDecoded = cText, "Testing text encryption and decryption")
 }
 
-# اختبار تشفير وفك تشفير بيانات ثنائية
+# Testing binary encryption and decryption
 func testBase64Binary oBase64 {
-    ? "اختبار تشفير وفك تشفير بيانات ثنائية"
+    ? "Testing binary encryption and decryption"
 
-    # إنشاء بيانات ثنائية
+    # Create binary data
     cBinary = ""
     for i = 0 to 255
         cBinary += char(i)
     next
 
-    # تشفير البيانات
+    # Encrypt the binary data
     cEncoded = oBase64.encode(cBinary)
-    ? "  طول البيانات المشفرة: " + len(cEncoded)
+    ? "  Encoded binary data length: " + len(cEncoded)
 
-    # فك تشفير البيانات
+    # Decrypt the binary data
     cDecoded = oBase64.decode(cEncoded)
-    ? "  طول البيانات بعد فك التشفير: " + len(cDecoded)
+    ? "  Decoded binary data length: " + len(cDecoded)
 
-    # التحقق من صحة فك التشفير
+    # Validate the decoded binary data
     bEqual = true
     if len(cBinary) != len(cDecoded)
         bEqual = false
@@ -71,35 +71,35 @@ func testBase64Binary oBase64 {
         next
     ok
 
-    assert(bEqual, "اختبار تشفير وفك تشفير البيانات الثنائية")
+    assert(bEqual, "Testing binary encryption and decryption")
 }
 
-# اختبار حالات خاصة
+# Testing special cases
 func testBase64SpecialCases oBase64 {
-    ? "اختبار حالات خاصة"
+    ? "Testing special cases"
 
-    # اختبار سلسلة فارغة
+    # Testing empty string
     cEncoded = oBase64.encode("")
     cDecoded = oBase64.decode(cEncoded)
-    assert(cDecoded = "", "اختبار سلسلة فارغة")
+    assert(cDecoded = "", "Testing empty string")
 
-    # اختبار سلسلة بطول 1
+    # Testing string with length 1
     cEncoded = oBase64.encode("A")
     cDecoded = oBase64.decode(cEncoded)
-    assert(cDecoded = "A", "اختبار سلسلة بطول 1")
+    assert(cDecoded = "A", "Testing string with length 1")
 
-    # اختبار سلسلة بطول 2
+    # Testing string with length 2
     cEncoded = oBase64.encode("AB")
     cDecoded = oBase64.decode(cEncoded)
-    assert(cDecoded = "AB", "اختبار سلسلة بطول 2")
+    assert(cDecoded = "AB", "Testing string with length 2")
 
-    # اختبار سلسلة بطول 3
+    # Testing string with length 3
     cEncoded = oBase64.encode("ABC")
     cDecoded = oBase64.decode(cEncoded)
-    assert(cDecoded = "ABC", "اختبار سلسلة بطول 3")
+    assert(cDecoded = "ABC", "Testing string with length 3")
 }
 
-# دالة مساعدة للتأكيد
+# Helper function for assertion
 func assert condition, message {
     if condition
         ? "  ✓ " + message

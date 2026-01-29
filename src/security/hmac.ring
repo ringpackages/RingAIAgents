@@ -2,17 +2,17 @@
 
 /*
 Class: HMAC
-Description: توفير وظائف HMAC للتحقق من سلامة البيانات
+Description: Provides HMAC functions to verify data safety
 */
 class HMAC {
     
     func init {
-        # لا شيء للتهيئة
+        # Nothing to initialize
     }
     
     # حساب HMAC-SHA256
     func hmac_sha256 cData, cKey {
-        # تحضير المفتاح
+        # Prepare the key
         if len(cKey) > 64 {
             cKey = sha256(cKey)
         }
@@ -21,7 +21,7 @@ class HMAC {
             cKey = cKey + copy(char(0), 64 - len(cKey))
         }
         
-        # حساب المفاتيح الداخلية والخارجية
+        # Calculate the inner and outer keys
         cInnerKey = ""
         cOuterKey = ""
         
@@ -30,16 +30,16 @@ class HMAC {
             cOuterKey += char(ascii(cKey[i]) ^ 0x5C)
         }
         
-        # حساب HMAC
+        # Calculate HMAC
         cInnerHash = sha256(cInnerKey + cData)
         cOuterHash = sha256(cOuterKey + cInnerHash)
         
         return cOuterHash
     }
     
-    # حساب HMAC-SHA1
+    # Calculate HMAC-SHA1
     func hmac_sha1 cData, cKey {
-        # تحضير المفتاح
+        # Prepare the key
         if len(cKey) > 64 {
             cKey = sha1(cKey)
         }
@@ -48,7 +48,7 @@ class HMAC {
             cKey = cKey + copy(char(0), 64 - len(cKey))
         }
         
-        # حساب المفاتيح الداخلية والخارجية
+        # Calculate the inner and outer keys
         cInnerKey = ""
         cOuterKey = ""
         
@@ -57,16 +57,16 @@ class HMAC {
             cOuterKey += char(ascii(cKey[i]) ^ 0x5C)
         }
         
-        # حساب HMAC
+        # Calculate HMAC
         cInnerHash = sha1(cInnerKey + cData)
         cOuterHash = sha1(cOuterKey + cInnerHash)
         
         return cOuterHash
     }
     
-    # حساب HMAC-MD5
+    # Calculate HMAC-MD5
     func hmac_md5 cData, cKey {
-        # تحضير المفتاح
+        # Prepare the key
         if len(cKey) > 64 {
             cKey = md5(cKey)
         }
@@ -75,7 +75,7 @@ class HMAC {
             cKey = cKey + copy(char(0), 64 - len(cKey))
         }
         
-        # حساب المفاتيح الداخلية والخارجية
+        # Calculate the inner and outer keys
         cInnerKey = ""
         cOuterKey = ""
         
@@ -84,14 +84,14 @@ class HMAC {
             cOuterKey += char(ascii(cKey[i]) ^ 0x5C)
         }
         
-        # حساب HMAC
+        # Calculate HMAC
         cInnerHash = md5(cInnerKey + cData)
         cOuterHash = md5(cOuterKey + cInnerHash)
         
         return cOuterHash
     }
     
-    # التحقق من صحة HMAC
+    # Verify HMAC
     func verify cData, cHMAC, cKey, cAlgorithm {
         cComputedHMAC = ""
         
@@ -109,7 +109,7 @@ class HMAC {
         return cComputedHMAC = cHMAC
     }
     
-    # توليد توكن مصادقة
+    # Generate authentication token
     func generateAuthToken cUserId, cUserRole, cSecret, nExpiry {
         cTimestamp = string(time())
         cExpiry = string(time() + nExpiry)
@@ -120,7 +120,7 @@ class HMAC {
         return cData + "|" + cHMAC
     }
     
-    # التحقق من صحة توكن المصادقة
+    # Verify authentication token
     func verifyAuthToken cToken, cSecret {
         aParts = split(cToken, "|")
         
@@ -134,12 +134,12 @@ class HMAC {
         cExpiry = aParts[4]
         cHMAC = aParts[5]
         
-        # التحقق من انتهاء صلاحية التوكن
+        # Verify token expiry
         if number(cExpiry) < time() {
             return false
         }
         
-        # التحقق من صحة HMAC
+        # Verify HMAC
         cData = cUserId + "|" + cUserRole + "|" + cTimestamp + "|" + cExpiry
         cComputedHMAC = hmac_sha256(cData, cSecret)
         

@@ -5,39 +5,38 @@
 */
 
 /*
-الدالة: initialize
-الوصف: تهيئة النظام
+function: initialize
+description: Initialize the system
 */
 func initialize
     try {
         ? logger("initialize function", "Initializing RingAI Agents API System...", :info)
 
-        # تهيئة المكونات الأساسية
+        # initialize the basic components
         oMonitor = new PerformanceMonitor("G:\RingAIAgents\db/performance_metrics.db")
         oMemory = new Memory("G:\RingAIAgents\db/memories.db")
 
-        # التحقق من وجود مفتاح API لـ Gemini
+        # check if the Gemini API key is set
         cGeminiApiKey = sysget("GEMINI_API_KEY")
         if cGeminiApiKey = "" {
             ? logger("initialize function", "GEMINI_API_KEY environment variable not set. Using default key.", :warning)
             cGeminiApiKey = "AIzaSyDJC5a7TpnJWQfG2rPlOvDpGDWCRKigDGc"  # مفتاح API افتراضي للاختبار فقط
         }
 
-        # تهيئة نموذج اللغة
+        # initialize the language model
         oLLM = new LLM(GEMINI)
         oLLM.setApiKey(cGeminiApiKey)
 
-        # تسجيل المكونات للمراقبة
-        oMonitor.registerLLM(oLLM)
+        # register the components for monitoring
         oMonitor.startMonitoring()
 
-        # تحميل العملاء
+        # load the agents
         loadAgents()
 
-        # تحميل الفرق
+        # load the teams
         loadTeams()
 
-        # تحميل المهام
+        # load the tasks
         loadTasks()
 
         ? logger("initialize function", "System initialized successfully!", :info)
@@ -45,9 +44,9 @@ func initialize
         ? logger("initialize function", "Error initializing system: " + cCatchError, :error)
     }
 
-    # تعريف المسارات
+    # define the routes
 
-    ## مسارات العرض الرئيسية
+    ## define the main display routes
     oServer.route(:Get, "/", :showDashboard)
     oServer.route(:Get, "/agents", :showAgents)
     oServer.route(:Get, "/teams", :showTeams)
@@ -57,28 +56,28 @@ func initialize
     oServer.route(:Get, "/chat/history", :showChatHistory)
     oServer.route(:Get, "/api-keys", :showAPIKeys)
 
-    ## مسارات العملاء
+    ## define the customer routes
     oServer.route(:Post, "/agents/add", :addAgent)
     oServer.route(:Get, "/agents/([^/]+)", :getAgent)
-    oServer.route(:Get, "/api/agents/list", :listAgents)  # مسار للحصول على قائمة العملاء
-    oServer.route(:Get, "/api/agents/check", :checkAgents)  # مسار للتحقق من حالة العملاء
+    oServer.route(:Get, "/api/agents/list", :listAgents)  # define the list agents route
+    oServer.route(:Get, "/api/agents/check", :checkAgents)  # define the check agents route
     oServer.route(:Post, "/agents/([^/]+)/update", :updateAgent)
     oServer.route(:Post, "/agents/([^/]+)/delete", :deleteAgent)
     oServer.route(:Post, "/agents/([^/]+)/train", :trainAgent)
     oServer.route(:Get, "/agents/([^/]+)/skills", :getAgentSkills)
     oServer.route(:Post, "/agents/([^/]+)/skills", :addAgentSkill)
 
-    ## مسارات الفرق
+    ## define the team routes
     oServer.route(:Post, "/teams/add", :addTeam)
     oServer.route(:Get, "/teams/([^/]+)", :getTeam)
-    oServer.route(:Get, "/api/teams/list", :listTeams)  # مسار للحصول على قائمة الفرق
+    oServer.route(:Get, "/api/teams/list", :listTeams)  # define the list teams route
     oServer.route(:Post, "/teams/([^/]+)/update", :updateTeam)
     oServer.route(:Post, "/teams/([^/]+)/delete", :deleteTeam)
     oServer.route(:Post, "/teams/([^/]+)/members", :addTeamMember)
     oServer.route(:Post, "/teams/([^/]+)/members/([^/]+)", :removeTeamMember)
     oServer.route(:Get, "/teams/([^/]+)/performance", :getTeamPerformance)
 
-    ## مسارات المهام
+    ## define the task routes
     oServer.route(:Post, "/tasks/add", :addTask)
     oServer.route(:Get, "/tasks/([^/]+)", :getTask)
     oServer.route(:Get, "/api/tasks/list", :listTasks)  
@@ -88,7 +87,7 @@ func initialize
     oServer.route(:Post, "/tasks/([^/]+)/progress", :updateTaskProgress)
     oServer.route(:Get, "/tasks/([^/]+)/history", :getTaskHistory)
 
-    ## مسارات المستخدمين
+    ## define the user routes
     oServer.route(:Post, "/users/add", :addUser)
     oServer.route(:Get, "/users/([^/]+)", :getUser)
     oServer.route(:Post, "/users/([^/]+)/update", :updateUser)
@@ -96,21 +95,21 @@ func initialize
     oServer.route(:Post, "/login", :login)
     oServer.route(:Get, "/logout", :logout)
 
-    ## مسارات الذكاء الاصطناعي
+    ## define the AI routes
     oServer.route(:Post, "/ai/chat", :aiChat)
     oServer.route(:Post, "/ai/analyze", :aiAnalyze)
     oServer.route(:Post, "/ai/learn", :aiLearn)
     oServer.route(:Get, "/ai/models", :getAIModels)
     oServer.route(:Post, "/ai/chat/history", :getChatHistory)
 
-    ## مسارات مفاتيح API
+    ## define the API key routes
     oServer.route(:Get, "/api/keys", :getAPIKeys)
     oServer.route(:Post, "/api/keys", :addAPIKey)
     oServer.route(:Post, "/api/keys/([^/]+)/update", :updateAPIKey)
     oServer.route(:Post, "/api/keys/([^/]+)/delete", :deleteAPIKey)
     oServer.route(:Post, "/api/keys/([^/]+)/test", :testAPIKey)
 
-    ## مسارات المراقبة
+    ## define the monitoring routes
     oServer.route(:Get, "/monitor/metrics", :getMetrics)
     oServer.route(:Get, "/monitor/performance", :getPerformance)
     oServer.route(:Get, "/monitor/events", :getEvents)

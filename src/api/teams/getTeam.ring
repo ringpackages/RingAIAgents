@@ -5,12 +5,12 @@
 */
 
 /*
-الدالة: getTeam
-الوصف: الحصول على معلومات فريق محدد
+function: getTeam
+description: Get a specific team's information
 */
 func getTeam
     try {
-        # محاولة الحصول على المعرف من معلمات URL
+        # try to get the team ID from the URL parameters
         cTeamID = ""
         try {
             cTeamID = oServer.match(1)
@@ -19,13 +19,13 @@ func getTeam
             ? logger("getTeam function", "Error getting URL match parameter", :error)
         }
 
-        # التحقق من وجود معرف صالح
+        # check if the team ID is valid
         if cTeamID = NULL or len(cTeamID) = 0 {
             oServer.setContent('{"status":"error","message":"No team ID provided"}', "application/json")
             return
         }
 
-        # البحث عن الفريق بالمعرف
+        # search for the team by ID
         oCrew = NULL
         nIndex = 0
 
@@ -39,14 +39,14 @@ func getTeam
 
         if oCrew != NULL {
 
-            # تجميع معرفات الأعضاء
+            # collect the member IDs
             aMemberIds = []
             for oMember in oCrew.getMembers() {
                 add(aMemberIds, oMember.getID())
             }
 
             ? logger("getTeam function", "Team retrieved successfully", :info)
-            # تحضير كائن JSON للاستجابة
+            # prepare the JSON response
             aResponse = [
                 :status = "success",
                 :team = [
@@ -60,13 +60,13 @@ func getTeam
                 ]
             ]
 
-            # تحويل الكائن إلى JSON
+            # convert the object to JSON
             cJSON = list2json(aResponse)
 
-            # تسجيل JSON للتصحيح
+            # log the JSON response for debugging
             ? logger("getTeam function", "JSON response: " + cJSON, :info)
 
-            # إرسال الاستجابة
+            # send the response
             oServer.setContent(cJSON, "application/json")
         else
             oServer.setContent('{"status":"error","message":"Team not found"}',

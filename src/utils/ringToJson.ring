@@ -1,5 +1,5 @@
 /*
-* دوال تحويل بين Ring و JSON
+* Functions to convert between Ring and JSON
 * Author: Azzeddine Remmal
 */
 
@@ -7,7 +7,7 @@ load "stdlib.ring"
 
 
 if isMainSourceFile() {
-    # مثال للاستخدام
+    # Example usage
     cJSON4 = '{"name": "Ahmed", "address": {"city": "Cairo", "country": "Egypt"}}'
     //? FromJSON(cJSON4)
 

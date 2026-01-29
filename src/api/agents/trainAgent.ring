@@ -5,8 +5,8 @@
 */
 
 /*
-الدالة: trainAgent
-الوصف: تدريب عميل على مهارة جديدة
+Function: trainAgent
+Description: Train an agent on a new skill
 */
 func trainAgent
     try {
@@ -17,10 +17,10 @@ func trainAgent
             cSkill = oServer["skill"]
             nLevel = number(oServer["level"])
 
-            # بدء التدريب
+            # Start training
             oAgent.startTraining(cSkill, nLevel)
 
-            # تسجيل التدريب في الذاكرة
+            # Store training in memory
             oMemory.store(
                 "Agent Training: " + oAgent.getName() + " - " + cSkill,
                 Memory.LONG_TERM,

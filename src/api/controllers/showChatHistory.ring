@@ -5,21 +5,21 @@
 */
 
 /*
-الدالة: showChatHistory
-الوصف: عرض تاريخ المحادثات
+function: showChatHistory
+description: Display the chat history
 */
 import System.Web
 
 func showChatHistory
     oPage = new BootStrapWebPage {
         Title = "RingAI Chat History"
-        # تحميل الستايلات المشتركة
+        # load common styles
         loadCommonStyles(oPage)
-        # تحميل ستايلات خاصة بالصفحة
+        # load page specific styles
         html("<link rel='stylesheet' href='/static/css/chat.css'>")
         html("<script src='/static/js/chat-history.js'></script>")
 
-        # إضافة الهيدر
+        # add the header
         getHeader(oPage)
 
         div {
@@ -36,7 +36,7 @@ func showChatHistory
                     }
                 }
 
-                # قسم البحث والتصفية
+                # add the search and filter section
                 div {
                     classname = "row mb-4"
                     div {
@@ -70,13 +70,13 @@ func showChatHistory
                                 style = "width: auto;"
                                 option { value = "0" text("All Agents") }
 
-                                # التحقق من وجود عملاء
+                                # check if agents list exists and is not empty
                                 if isList(aAgents) and len(aAgents) > 0 {
                                     ? logger("showChatHistory function", "Number of agents: " + len(aAgents), :info)
                                     for i = 1 to len(aAgents) {
                                         if isObject(aAgents[i]) {
                                             ? logger("showChatHistory function", "Checking agent " + i, :info)
-                                            # لغة الرينج ليست حساسة لحالة الأحرف، لذلك نتحقق من وجود الدوال بأحرف صغيرة
+                                            # check if the agent has the required methods
                                             if methodExists(aAgents[i], "getname") and methodExists(aAgents[i], "getid") {
                                                 cName = aAgents[i].getname()
                                                 cId = aAgents[i].getid()
@@ -97,7 +97,7 @@ func showChatHistory
                                 else
                                     ? logger("showChatHistory function", "No agents found or agents list is not valid, adding default agents", :warning)
 
-                                    # إضافة وكلاء افتراضيين للقائمة المنسدلة
+                                    # add default agents to the dropdown list
                                     option {
                                         value = "agent_default_1"
                                         text("Default Assistant")
@@ -128,7 +128,7 @@ func showChatHistory
                     }
                 }
 
-                # قسم عرض المحادثات
+                # add the conversations section
                 div {
                     classname = "row"
                     div {
@@ -183,10 +183,10 @@ func showChatHistory
             }
         }
 
-        # إضافة الفوتر
+        # add the footer
         getFooter(oPage)
 
-        # إضافة سكريبت لتحميل تاريخ المحادثات
+        # add the script to load chat history
         html("<script>
             $(document).ready(function() {
                 // Load chat history

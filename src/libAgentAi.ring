@@ -1,9 +1,9 @@
 /*
-    مكتبة RingAI Agents - الواجهة الرئيسية
-    تجمع كل المكونات الأساسية في مكان واحد
+    RingAI Agents Library - Main Interface
+    Combines all basic components in one place
 */
 
-# تحميل المكتبات الأساسية
+# Load basic libraries
 load "sqlitelib.ring"
 load "ringThreadPro.ring"
 load "consolecolors.ring"
@@ -14,30 +14,30 @@ load "csvlib.ring"
 load "subprocess.ring"
 load "openssllib.ring"
 
-# تحميل المكتبات المساعدة
+# Load helper libraries
 load "utils/ringToJson.ring"
 Load "utils/helpers.ring"
 Load "utils/http_client.ring"
 Load "core/state.ring"
 
-# تحميل المكونات الأساسية بالترتيب الصحيح
-Load "core/tools.ring"      # لا يعتمد على أي مكون آخر
-Load "core/memory.ring"     # لا يعتمد على أي مكون آخر
-Load "core/task.ring"       # لا يعتمد على أي مكون آخر
-Load "core/llm.ring"        # يعتمد على helpers
-Load "core/monitor.ring"    # لا يعتمد على أي مكون آخر
-Load "core/reinforcement.ring" # لا يعتمد على أي مكون آخر
-Load "core/flow.ring"       # يعتمد على state
-Load "core/agent.ring"      # يعتمد على llm, task, memory, tools
-Load "core/crew.ring"       # يعتمد على agent
-Load "core/integration.ring" # يعتمد على memory, task, agent, crew
+# Load core components in the correct order
+Load "core/tools.ring"      # does not depend on any component
+Load "core/memory.ring"     # does not depend on any component
+Load "core/task.ring"       # does not depend on any component
+Load "core/llm.ring"        # depends on helpers
+Load "core/monitor.ring"    # does not depend on any component
+Load "core/reinforcement.ring" # does not depend on any component
+Load "core/flow.ring"       # depends on state
+Load "core/agent.ring"      # depends on llm, task, memory, tools
+Load "core/crew.ring"       # depends on agent
+Load "core/integration.ring" # depends on memory, task, agent, crew
 
-# تحميل أدوات البناء 
+# Load building tools
 Load "tools\development_tools.ring"
 Load "tools\DefaultTools.ring"
 //Load "tools\advancedtools.ring"
 
-# تهيئة النظام
+# Initialize the system
 serverdebug = false # true
 aDebag = [:error, :info]
 
@@ -93,24 +93,24 @@ if isMainSourceFile() {
 
 class AgentAI
 
-    # الثوابت
+    # constants
     IDLE = :idle
     WORKING = :working
     LEARNING = :learning
     ERROR = :error
     
-    # المتغيرات العامة
+    # general variables
     bVerbose = true
 
     func init
-        if bVerbose { ? "تهيئة نظام العملاء الذكي" }
+        if bVerbose { ? "Setting up the smart customer system" }
 
-        # تهيئة المكونات الأساسية
+        # Initialize components
         oMemory = new Memory("G:/RingAIAgents/db/AgentAI_memory.db")
         oMonitor = new PerformanceMonitor("G:/RingAIAgents/db/AgentAI_monitor.db")
         oRL = new ReinforcementLearning(:epsilon_greedy)
 
-        # تهيئة القوائم
+        # Initialize lists
         aAgents = []
         aTeams = []
         aTools = []
@@ -118,71 +118,71 @@ class AgentAI
 
         return self
 
-    # إدارة العملاء
+    # Create agent
     func createAgent cName, cDescription
         oAgent = new Agent(cName, cDescription)
         add(aAgents, oAgent)
-        if bVerbose { ? "تم إنشاء عميل جديد: " + cName }
+        if bVerbose { ? "New agent created: " + cName }
         return oAgent
 
     func removeAgent cAgentId
         for i = 1 to len(aAgents) {
             if aAgents[i].getId() = cAgentId {
                 del(aAgents, i)
-                if bVerbose { ? "تم حذف العميل: " + cAgentId }
+                if bVerbose { ? "Agent removed: " + cAgentId }
                 return true
             }
         }
         return false
 
-    # إدارة الفرق
+    # Create team
     func createTeam  objectName, cName, oLeaderAgent
         oTeam = new Crew(objectName, cName, oLeaderAgent)
         add(aTeams, oTeam)
-        if bVerbose { ? "تم إنشاء فريق جديد: " + cName }
+        if bVerbose { ? "New team created: " + cName }
         return oTeam
 
     func removeTeam cTeamId
         for i = 1 to len(aTeams) {
             if aTeams[i].getId() = cTeamId {
                 del(aTeams, i)
-                if bVerbose { ? "تم حذف الفريق: " + cTeamId }
+                if bVerbose { ? "Team removed: " + cTeamId }
                 return true
             }
         }
         return false
 
-    # إدارة المهام
+    # Create task
     func createTask cDescription
         oTask = new Task(cDescription)
         add(aTasks, oTask)
-        if bVerbose { ? "تم إنشاء مهمة جديدة: " + cDescription }
+        if bVerbose { ? "New task created: " + cDescription }
         return oTask
 
     func assignTask oTask, oAgent
         if oAgent.assignTask(oTask) {
-            if bVerbose { ? "تم إسناد المهمة للعميل: " + oAgent.getName() }
+            if bVerbose { ? "Task assigned to agent: " + oAgent.getName() }
             return true
         }
         return false
 
-    # إدارة الأدوات
+    # Register tool
     func registerTool oTool
         add(aTools, oTool)
-        if bVerbose { ? "تم تسجيل أداة جديدة: " + oTool.getName() }
+        if bVerbose { ? "New tool registered: " + oTool.getName() }
         return true
 
     func unregisterTool cToolName
         for i = 1 to len(aTools) {
             if aTools[i].getName() = cToolName {
                 del(aTools, i)
-                if bVerbose { ? "تم إلغاء تسجيل الأداة: " + cToolName }
+                if bVerbose { ? "Tool unregistered: " + cToolName }
                 return true
             }
         }
         return false
 
-    # المراقبة والتحليل
+    # Get performance metrics
     func getPerformanceMetrics
         return oMonitor.getMetrics()
 
@@ -195,12 +195,12 @@ class AgentAI
         ]
 
     private
-        # المكونات الأساسية
+        # Components
         oMemory
         oMonitor
         oRL
 
-        # القوائم
+        # Lists
         aAgents
         aTeams
         aTools

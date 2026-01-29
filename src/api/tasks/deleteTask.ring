@@ -5,12 +5,12 @@
 */
 
 /*
-الدالة: deleteTask
-الوصف: حذف مهمة
+function: deleteTask
+description: Delete a task
 */
 func deleteTask
     try {
-        # محاولة الحصول على المعرف من معلمات URL
+        # try to get the task ID from the URL
         cTaskID = ""
         try {
             cTaskID = oServer.match(1)
@@ -19,13 +19,13 @@ func deleteTask
             ? logger("deleteTask function", "Error getting URL match parameter", :error)
         }
 
-        # التحقق من وجود معرف صالح
+        # check if the task ID is valid
         if cTaskID = NULL or len(cTaskID) = 0 {
             oServer.setContent('{"status":"error","message":"No task ID provided"}', "application/json")
             return
         }
 
-        # البحث عن المهمة بالمعرف
+        # search for the task by ID
         oTask = NULL
         nIndex = 0
 
@@ -40,10 +40,10 @@ func deleteTask
         if oTask != NULL {
             ? logger("deleteTask function", "Deleting task: " + oTask.getTitle(), :info)
 
-            # حذف المهمة
+            # delete the task
             del(aTasks, nIndex)
 
-            # حفظ التغييرات في قاعدة البيانات
+            # save the changes to the database
             if saveTasks() {
                 ? logger("deleteTask function", "Task deleted and database updated", :info)
                 oServer.setContent('{"status":"success","message":"Task deleted successfully"}',

@@ -5,8 +5,8 @@
 */
 
 /*
-الدالة: getTaskHistory
-الوصف: الحصول على سجل المهمة
+function: getTaskHistory
+description: Get a task history
 */
 func getTaskHistory
     try {
@@ -14,7 +14,7 @@ func getTaskHistory
         if nID > 0 and nID <= len(aTasks) {
             oTask = aTasks[nID]
 
-            # استرجاع السجل من الذاكرة
+            # retrieve the history from memory
             aHistory = oMemory.retrieve(
                 "task_" + nID,
                 Memory.LONG_TERM,

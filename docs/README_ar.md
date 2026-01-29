@@ -1,6 +1,6 @@
 # RingAI Agents
 
-نظام متكامل لإدارة العملاء الذكيين (AI Agents) مع دعم مرجان للذكاء الاصطناعي.
+نظام متكامل لإدارة العملاء الذكيين (AI Agents) 
 
 ## المميزات الرئيسية
 
@@ -62,7 +62,6 @@
 ### 3. الأدوات والمكتبات
 - RingQt
 - SQLite
-- مرجان
 - RingThreadPro
 - HTTP
 
@@ -76,7 +75,6 @@
 
 ### المكتبات
 - RingThreadPro
-- MorGen
 - RingAIAgents Core
 
 ## التثبيت
@@ -93,14 +91,9 @@ ringpm install sqlitelib
 ringpm install threadpro
 ```
 
-3. تثبيت مرجان
+3. تثبيت RingAI Agents
 ```
-git clone https://github.com/YourUsername/MorGen.git
-```
-
-4. تثبيت RingAI Agents
-```
-git clone https://github.com/YourUsername/RingAIAgents.git
+git clone https://github.com/Azzeddine2017/RingAIAgents.git
 cd RingAIAgents
 ring install.ring
 ```

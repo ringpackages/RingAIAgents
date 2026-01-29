@@ -1,8 +1,8 @@
 
 
 /*
-الكلاس: LoginDialog
-الوصف: نافذة تسجيل الدخول
+the class: LoginDialog
+the description: login dialog
 */
 class LoginDialog from QDialog
 
@@ -18,7 +18,7 @@ class LoginDialog from QDialog
         super.init(oParent)
         setWindowTitle("Login")
         setModal(true)
-        setFixedSize(600, 800)  # تثبيت حجم الديالوج - عرض أكبر وطول أقل
+        setFixedSize(600, 800)  # fix dialog size - larger width and smaller height
         initUI()
         loadSavedCredentials()
     }
@@ -27,7 +27,7 @@ class LoginDialog from QDialog
         # Create main layout
         oMainLayout = new QVBoxLayout()
         oMainLayout.setSpacing(5)
-        oMainLayout.setContentsMargins(15, 10, 15, 10)  # تقليل الهوامش
+        oMainLayout.setContentsMargins(15, 10, 15, 10)  # reduce margins
 
         # Set window background
         setStyleSheet("background-color: #f5f7fa;")
@@ -44,7 +44,7 @@ class LoginDialog from QDialog
 
         # Logo
         oLogoLabel = new QLabel(oLogoContainer) {
-            # setPixmap(new QPixmap("icons/logo.png")) - غير مدعومة
+            # setPixmap(new QPixmap("icons/logo.png")) - not supported
             settext("RingAI Agents")
             setAlignment(Qt_AlignHCenter)
             setStyleSheet("font-size: 24px; font-weight: bold; color: #3498db; margin: 10px 0;")

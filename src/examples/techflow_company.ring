@@ -1,16 +1,16 @@
-load "guilib.ring"  # تحميل مكتبة الواجهة الرسومية
+load "guilib.ring"  # Load the GUI library
 load "G:\RingAIAgents\src\gui\main_window.ring"
 
 /*
 Author:  Azzeddine Remmal
 Date: 2025
-مثال: TechFlow Solutions
-شركة برمجيات متكاملة تعمل في مجال تطوير التطبيقات وحلول الذكاء الاصطناعي
+Example: TechFlow Solutions
+A comprehensive software company working in the field of application development and artificial intelligence solutions
 */
 
-# إنشاء الشركة والفرق
+# Create the company and teams
 func main {
-    # تهيئة النافذة الرئيسية
+    # Initialize the main window
     oApp = new QApp {
         oWindow = new MainWindow() 
         setupTechFlowCompany()
@@ -21,7 +21,7 @@ func main {
 }
 
 func setupTechFlowCompany {
-    # 1. فريق تطوير الواجهات الأمامية
+    # 1. Frontend Development Team
     oFrontendCrew = new Crew("Frontend Development Team") {
         setDescription("Responsible for creating responsive and user-friendly interfaces")
         setLeader(createAgent("Sarah Chen", "Senior Frontend Developer", [
@@ -47,7 +47,7 @@ func setupTechFlowCompany {
         ]))
     }
 
-    # 2. فريق تطوير الخدمات الخلفية
+    # 2. Backend Development Team
     oBackendCrew = new Crew("Backend Development Team") {
         setDescription("Building robust and scalable server-side applications")
         setLeader(createAgent("David Kumar", "Senior Backend Developer", [
@@ -73,7 +73,7 @@ func setupTechFlowCompany {
         ]))
     }
 
-    # 3. فريق الذكاء الاصطناعي
+    # 3. AI Development Team
     oAICrew = new Crew("AI Development Team") {
         setDescription("Developing cutting-edge AI solutions")
         setLeader(createAgent("Dr. Maria Rodriguez", "AI Research Lead", [
@@ -98,7 +98,7 @@ func setupTechFlowCompany {
         ]))
     }
 
-    # 4. فريق ضمان الجودة
+    # 4. Quality Assurance Team
     oQACrew = new Crew("Quality Assurance Team") {
         setDescription("Ensuring software quality and reliability")
         setLeader(createAgent("Robert Taylor", "QA Lead", [
@@ -121,7 +121,7 @@ func setupTechFlowCompany {
         ]))
     }
 
-    # 5. فريق DevOps
+    # 5. DevOps Team
     oDevOpsCrew = new Crew("DevOps Team") {
         setDescription("Managing infrastructure and deployment pipelines")
         setLeader(createAgent("Thomas Anderson", "DevOps Lead", [
@@ -147,9 +147,9 @@ func setupTechFlowCompany {
         ]))
     }
 
-    # إضافة المهام
+    # Add tasks
     
-    # 1. مشروع تطوير منصة التجارة الإلكترونية
+    # 1. E-commerce Platform Development
     addTask("E-commerce Platform Development", "High", [
         ["Frontend development of product catalog", "Medium", "Implement responsive design", ["React", "Vue.js"]],
         ["Backend API development", "High", "Implement RESTful API", ["Node.js", "Python"]],
@@ -164,7 +164,7 @@ func setupTechFlowCompany {
         ["Analytics dashboard", "Medium", "Implement analytics dashboard", ["Tableau", "Power BI"]]
     ], oBackendCrew, "2025-03-20")
 
-    # 2. مشروع نظام توصيات المنتجات
+    # 2. Product Recommendation Engine
     addTask("Product Recommendation Engine", "Medium", [
         ["Data collection and preprocessing", "Medium", "Collect and preprocess data", ["Python", "Pandas"]],
         ["Model development and training", "High", "Develop and train recommendation model", ["TensorFlow", "Scikit-learn"]],
@@ -172,7 +172,7 @@ func setupTechFlowCompany {
         ["Performance optimization", "High", "Optimize performance", ["Python", "NumPy"]]
     ], oAICrew, "2025-04-01")
 
-    # 3. اختبار وضمان الجودة
+    # 3. E-commerce Platform Testing
     addTask("E-commerce Platform Testing", "High", [
         ["Functional testing", "Medium", "Test functionality", ["Selenium", "JUnit"]],
         ["Performance testing", "High", "Test performance", ["JMeter", "Gatling"]],
@@ -180,7 +180,7 @@ func setupTechFlowCompany {
         ["User acceptance testing", "High", "Test user acceptance", ["Manual Testing", "API Testing"]]
     ], oQACrew, "2025-03-25")
 
-    # 4. نشر وتشغيل النظام
+    # 4. Platform Deployment
     addTask("Platform Deployment", "High", [
         ["Infrastructure setup", "Medium", "Set up infrastructure", ["AWS", "Terraform"]],
         ["CI/CD pipeline configuration", "High", "Configure CI/CD pipeline", ["Jenkins", "GitHub Actions"]],
@@ -188,7 +188,7 @@ func setupTechFlowCompany {
         ["Backup and recovery planning", "High", "Plan backup and recovery", ["AWS", "Ansible"]]
     ], oDevOpsCrew, "2025-04-05")
 
-    # إضافة الفرق إلى النافذة الرئيسية
+    # Add crews to the main window
     addCrew(oFrontendCrew)
     addCrew(oBackendCrew)
     addCrew(oAICrew)
@@ -196,32 +196,32 @@ func setupTechFlowCompany {
     addCrew(oDevOpsCrew)
 }
 
-# دالة مساعدة لإنشاء عميل
+# Helper function to create an agent
 func createAgent cName, cRole, aSkills {
     oAgent = new Agent(cName)
     oAgent {
         setRole(cRole)
         
-        # إضافة المهارات مع مستويات الخبرة
+        # Add skills with experience levels
         for cSkill in aSkills {
             if type(cSkill) = "STRING" {
-                addSkill(cSkill, random()% 70-100)  # مستوى خبرة عشوائي
+                addSkill(cSkill, random()% 70-100)  # Random experience level
             else
-                addSkill(cSkill[1], cSkill[2])  # مستوى خبرة محدد
+                addSkill(cSkill[1], cSkill[2])  # Specific experience level
             }
         }
         
-        # تعيين سمات شخصية مناسبة للدور
+        #   Set appropriate personality traits for the role
         switch cRole {
             case "Senior Frontend Developer"
                 setPersonality([
-                    :openness = 85,  # منفتح على التقنيات الجديدة
-                    :conscientiousness = 90,  # منظم ودقيق
-                    :extraversion = 75,  # قادر على التواصل مع الفريق
-                    :agreeableness = 80,  # متعاون
-                    :neuroticism = 30   # مستقر عاطفياً
+                    :openness = 85,  # Open to new technologies
+                    :conscientiousness = 90,  # Organized and detail-oriented
+                    :extraversion = 75,  # Able to communicate with the team
+                    :agreeableness = 80,  # Cooperative
+                    :neuroticism = 30   # Stable emotionally
                 ])
-                # تعيين تفضيلات العمل
+                # Set work preferences
                 setPreferences([
                     :workStyle = "collaborative",
                     :communicationStyle = "direct",
@@ -229,7 +229,7 @@ func createAgent cName, cRole, aSkills {
                     :workHours = "flexible",
                     :learningStyle = "hands-on"
                 ])
-                # تعيين الأهداف
+                # Set goals
                 setGoals([
                     "Improve application performance",
                     "Implement responsive designs",
@@ -239,11 +239,11 @@ func createAgent cName, cRole, aSkills {
                 
             case "AI Research Lead"
                 setPersonality([
-                    :openness = 95,  # شغوف بالابتكار
-                    :conscientiousness = 85,  # منهجي
-                    :extraversion = 70,  # قادر على تقديم العروض
-                    :agreeableness = 75,  # متعاون
-                    :neuroticism = 35   # مستقر تحت الضغط
+                    :openness = 95,  # Enjoys innovation
+                    :conscientiousness = 85,  # Methodical
+                    :extraversion = 70,  # Able to present ideas
+                    :agreeableness = 75,  # Cooperative
+                    :neuroticism = 35   # Stable under pressure
                 ])
                 setPreferences([
                     :workStyle = "research-oriented",
@@ -261,11 +261,11 @@ func createAgent cName, cRole, aSkills {
                 
             case "DevOps Lead"
                 setPersonality([
-                    :openness = 80,  # متقبل للتغيير
-                    :conscientiousness = 95,  # دقيق جداً
-                    :extraversion = 70,  # قادر على التواصل
-                    :agreeableness = 85,  # داعم للفريق
-                    :neuroticism = 25   # هادئ تحت الضغط
+                    :openness = 80,  # Open to change
+                    :conscientiousness = 95,  # Very meticulous
+                    :extraversion = 70,  # Able to communicate
+                    :agreeableness = 85,  # Supportive of the team
+                    :neuroticism = 25   # Stable under pressure
                 ])
                 setPreferences([
                     :workStyle = "systematic",
@@ -291,17 +291,17 @@ func createAgent cName, cRole, aSkills {
                 ])
         }
         
-        # تعيين مستوى الطاقة والحالة العاطفية
+        # Set energy level and emotional state
         setEnergyLevel(100)
         setEmotionalState("focused")
         
-        # تعيين حالة نشطة
+        # Set active status
         setActive(true)
     }
     return oAgent
 }
 
-# دالة مساعدة لإضافة مهمة
+# Helper function to add a task
 func addTask cName, cPriority, aSubtasks, oCrew, cDueDate {
     oTask = new Task(cName, "Project: " + cName)
     oTask {
@@ -309,25 +309,25 @@ func addTask cName, cPriority, aSubtasks, oCrew, cDueDate {
         setDueDate(cDueDate)
         assign(oCrew)
         
-        # إضافة المهام الفرعية مع التفاصيل
+        # Add subtasks with details
         for cSubtask in aSubtasks {
             oSubTask = new Task(
-                cSubtask[1],  # اسم المهمة الفرعية
+                cSubtask[1],  # Subtask name
                 "Subtask of: " + cName
             )
             oSubTask {
-                setPriority(cSubtask[2])  # أولوية المهمة الفرعية
+                setPriority(cSubtask[2])  # Subtask priority
                 if len(cSubtask) > 2 {
-                    setDescription(cSubtask[3])  # وصف تفصيلي
+                    setDescription(cSubtask[3])  # Detailed description
                 }
                 if len(cSubtask) > 3 {
-                    setRequiredSkills(cSubtask[4])  # المهارات المطلوبة
+                    setRequiredSkills(cSubtask[4])  # Required skills
                 }
             }
             addSubTask(oSubTask)
         }
         
-        # إضافة معايير القبول
+        # Set acceptance criteria
         setAcceptanceCriteria([
             "All subtasks completed",
             "Code review passed",
@@ -336,14 +336,14 @@ func addTask cName, cPriority, aSubtasks, oCrew, cDueDate {
             "Performance requirements met"
         ])
         
-        # إضافة الموارد المطلوبة
+        # Set required resources
         setRequiredResources([
             :hardware = ["Development machine", "Testing devices"],
             :software = ["IDE", "Build tools", "Testing frameworks"],
             :access = ["Source code", "Databases", "APIs"]
         ])
         
-        # إضافة المخاطر المحتملة
+        # Set possible risks
         setRisks([
             :technical = ["Integration issues", "Performance bottlenecks"],
             :schedule = ["Resource availability", "Dependency delays"],
@@ -353,7 +353,7 @@ func addTask cName, cPriority, aSubtasks, oCrew, cDueDate {
     getParent().addTask(oTask)
 }
 
-# تعريف الأدوات والتقنيات المستخدمة
+# Define the tools and technologies used
 class TechStack {
     # Frontend Tools
     aFrontendTools = [

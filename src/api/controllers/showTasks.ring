@@ -5,22 +5,22 @@
 */
 
 /*
-الدالة: showTasks
-الوصف: عرض قائمة المهام
+function: showTasks
+description: Display the tasks list
 */
 import System.Web
 
 func showTasks
     oPage = New BootStrapWebPage {
         Title = "RingAI Tasks List"
-        # تحميل الستايلات المشتركة
+        # load the common styles
         loadCommonStyles(oPage)
-        # تحميل ستايلات خاصة بالصفحة
+        # load the page specific styles
         html("<link rel='stylesheet' href='/static/css/tables.css'>")
         html("<script src='/static/js/common.js'></script>")
         html("<script src='/static/js/tasks.js'></script>")
 
-        # إضافة الهيدر
+        # add the header
         getHeader(oPage)
 
         div {
@@ -197,7 +197,7 @@ func showTasks
             }
         }
 
-        # إضافة الفوتر
+        # add the footer
         getFooter(oPage)
 
         noOutput()

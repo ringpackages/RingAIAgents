@@ -5,8 +5,8 @@
 */
 
 /*
-الدالة: addAgent
-الوصف: إضافة عميل جديد
+Function: addAgent
+Description: Add a new agent
 */
 func addAgent
     try {
@@ -14,41 +14,41 @@ func addAgent
         oAgent = new Agent(oServer["name"], oServer["goal"]) {
             setRole(oServer["role"])
 
-            # تهيئة المهارات
+            # Initialize skills
             if oServer["skills"] != NULL {
-                # تقسيم المهارات المفصولة بفواصل
+                # Split skills separated by commas
                 Skills = split(oServer["skills"], ",")
                 ? logger("addAgent function", "Skills to add: " + ToCode(Skills), :info)
 
-                # إضافة كل مهارة
+                # Add each skill
                 for i = 1 to len(Skills) {
                     cSkill = trim(Skills[i])
                     if len(cSkill) > 0 {
                         ? logger("addAgent function", "Adding skill: " + cSkill, :info)
                         try {
-                            addSkill(cSkill, 50)  # مستوى افتراضي 50
+                            addSkill(cSkill, 50)  # Default level 50
                         catch
                             ? logger("addAgent function", "Error adding skill: " + cCatchError, :error)
                         }
                     }
                 }
 
-                # طباعة المهارات بعد التهيئة
+                # Print skills after initialization
                 try {
                     ? logger("addAgent function", "Initial skills: " + ToCode(getSkills()), :info)
                 catch
                     ? logger("addAgent function", "Error getting skills: " + cCatchError, :error)
                 }
             else
-                # إضافة مهارة افتراضية إذا لم يتم تحديد مهارات
+                # Add default skill if no skills specified
                 ? logger("addAgent function", "No skills specified, adding default skill", :info)
                 addSkill("General Knowledge", 50)
             }
 
-            # تهيئة الخصائص
+            # Initialize properties
             setProperties(oServer["properties"])
 
-            # تهيئة السمات الشخصية
+            # Initialize personality traits
             setPersonalityTraits([
                 :openness = number(oServer["openness"]),
                 :conscientiousness = number(oServer["conscientiousness"]),
@@ -57,15 +57,15 @@ func addAgent
                 :neuroticism = number(oServer["neuroticism"])
             ])
 
-            # تهيئة نموذج اللغة
+            # Initialize language model
             setLanguageModel(oServer["language_model"])
         }
 
-        # إضافة العميل وتسجيله في المراقب
+        # Add agent and register it in the monitor
         add(aAgents, oAgent)
         oMonitor.registerAgent(oAgent)
 
-        # تخزين معلومات العميل في الذاكرة content, type, priority, tags, metadata
+        # Store agent information in memory content, type, priority, tags, metadata
         oMemory.store([
             :content = "Agent created: " + oAgent.getName(),
             :type =  oMemory.LONG_TERM ,
@@ -74,7 +74,7 @@ func addAgent
             :metadata = [:timestamp = TimeList()[5]]
         ])
 
-        # حفظ العملاء في قاعدة البيانات
+        # Save agents to database
         saveAgents()
 
         oServer.setContent('{"status":"success","message":"Agent added successfully","id":' +

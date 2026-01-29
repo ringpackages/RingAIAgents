@@ -5,16 +5,16 @@
 */
 
 /*
-الدالة: listTasks
-الوصف: الحصول على قائمة المهام
+function: listTasks
+description: Get a list of tasks
 */
 func listTasks
     try {
-        # تجميع قائمة المهام
+        # collect the tasks
         aTasksList = []
         
         for oTask in aTasks {
-            # تجميع المهام الفرعية
+            # collect the subtasks
             aSubtasks = []
             for oSubtask in oTask.aSubtasks {
                 add(aSubtasks, [
@@ -24,7 +24,7 @@ func listTasks
                 ])
             }
             
-            # إضافة معلومات المهمة
+            # add task information
             add(aTasksList, [
                 :id = oTask.getId(),
                 :title = oTask.getTitle(),
@@ -38,19 +38,19 @@ func listTasks
             ])
         }
         
-        # تحضير كائن JSON للاستجابة
+        # prepare the JSON response
         aResponse = [
             :status = "success",
             :tasks = aTasksList
         ]
         
-        # تحويل الكائن إلى JSON
+        # convert the object to JSON
         cJSON = list2json(aResponse)
         
-        # تسجيل JSON للتصحيح
+        # log the JSON response for debugging
         ? logger("listTasks function", "JSON response: " + cJSON, :info)
         
-        # إرسال الاستجابة
+        # send the response
         oServer.setContent(cJSON, "application/json")
     catch
         ? logger("listTasks function", "Error retrieving tasks: " + cCatchError, :error)

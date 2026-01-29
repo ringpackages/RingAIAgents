@@ -5,8 +5,8 @@
 */
 
 /*
-الدالة: addAgentSkill
-الوصف: إضافة مهارة جديدة لعميل
+Function: addAgentSkill
+Description: Add a new skill to an agent
 */
 func addAgentSkill
     try {
@@ -17,7 +17,7 @@ func addAgentSkill
             cSkill = oServer["skill"]
             nInitialLevel = number(oServer["initial_level"])
 
-            # إضافة المهارة
+            # Add skill
             oAgent.addSkill(cSkill, nInitialLevel)
             ? logger("addAgentSkill function", "Skill added successfully", :info)
             oServer.setContent('{"status":"success","message":"Skill added successfully"}',

@@ -5,12 +5,12 @@
 */
 
 /*
-الدالة: deleteTeam
-الوصف: حذف فريق
+function: deleteTeam
+description: Delete a team
 */
 func deleteTeam
     try {
-        # محاولة الحصول على المعرف من معلمات URL
+        # try to get the team ID from the URL parameters
         cTeamID = ""
         try {
             cTeamID = oServer.match(1)
@@ -19,13 +19,13 @@ func deleteTeam
             ? logger("deleteTeam function", "Error getting URL match parameter", :error)
         }
 
-        # التحقق من وجود معرف صالح
+        # check if the team ID is valid
         if cTeamID = NULL or len(cTeamID) = 0 {
             oServer.setContent('{"status":"error","message":"No team ID provided"}', "application/json")
             return
         }
 
-        # البحث عن الفريق بالمعرف
+        # search for the team by ID
         oCrew = NULL
         nIndex = 0
 
@@ -38,7 +38,7 @@ func deleteTeam
         }
 
         if oCrew != NULL {
-            # إزالة الفريق من المراقب
+            # remove the team from the monitor
             try {
                 oMonitor.unregisterCrew(oCrew)
                 ? logger("deleteTeam function", "Team unregistered from monitor", :info)
@@ -46,11 +46,11 @@ func deleteTeam
                 ? logger("deleteTeam function", "Error unregistering team: " + cCatchError, :error)
             }
 
-            # حذف الفريق
+            # delete the team
             del(aTeams, nIndex)
             ? logger("deleteTeam function", "Team deleted", :info)
 
-            # حفظ التغييرات في قاعدة البيانات
+            # save the changes to the database
             if saveTeams() {
                 ? logger("deleteTeam function", "Team deleted and database updated", :info)
                 oServer.setContent('{"status":"success","message":"Team deleted successfully"}',

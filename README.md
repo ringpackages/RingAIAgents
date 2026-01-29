@@ -1,6 +1,6 @@
 # Ring AI Agents
 
-A comprehensive AI agent management system with MorGen AI support.
+A comprehensive AI agent management system.
 
 ## Key Features
 

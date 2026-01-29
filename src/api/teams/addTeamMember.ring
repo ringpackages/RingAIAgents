@@ -5,8 +5,8 @@
 */
 
 /*
-الدالة: addTeamMember
-الوصف: إضافة عضو جديد للفريق
+function: addTeamMember
+description: Add a new team member
 */
 func addTeamMember
     try {
@@ -16,10 +16,10 @@ func addTeamMember
 
             nAgentId = number(oServer["agent_id"])
             if nAgentId > 0 and nAgentId <= len(aAgents) {
-                # إضافة العضو
+                # add the member
                 oCrew.addMember(aAgents[nAgentId])
 
-                # تسجيل الإضافة في الذاكرة
+                # store the addition in the memory
                 oMemory.store(
                     "Team Member Added: " + aAgents[nAgentId].getName() + " to " + oCrew.getName(),
                     Memory.LONG_TERM,

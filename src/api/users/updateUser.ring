@@ -5,8 +5,8 @@
 */
 
 /*
-الدالة: updateUser
-الوصف: تحديث معلومات مستخدم
+function: updateUser
+description: Update user information
 */
 func updateUser
     try {

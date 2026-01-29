@@ -5,8 +5,8 @@
 */
 
 /*
-الدالة: logout
-الوصف: تسجيل خروج المستخدم
+function: logout
+description: User logout
 */
 func logout
     try {

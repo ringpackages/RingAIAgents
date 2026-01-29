@@ -1,6 +1,6 @@
 /*
-الكلاس: AddAgentDialog
-الوصف: نافذة حوار لإضافة عميل جديد
+the class: AddAgentDialog
+the description: a dialog for adding a new agent
 */
 
 class AddAgentDialog from QDialog
@@ -16,20 +16,20 @@ class AddAgentDialog from QDialog
     # Data
     aSkills = []
     aPersonalityTraits = []
-    oParent  # مرجع للنافذة الأم
+    oParent  # parent window reference
 
    
 
     func init oParent {
         super.init(oParent)
-        this.oParent = oParent  # تخزين مرجع للنافذة الأم
+        this.oParent = oParent  # store parent window reference
         setWindowTitle("Add New Agent")
         setModal(true)
-        setFixedSize(600, 600)  # عرض أكبر وطول أقل
+        setFixedSize(600, 600)  # larger width and smaller height
         initUI()
     }
 
-     # دالة للحصول على النافذة الأم
+     # function to get the parent window
     func getParent {
         return oParent
     }
@@ -38,7 +38,7 @@ class AddAgentDialog from QDialog
         # Create main layout
         oMainLayout = new QVBoxLayout()
         oMainLayout.setSpacing(8)
-        oMainLayout.setContentsMargins(15, 10, 15, 10)  # تقليل الهوامش
+        oMainLayout.setContentsMargins(15, 10, 15, 10)  # reduce margins
 
         # Header
         oHeaderLabel = new QLabel(this) {

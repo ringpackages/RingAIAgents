@@ -5,26 +5,26 @@
 */
 
 /*
-الدالة: saveTeams
-الوصف: حفظ الفرق في قاعدة البيانات
+function: saveTeams
+description: Save teams to the database
 */
 func saveTeams
     try {
-        # التحقق من وجود فرق
+        # check if there are any teams
         if len(aTeams) = 0 {
             return false
         }
 
-        # تحديد مسار قاعدة البيانات
+        # define the database path
         cDBPath = "G:\RingAIAgents\db\teams.db"
 
-        # إنشاء قاعدة بيانات للفرق إذا لم تكن موجودة
+        # create the database if it doesn't exist
         if !fexists(cDBPath) {
             ? logger("saveTeams function", "Creating new database at: " + cDBPath, :info)
             oDatabase = sqlite_init()
             sqlite_open(oDatabase, cDBPath)
 
-            # إنشاء جدول الفرق
+            # create the teams table if it doesn't exist
             cSQL = "CREATE TABLE IF NOT EXISTS teams (
                     id TEXT PRIMARY KEY,
                     name TEXT,
@@ -35,38 +35,38 @@ func saveTeams
                 )"
             sqlite_execute(oDatabase, cSQL)
 
-            # إغلاق قاعدة البيانات
+            # close the database
             sqlite_close(oDatabase)
         }
 
-        # فتح قاعدة البيانات
+        # open the database
         oDatabase = sqlite_init()
         sqlite_open(oDatabase, cDBPath)
 
-        # حفظ الفرق الحالية - استخدام REPLACE INTO بدلاً من حذف ثم إضافة
+        # save the teams - using REPLACE INTO instead of delete then add
         ? logger("saveTeams function", "Saving " + len(aTeams) + " teams to database", :info)
         for i = 1 to len(aTeams) {
             oCrew = aTeams[i]
 
-            # تجميع معرفات الأعضاء
+            # collect the member IDs
             aMemberIds = []
             for oMember in oCrew.getMembers() {
                 add(aMemberIds, oMember.getID())
             }
 
-            # تحويل معرفات الأعضاء إلى JSON
+            # convert member IDs to JSON
             cMembers = list2json(aMemberIds)
 
-            # تنظيف النصوص من علامات الاقتباس المزدوجة
+            # clean the text from double quotes
             cName = substr(oCrew.getName(), '"', '""')
             cObjective = substr(oCrew.getObjective(), '"', '""')
 
-            # تسجيل البيانات للتصحيح
+            # log the data for debugging
             ? logger("saveTeams function", "Saving team: " + oCrew.getId(), :info)
             ? logger("saveTeams function", "Name: " + cName, :info)
             ? logger("saveTeams function", "Objective: " + cObjective, :info)
 
-            # إضافة الفريق إلى قاعدة البيانات أو تحديثه إذا كان موجودًا
+            # add the team to the database or update it if it exists
             cSQL = "REPLACE INTO teams (id, name, objective, leader_id, members) VALUES (
                     '" + oCrew.getId() + "',
                     '" + cName + "',
@@ -77,7 +77,7 @@ func saveTeams
             sqlite_execute(oDatabase, cSQL)
         }
 
-        # إغلاق قاعدة البيانات
+        # close the database
         sqlite_close(oDatabase)
 
         ? logger("saveTeams function", "Teams saved successfully", :info)

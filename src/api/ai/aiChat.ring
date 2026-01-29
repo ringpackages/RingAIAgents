@@ -6,36 +6,36 @@
 
 
 /*
-الدالة: aiChat
-الوصف: التفاعل مع نموذج اللغة
+Function: aiChat
+Description: Interaction with language model
 */
 func aiChat
     try {
-        # استخراج البيانات من الطلب
+        # Extract data from request
         cPrompt = NULL
         cBody = NULL
 
-        # محاولة استخراج البيانات من معلمات الطلب
+        # Try to extract data from request parameters
         cPrompt = oServer["prompt"]
         ? logger("aiChat function", "Trying to get prompt from params: " + cPrompt, :info)
 
-        # إذا لم يتم العثور على البيانات في المعلمات، حاول استخراجها من جسم الطلب
+        # If data not found in parameters, try to extract it from request body
         if cPrompt = NULL {
             ? logger("aiChat function", "Trying to extract data from request body", :info)
 
-            # الحصول على محتوى الطلب
+            # Get request content
             try {
                 cBody = oServer["request"]
                 ? logger("aiChat function", "Request body length: " + len(cBody), :info)
                 ? logger("aiChat function", "Request body: " + cBody, :info)
 
                 if cBody != NULL and trim(cBody) != "" {
-                    # محاولة تحليل البيانات كـ JSON
+                    # Try to parse data as JSON
                     try {
-                        # تنظيف النص من أي أحرف غير مرئية
+                        # Clean text from any invisible characters
                         cBody = trim(cBody)
 
-                        # التحقق من أن النص يبدأ بـ { أو [
+                        # Check if text starts with { or [
                         if left(cBody, 1) = "{" or left(cBody, 1) = "[" {
                             aBody = JSON2List(cBody)
                             ? logger("aiChat function", "Body parsed as JSON", :info)
@@ -65,27 +65,27 @@ func aiChat
             }
         }
 
-        # إذا لم يتم العثور على البيانات، ارفع خطأ
+        # If data not found, raise error
         if cPrompt = NULL {
             raise("Missing prompt data")
         }
 
-        # استخراج معلمات الطلب
+        # Extract request parameters
         aParams = []
 
-        # التحقق من معرف العميل
+        # Check for agent ID
         nAgentId = 0
         cAgentId = ""
 
-        # محاولة استخراج معرف العميل من معلمات الطلب
+        # Try to extract agent ID from request parameters
         cAgentId = oServer["agent_id"]
         ? logger("aiChat function", "Agent ID from params: " + cAgentId, :info)
 
-        # إذا لم يتم العثور على معرف العميل في المعلمات، حاول استخراجه من جسم الطلب
+        # If agent ID not found in parameters, try to extract it from request body
         if cAgentId = NULL or cAgentId = "" {
             ? logger("aiChat function", "Trying to extract agent_id from request body", :info)
 
-            # استخدام aBody الذي تم تحليله سابقًا إذا كان موجودًا
+            # Use aBody that was parsed previously if available
             if isList(aBody) {
                 if aBody[:agent_id] != NULL {
                     cAgentId = aBody[:agent_id]
@@ -98,14 +98,14 @@ func aiChat
             }
         }
 
-        # إذا كان معرف العميل موجودًا، حاول تحويله إلى رقم
+        # If agent ID exists, try to convert it to number
         if cAgentId != NULL and cAgentId != "" {
             try {
-                # تحويل معرف العميل إلى رقم
+                # Convert agent ID to number
                 if isNumber(cAgentId) {
                     nAgentId = number(cAgentId)
                 else
-                    # إذا كان معرف العميل نصًا، ابحث عن العميل بالمعرف
+                    # If agent ID is text, search for agent by ID
                     for i = 1 to len(aAgents) {
                         if isObject(aAgents[i]) and methodExists(aAgents[i], "getid") {
                             if aAgents[i].getid() = cAgentId {
@@ -122,20 +122,20 @@ func aiChat
             }
         }
 
-        # إذا لم يتم العثور على معرف العميل، استخدم العميل الافتراضي
+        # If agent ID not found, use default agent
         if nAgentId = 0 {
             ? logger("aiChat function", "Using default agent", :info)
         }
 
-        # التعامل مع العميل المحدد
+        # Handle the selected agent
         cResponse = ""
 
-        # التحقق من معرفات الوكلاء الافتراضيين
+        # Check for default agent ID
         if left(cAgentId, 13) = "agent_default" {
             ? logger("aiChat function", "Using default agent with ID: " + cAgentId, :info)
 
-            # استخدام نموذج اللغة مباشرة مع سياق العميل الافتراضي
-            # مفتاح API تم تعيينه بالفعل في initialize.ring
+            # Use language model directly with default client context
+            # API key is already set in initialize.ring
 
             if cAgentId = "agent_default_1" {
                 cContext = "You are Default Assistant. A helpful AI assistant that can answer questions and provide information."
@@ -157,10 +157,10 @@ func aiChat
             cResponse = oLLM.getResponse(cPrompt, aParams)
 
         elseif nAgentId > 0 and nAgentId <= len(aAgents)
-            # استخدام العميل المحدد للرد على الرسالة
+            # Use the selected agent to respond to the message
             oAgent = aAgents[nAgentId]
 
-            # التحقق من وجود دالة receiveMessage في العميل
+            # Check if receiveMessage method exists in the agent
             if method_exists(oAgent, "receiveMessage") {
                 aResult = oAgent.receiveMessage(cPrompt)
 
@@ -174,7 +174,7 @@ func aiChat
                     cResponse = "Error: " + aResult[:error]
                 }
             else
-                # استخدام نموذج اللغة مباشرة مع سياق العميل
+                # Use language model directly with client context
                 oLLM.setApiKey(sysget("GEMINI_API_KEY"))
                 cContext = "You are " + oAgent.getname() + ". " + oAgent.getgoal()
                 oLLM.setSystemPrompt(cContext)
@@ -182,13 +182,13 @@ func aiChat
             }
 
         else
-            # استخدام نموذج اللغة الافتراضي
+            # Use default language model
             oLLM.setApiKey(sysget("GEMINI_API_KEY"))
             oLLM.setSystemPrompt("You are an AI assistant. Be helpful, concise, and accurate.")
             cResponse = oLLM.getResponse(cPrompt, aParams)
         }
 
-        # تخزين المحادثة في الذاكرة
+        # Store the conversation in memory
         aMetadata = [
             :prompt = cPrompt,
             :response = cResponse,
@@ -203,13 +203,13 @@ func aiChat
             :metadata = aMetadata
         ])
 
-        # إنشاء كائن JSON للاستجابة
+        # Create JSON object for response
         aResponseObj = [
             :status = "success",
             :response = cResponse
         ]
 
-        # تحويل الكائن إلى سلسلة JSON
+        # Convert object to JSON string
         cResponseJson = list2JSON(aResponseObj)
 
         ? logger("aiChat function", "Chat processed successfully", :info)
@@ -217,13 +217,13 @@ func aiChat
     catch
         ? logger("aiChat function", "Error processing chat: " + cCatchError, :error)
 
-        # إنشاء كائن JSON للخطأ
+        # Create JSON object for error
         aErrorObj = [
             :status = "error",
             :message = cCatchError
         ]
 
-        # تحويل الكائن إلى سلسلة JSON
+        # Convert object to JSON string
         cErrorJson = list2JSON(aErrorObj)
 
         oServer.setContent(cErrorJson, "application/json")

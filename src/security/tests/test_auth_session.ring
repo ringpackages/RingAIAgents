@@ -7,81 +7,81 @@ load "G:/RingAIAgents/src/security/TokenManager.ring"
 load "G:/RingAIAgents/src/security/hmac.ring"
 
 /*
-    اختبار المصادقة والجلسات
+    Testing authentication and sessions
 */
 func main {
-    ? "=== اختبار المصادقة والجلسات ==="
+    ? "=== Testing authentication and sessions ==="
     
-    # اختبار الجلسات
+    # Testing sessions
     testSessions()
     
-    # اختبار التوكنات
+    # Testing tokens
     testTokens()
     
-    ? "=== تم اكتمال الاختبارات بنجاح ==="
+    ? "=== Testing completed successfully ==="
 }
 
-# اختبار الجلسات
+# Testing sessions
 func testSessions {
-    ? "اختبار الجلسات..."
+    ? "Testing sessions..."
     
     oSession = new SessionManager()
     
-    # إنشاء جلسة
+    # Create session
     cUserId = "user123"
     cUserRole = "admin"
     cUserIP = "192.168.0.187"
     
     cSessionToken = oSession.createSession(cUserId, cUserRole, cUserIP)
-    assert(len(cSessionToken) > 0, "اختبار إنشاء الجلسة")
+    assert(len(cSessionToken) > 0, "Testing session creation")
     ? cSessionToken
-    # التحقق من صحة الجلسة
+    # Validate session
     aSessionData = oSession.validateSession(cSessionToken)
-    ? "بيانات الجلسة: "
+    ? "Session data: "
     ? aSessionData
     
-    # التحقق من نوع البيانات المرجعة
-    assert(not aSessionData = false, "اختبار التحقق من صحة الجلسة")
+    # Validate session
+    assert(not aSessionData = false, "Testing session validation")
     
-    # التحقق من البيانات فقط إذا كانت قائمة
+    # Validate session data
     if type(aSessionData) = "LIST" {
-        assert(aSessionData["user_id"] = cUserId, "اختبار بيانات الجلسة")
+        assert(aSessionData["user_id"] = cUserId, "Testing session data")
     }
     
-    # تدمير الجلسة
+    # Destroy session
     cSessionId = split(cSessionToken, ".")[1]
-    assert(oSession.destroySession(cSessionId), "اختبار تدمير الجلسة")
+    assert(oSession.destroySession(cSessionId), "Testing session destruction")
     
-    ? "  تم اختبار الجلسات بنجاح"
+    ? "  Testing sessions completed successfully"
 }
 
-# اختبار التوكنات
+# Testing tokens
 func testTokens {
-    ? "اختبار التوكنات..."
+    ? "Testing tokens..."
     
     oToken = new TokenManager()
     
-    # إنشاء توكن
+    # Create token
     cUserId = "user123"
     cUserRole = "admin"
     aCustomClaims = [["app", "ringai"], ["device", "desktop"]]
     
     cToken = oToken.createToken(cUserId, cUserRole, aCustomClaims)
-    assert(len(cToken) > 0, "اختبار إنشاء التوكن")
+    assert(len(cToken) > 0, "Testing token creation")
     
-    # التحقق من صحة التوكن
+    # Validate token
     aTokenData = oToken.validateToken(cToken)
-    assert(type(aTokenData) = "LIST", "اختبار التحقق من صحة التوكن")
-    assert(aTokenData[:sub] = cUserId, "اختبار بيانات التوكن")
+    assert(type(aTokenData) = "LIST", "Testing token validation")
+    assert(aTokenData[:sub] = cUserId, "Testing token data")
     
-    # إلغاء التوكن
-    assert(oToken.revokeToken(cToken), "اختبار إلغاء التوكن")
-    assert(not oToken.validateToken(cToken), "اختبار التحقق من إلغاء التوكن")
+    # Revoke token
+    assert(oToken.revokeToken(cToken), "Testing token revocation")
+    assert(not oToken.validateToken(cToken), "Testing token revocation")
     
-    ? "  تم اختبار التوكنات بنجاح"
+    ? "  Testing tokens completed successfully"
 }
 
-# دالة مساعدة للتأكيد
+# Helper function for assertion
 /*func assert condition, message {
     if condition
         ? "  ✓ " + message

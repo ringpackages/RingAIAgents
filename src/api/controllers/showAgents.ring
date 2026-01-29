@@ -5,22 +5,22 @@
 */
 
 /*
-الدالة: showAgents
-الوصف: عرض قائمة العملاء
+Function: showAgents
+Description: Display a list of agents
 */
 import System.Web
 
 func showAgents
     oPage = New BootStrapWebPage {
         Title = "RingAI Agents List"
-        # تحميل الستايلات المشتركة
+        # Load common styles
         loadCommonStyles(oPage)
-        # تحميل ستايلات خاصة بالصفحة
+        # Load page-specific styles
         html("<link rel='stylesheet' href='/static/css/tables.css'>")
         html("<script src='/static/js/common.js'></script>")
         html("<script src='/static/js/agents.js'></script>")
 
-        # إضافة الهيدر
+        # Add header
         getHeader(oPage)
 
         div {
@@ -88,18 +88,18 @@ func showAgents
                                             try {
                                                 aSkills = oAgent.getSkills()
 
-                                                # التحقق من أن aSkills هي قائمة وليست فارغة
+                                                # Check if aSkills is a list and not empty
                                                 if islist(aSkills) and len(aSkills) > 0 {
-                                                    # تحضير المهارات للعرض
+                                                    # Prepare skills for display
 
-                                                    # إضافة كل مهارة إلى النص
+                                                    # Add each skill to the text
                                                     for i = 1 to len(aSkills) {
-                                                        if i <= len(aSkills) {  # التحقق من أن المؤشر ضمن النطاق
+                                                        if i <= len(aSkills) {  # Check if the index is within range
                                                             aSkill = aSkills[i]
                                                             if isList(aSkill) and aSkill[:name] != NULL {
                                                                 Skills += aSkill[:name]
 
-                                                                # إضافة مستوى المهارة إذا كان متاحاً
+                                                                # Add skill level if available
                                                                 if aSkill[:proficiency] != NULL {
                                                                     Skills += " (" + aSkill[:proficiency] + ")"
                                                                 }
@@ -111,15 +111,15 @@ func showAgents
                                                         }
                                                     }
                                                 else
-                                                    # لا توجد مهارات أو قائمة المهارات فارغة
+                                                    # No skills or empty skills list
                                                 }
 
-                                                # إذا لم يتم إضافة أي مهارات، عرض "No skills"
+                                                # If no skills are added, display "No skills"
                                                 if Skills = "" {
                                                     Skills = "No skills"
                                                 }
                                             catch
-                                                # تجاهل أخطاء عرض المهارات
+                                                # Ignore skill display errors
                                                 Skills = "No skills"
                                             }
                                             td {
@@ -404,17 +404,17 @@ func showAgents
             }
         }
 
-        # إضافة سكريبت لتفعيل النوافذ المنبثقة
+        # Add script to activate popups
         html("<script>
             $(document).ready(function() {
-                // تفعيل النوافذ المنبثقة
+                // Activate popups
                 $('#mainModal').modal({
                     show: false
                 });
             });
         </script>")
 
-        # إضافة الفوتر
+        # Add footer
         getFooter(oPage)
 
         noOutput()

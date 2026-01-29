@@ -5,8 +5,8 @@
 */
 
 /*
-الدالة: getUser
-الوصف: الحصول على معلومات مستخدم
+function: getUser
+description: Get user information
 */
 func getUser
     try {

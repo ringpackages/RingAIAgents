@@ -5,12 +5,12 @@
 */
 
 /*
-الدالة: getTask
-الوصف: الحصول على معلومات مهمة محددة
+function: getTask
+description: Get a specific task
 */
 func getTask
     try {
-        # محاولة الحصول على المعرف من معلمات URL
+        # try to get the task ID from the URL
         cTaskID = ""
         try {
             cTaskID = oServer.match(1)
@@ -19,13 +19,13 @@ func getTask
             ? logger("getTask function", "Error getting URL match parameter", :error)
         }
 
-        # التحقق من وجود معرف صالح
+        # check if the task ID is valid
         if cTaskID = NULL or len(cTaskID) = 0 {
             oServer.setContent('{"status":"error","message":"No task ID provided"}', "application/json")
             return
         }
 
-        # البحث عن المهمة بالمعرف
+        # search for the task by ID
         oTask = NULL
         nIndex = 0
 
@@ -40,7 +40,7 @@ func getTask
         if oTask != NULL {
             ? logger("getTask function", "Found task: " + oTask.cTitle, :info)
 
-            # تجميع المهام الفرعية
+            # collect the subtasks
             aSubtasks = []
             for oSubtask in oTask.aSubtasks {
                 add(aSubtasks, [
@@ -52,7 +52,7 @@ func getTask
 
             ? logger("getTask function", "Task retrieved successfully", :info)
 
-            # تحضير كائن JSON للاستجابة
+            # prepare the JSON response
             aResponse = [
                 :status = "success",
                 :task = [
@@ -69,13 +69,12 @@ func getTask
                 ]
             ]
 
-            # تحويل الكائن إلى JSON
+            # convert the object to JSON
             cJSON = list2json(aResponse)
 
-            # تسجيل JSON للتصحيح
-            ? logger("getTask function", "JSON response: " + cJSON, :info)
+            # log the JSON response for debugging
 
-            # إرسال الاستجابة
+            # send the response
             oServer.setContent(cJSON, "application/json")
         else
             oServer.setContent('{"status":"error","message":"Task not found"}',

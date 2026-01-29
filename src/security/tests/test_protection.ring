@@ -11,85 +11,85 @@ load "G:\RingAIAgents\src\utils\helpers.ring"
 
 
 /*
-    اختبار الحماية
+    Testing protection
 */
 func main {
-    ? "=== اختبار الحماية ==="
+    ? "=== Testing protection ==="
     
-    # اختبار التحقق من صحة المدخلات
+    # Testing input validation
     testInputValidation()
     
-    # اختبار الحماية من CSRF
+    # Testing CSRF protection
     testCSRFProtection()
     
-    # اختبار الحماية من XSS
+    # Testing XSS protection
     testXSSProtection()
     
-    ? "=== تم اكتمال الاختبارات بنجاح ==="
+    ? "=== Testing protection completed successfully ==="
 }
 
-# اختبار التحقق من صحة المدخلات
+# Testing input validation
 func testInputValidation {
-    ? "اختبار التحقق من صحة المدخلات..."
+    ? "Testing input validation..."
     
     oValidator = new InputValidator()
     
-    # اختبار التحقق من صحة البريد الإلكتروني
-    assert(oValidator.validateEmail("user@example.com"), "اختبار بريد إلكتروني صحيح")
-    assert(not oValidator.validateEmail("invalid-email"), "اختبار بريد إلكتروني غير صحيح")
+    # Testing email validation
+    assert(oValidator.validateEmail("user@example.com"), "Testing valid email")
+    assert(not oValidator.validateEmail("invalid-email"), "Testing invalid email")
     
-    # اختبار التحقق من صحة كلمة المرور
-    assert(oValidator.validatePassword("P@ssw0rd123"), "اختبار كلمة مرور صحيحة")
-    assert(not oValidator.validatePassword("weak"), "اختبار كلمة مرور ضعيفة")
+    # Testing password validation
+    assert(oValidator.validatePassword("P@ssw0rd123"), "Testing valid password")
+    assert(not oValidator.validatePassword("weak"), "Testing weak password")
     
-    # اختبار التحقق من صحة النص
-    assert(oValidator.validateText("نص عادي للاختبار"), "اختبار نص عادي")
-    assert(not oValidator.validateText("<script>alert('XSS')</script>"), "اختبار نص يحتوي على XSS")
+    # Testing text validation
+    assert(oValidator.validateText("Normal text"), "Testing valid text")
+    assert(not oValidator.validateText("<script>alert('XSS')</script>"), "Testing text with XSS")
     
-    # اختبار تنظيف النص
+    # Testing text sanitization
     cDirtyText = "<script>alert('XSS')</script>"
     cCleanText = oValidator.sanitizeText(cDirtyText)
-    assert(substr(cCleanText, "<script>") = 0, "اختبار تنظيف النص")
+    assert(substr(cCleanText, "<script>") = 0, "Testing text sanitization")
     
-    ? "  تم اختبار التحقق من صحة المدخلات بنجاح"
+    ? "  Testing input validation completed successfully"
 }
 
-# اختبار الحماية من CSRF
+# Testing CSRF protection
 func testCSRFProtection {
-    ? "اختبار الحماية من CSRF..."
+    ? "Testing CSRF protection..."
     
     oCSRF = new CSRFProtection()
     
-    # إنشاء توكن CSRF
+    # Testing token generation
     cSessionId = "session123"
     cToken = oCSRF.generateToken(cSessionId)
-    assert(len(cToken) > 0, "اختبار إنشاء توكن CSRF")
+    assert(len(cToken) > 0, "Testing token generation")
     
-    # التحقق من صحة التوكن
-    assert(oCSRF.validateToken(cToken, cSessionId), "اختبار التحقق من صحة توكن CSRF")
+    # Testing token validation
+    assert(oCSRF.validateToken(cToken, cSessionId), "Testing token validation")
     
-    # إنشاء حقل نموذج
+    # Testing form field creation
     cFormField = oCSRF.createFormField(cSessionId)
-    assert(substr(cFormField, "csrf_token") > 0, "اختبار إنشاء حقل نموذج")
+    assert(substr(cFormField, "csrf_token") > 0, "Testing form field creation")
     
-    ? "  تم اختبار الحماية من CSRF بنجاح"
+    ? "  Testing CSRF protection completed successfully"
 }
 
-# اختبار الحماية من XSS
+# Testing XSS protection
 func testXSSProtection {
-    ? "اختبار الحماية من XSS..."
+    ? "Testing XSS protection..."
     
     oXSS = new XSSProtection
     
-    # اختبار تنظيف النص
+    # Testing text sanitization
     cDirtyText = "<script>alert('XSS')</script>"
     cCleanText = oXSS.sanitize(cDirtyText)
-    assert(substr(cCleanText, "<script>") = 0, "اختبار تنظيف النص")
+    assert(substr(cCleanText, "<script>") = 0, "Testing text sanitization")
     
-    ? "  تم اختبار الحماية من XSS بنجاح"
+    ? "  Testing XSS protection completed successfully"
 }
 
-# دالة مساعدة للتأكيد
+# Testing helper function
 /*func assert condition, message {
     if condition
         ? "  ✓ " + message

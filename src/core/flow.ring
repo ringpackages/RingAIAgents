@@ -1,11 +1,11 @@
-# تم نقل الاستدعاءات إلى libAgentAi.ring
+# The summonses were transferred to libAgentAi.ring
 
 /*
-الكلاس: Flow
-الوصف: يمثل تدفق العمل في النظام ويدير تسلسل المهام والحالة
+the class: Flow
+the description: represents the workflow in the system and manages the sequence of tasks and states
 */
 class Flow {
-    # المتغيرات العامة
+    # the public variables
     cId
     oState
     aListeners
@@ -18,70 +18,70 @@ class Flow {
         cId = generateUniqueId("flow_")
         oState = new State()
         aListeners = []
-        # إنشاء مدير الثريد مع 4 ثريدات
+        # create thread manager with 4 threads
         oThreads = new ThreadManager(4)
-        # إنشاء mutex للمزامنة
+        # create mutex for synchronization
         this.nMutexId = oThreads.createRecursiveMutex()
        // oThreads.dumpThreadInfo()
 
-        # تسجيل الدوال المتاحة
+        # register available methods
         aRegisteredMethods = []
     }
 
     /*
-    الدالة: start
-    الوصف: تحديد نقطة البداية للتدفق
-    المدخلات: cMethodName - اسم الدالة التي ستبدأ التدفق
+    the function: start
+    the description: sets the starting point of the workflow
+    the input: cMethodName - the name of the function to start the workflow
     */
     func start cMethodName {
         return addListener(:start, cMethodName)
     }
 
     /*
-    الدالة: listen
-    الوصف: إضافة مستمع لحدث معين
-    المدخلات: cEvent - الحدث المراد الاستماع له
-             cMethodName - اسم الدالة التي ستنفذ عند حدوث الحدث
+    the function: listen
+    the description: adds a listener for a specific event
+    the input: cEvent - the event to listen to
+             cMethodName - the name of the function to execute when the event occurs
     */
     func listen cEvent, cMethodName {
         return addListener(cEvent, cMethodName)
     }
 
     /*
-    الدالة: or_
-    الوصف: دمج مستمعين أو أكثر بحيث يتم تنفيذ الدالة عند حدوث أي منهم
-    المدخلات: aEvents - قائمة بالأحداث
+    the function: or_
+    the description: merges listeners so that the function is executed when any of them occurs
+    the input: aEvents - list of events
     */
     func or_ aEvents {
         if type(aEvents) != "LIST" {
-            raise("يجب تمرير قائمة من الأحداث")
+            raise("A list of events must be passed around.")
         }
         return "or:" + list2str(aEvents)
     }
 
     /*
-    الدالة: and_
-    الوصف: دمج مستمعين أو أكثر بحيث يتم تنفيذ الدالة عند حدوث جميعهم
-    المدخلات: aEvents - قائمة بالأحداث
+    the function: and_
+    the description: merges listeners so that the function is executed when all of them occur
+    the input: aEvents - list of events
     */
     func and_ aEvents {
         if type(aEvents) != "LIST" {
-            raise("يجب تمرير قائمة من الأحداث")
+            raise("A list of events must be passed around.")
         }
         return "and:" + list2str(aEvents)
     }
 
     /*
-    الدالة: parallel
-    الوصف: تنفيذ مجموعة من المهام بشكل متوازي
-    المدخلات: aTasks - قائمة بالمهام المراد تنفيذها
+    the function: parallel
+    the description: executes a list of tasks in parallel
+    the input: aTasks - list of tasks to execute
     */
     func parallel aTasks {
         if type(aTasks) != "LIST" {
-            raise("يجب تمرير قائمة من المهام")
+            raise("A list of tasks must be passed around.")
         }
 
-        # تنفيذ المهام في ثريدات متوازية
+        # execute tasks in parallel threads
         for i = 1 to len(aTasks) {
             oThreads.createThread(i, aTasks[i])
             oThreads.setThreadName(i, "Task_" + i)
@@ -89,16 +89,16 @@ class Flow {
     }
 
     /*
-    الدالة: waitAll
-    الوصف: انتظار اكتمال جميع المهام المتوازية
+    the function: waitAll
+    the description: waits for all parallel tasks to complete
     */
     func waitAll {
         oThreads.joinAllThreads()
     }
 
     /*
-    الدالة: execute
-    الوصف: تنفيذ التدفق
+    the function: execute
+    the description: executes the flow
     */
     func execute {
         emit(:start, null)
@@ -108,10 +108,10 @@ class Flow {
     //private
 
     /*
-    الدالة: addListener
-    الوصف: إضافة مستمع داخلي
-    المدخلات: cEvent - الحدث
-             cMethod - الدالة المستمعة
+    the function: addListener
+    the description: adds an internal listener
+    the input: cEvent - the event
+             cMethod - the listener function
     */
     func addListener cEvent, cMethod {
         oThreads.lockMutex(this.nMutexId)
@@ -125,10 +125,10 @@ class Flow {
     }
 
     /*
-    الدالة: emit
-    الوصف: إطلاق حدث معين
-    المدخلات: cEvent - الحدث المراد إطلاقه
-             xData - البيانات المرتبطة بالحدث
+    the function: emit
+    the description: emits an event
+    the input: cEvent - the event to emit
+             xData - the data associated with the event
     */
     func emit cEvent, xData {
         if this.nMutexId != 0 {
@@ -142,14 +142,13 @@ class Flow {
         nThreadId = 1
         for listener in aCurrentListeners {
             if isMatchingEvent(listener[:event], cEvent) {
-                # إنشاء دالة مغلفة لتمرير البيانات
                 listenerMethod = listener[:method]
 
-                # محاولة استدعاء الدالة باستخدام callMethod
+                # try to call the method using callMethod
                 if callMethod(listenerMethod, xData)
-                    # تم استدعاء الدالة بنجاح
+                    # method called successfully
                 else
-                    # استخدام الطريقة التقليدية
+                    # using the traditional method
                     wrapperFunc = listenerMethod + "(" + xData + ")"
                     oThreads.createThread(nThreadId, wrapperFunc)
                     oThreads.setThreadName(nThreadId, "Event_" + cEvent + "_" + nThreadId)
@@ -160,11 +159,11 @@ class Flow {
     }
 
     /*
-    الدالة: isMatchingEvent
-    الوصف: التحقق من تطابق الحدث
-    المدخلات: cPattern - نمط الحدث
-             cEvent - الحدث الفعلي
-    المخرجات: true إذا كان هناك تطابق
+    the function: isMatchingEvent
+    the description: checks if the event matches the pattern
+    the input: cPattern - the event pattern
+             cEvent - the actual event
+    the output: true if there is a match
     */
     func isMatchingEvent cPattern, cEvent {
         if left(cPattern, 3) = "or:" {
@@ -184,8 +183,8 @@ class Flow {
     }
 
     /*
-    الدالة: cleanup
-    الوصف: تنظيف الموارد المستخدمة
+    the function: cleanup
+    the description: cleans up the resources used
     */
     func cleanup {
         if oThreads != null {
@@ -195,19 +194,19 @@ class Flow {
     }
 
     /*
-    الدالة: registerMethod
-    الوصف: تسجيل دالة ليتم استدعاؤها من الكلاس الأب
-    المدخلات: cMethodName - اسم الدالة المراد تسجيلها
+    the function: registerMethod
+    the description: registers a method to be called from the parent class
+    the input: cMethodName - the name of the method to register
     */
     func registerMethod cMethodName {
         add(aRegisteredMethods, cMethodName)
     }
 
     /*
-    الدالة: callMethod
-    الوصف: استدعاء دالة مسجلة
-    المدخلات: cMethodName - اسم الدالة المراد استدعاؤها
-               xData - البيانات المراد تمريرها للدالة
+    the function: callMethod
+    the description: calls a registered method
+    the input: cMethodName - the name of the method to call
+               xData - the data to pass to the method
     */
     func callMethod cMethodName, xData {
         if find(aRegisteredMethods, cMethodName) > 0 {
@@ -222,8 +221,8 @@ class Flow {
     }
 
     /*
-    الدالة: destructor
-    الوصف: تنظيف الموارد عند حذف الكائن
+    the function: destructor
+    the description: cleans up the resources when the object is deleted
     */
     func destructor {
         cleanup()

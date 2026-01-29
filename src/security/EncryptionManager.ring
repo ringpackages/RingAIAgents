@@ -4,75 +4,75 @@ load "G:/RingAIAgents/src/security/config/SecurityConfig.ring"
 
 /*
 Class: EncryptionManager
-Description: مدير التشفير
+Description: Encryption Manager
 */
 class EncryptionManager {
 
     func init {
         oConfig = new SecurityConfig
 
-        # تحميل إعدادات التشفير من التكوين
+        # Load encryption settings from configuration
         this.cAlgorithm = oConfig.cEncryptionAlgorithm
         this.nKeyLength = oConfig.nKeyLength
         this.nIVLength = oConfig.nIVLength
 
-        # التحقق من دعم الخوارزمية
+        # Check for algorithm support
         aSupportedCiphers = supportedCiphers()
         if not find(aSupportedCiphers, this.cAlgorithm) {
             raise("Unsupported encryption algorithm: " + this.cAlgorithm)
         }
     }
 
-    # تشفير البيانات
+    # Encrypt data
     func encrypte cData, cKey, cIV {
         try {
             return encrypt(cData, cKey, cIV, this.cAlgorithm)
         catch
-            raise("خطأ في التشفير: " + cCatchError)
+            raise("Error encrypting data: " + cCatchError)
         }
     }
 
-    # تشفير البيانات باستخدام خوارزمية محددة
+    # Encrypt data using a specific algorithm
     func encryptWithAlgorithm cData, cKey, cIV, cCipherAlgorithm {
         try {
-            # التحقق من دعم الخوارزمية
+            # Check for algorithm support
             aSupportedCiphers = supportedCiphers()
             if not find(aSupportedCiphers, cCipherAlgorithm) {
                 raise("Unsupported encryption algorithm: " + cCipherAlgorithm)
             }
-            # تشفير البيانات
+            # Encrypt data
             return encrypt(cData, cKey, cIV, cCipherAlgorithm)
         catch
-            raise("خطأ في التشفير: " + cCatchError)
+            raise("Error encrypting data: " + cCatchError)
         }
     }
 
-    # فك تشفير البيانات
+    # Decrypt data
     func decrypte cEncryptedData, cKey, cIV {
         try {
-            # فك تشفير البيانات
+            # Decrypt data
             return decrypt(cEncryptedData, cKey, cIV, this.cAlgorithm)
         catch
-            raise("خطأ في فك التشفير: " + cCatchError)
+            raise("Error decrypting data: " + cCatchError)
         }
     }
 
-    # فك تشفير البيانات باستخدام خوارزمية محددة
+    # Decrypt data using a specific algorithm
     func decryptWithAlgorithm cEncryptedData, cKey, cIV, cCipherAlgorithm {
         try {
-            # التحقق من دعم الخوارزمية
+            # Check for algorithm support
             aSupportedCiphers = supportedCiphers()
             if not find(aSupportedCiphers, cCipherAlgorithm) {
                 raise("Unsupported encryption algorithm: " + cCipherAlgorithm)
             }
-            # فك تشفير البيانات
+            # Decrypt data
             return decrypt(cEncryptedData, cKey, cIV, cCipherAlgorithm)
         catch
-            raise("خطأ في فك التشفير: " + cCatchError)
+            raise("Error decrypting data: " + cCatchError)
         }
     }
 
-    # توليد مفتاح عشوائي
+    # Generate random key
     func generateKey nLength {
         if nLength <= 0 {
             nLength = this.nKeyLength
@@ -81,7 +81,7 @@ class EncryptionManager {
         return randbytes(nLength)
     }
 
-    # توليد vector تهيئة عشوائي
+    # Generate random initialization vector
     func generateIV nLength {
         if nLength <= 0 {
             nLength = this.nIVLength
@@ -90,12 +90,12 @@ class EncryptionManager {
         return randbytes(nLength)
     }
 
-    # الحصول على قائمة الخوارزميات المدعومة
+    # Get list of supported algorithms
     func getSupportedAlgorithms {
         return supportedCiphers()
     }
 
-    # حساب تجزئة MD5 للملف
+    # Calculate MD5 hash of file
     func calculateMD5File cFilePath {
         try {
             # قراءة محتوى الملف
@@ -113,7 +113,7 @@ class EncryptionManager {
         }
     }
 
-    # حساب تجزئة SHA1 للملف
+    # Calculate SHA1 hash of file
     func calculateSHA1File cFilePath {
         try {
             cFileContent = Read(cFilePath)
@@ -126,7 +126,7 @@ class EncryptionManager {
         }
     }
 
-    # حساب تجزئة SHA256 للملف
+    # Calculate SHA256 hash of file
     func calculateSHA256File cFilePath {
         try {
             cFileContent = Read(cFilePath)
@@ -139,7 +139,7 @@ class EncryptionManager {
         }
     }
 
-    # حساب تجزئة SHA512 للملف
+    # Calculate SHA512 hash of file
     func calculateSHA512File cFilePath {
         try {
             cFileContent = Read(cFilePath)
@@ -152,20 +152,20 @@ class EncryptionManager {
         }
     }
 
-    # توليد زوج مفاتيح RSA
+    # Generate RSA key pair
     func generateRSAKeyPair nBits {
         try {
-            # توليد زوج مفاتيح RSA
+            # Generate RSA key pair
             rsaKey = rsa_generate(nBits)
 
-            # استخراج معلمات المفتاح
+            # Extract key parameters
             rsaKeyParams = rsa_export_params(rsaKey)
 
-            # إنشاء المفتاح العام
+            # Create public key
             rsaPublicKeyParam = [:n = rsaKeyParams[:n], :e = rsaKeyParams[:e]]
             rsaPublicKey = rsa_import_params(rsaPublicKeyParam)
 
-            # تصدير المفاتيح بتنسيق PEM
+            # Export keys in PEM format
             cPrivateKeyPEM = rsa_export_pem(rsaKey)
             cPublicKeyPEM = rsa_export_pem(rsaPublicKey)
 
@@ -174,205 +174,205 @@ class EncryptionManager {
                 :public_key = cPublicKeyPEM
             ]
         catch
-            raise("خطأ في توليد زوج مفاتيح RSA: " + cCatchError)
+            raise("Error generating RSA key pair: " + cCatchError)
         }
     }
 
-    # تشفير البيانات باستخدام RSA
+    # Encrypt data using RSA
     func encryptRSA cData, cPublicKeyPEM {
         try {
-            # استيراد المفتاح العام
+            # Import public key
             rsaPublicKey = rsa_import_pem(cPublicKeyPEM)
 
-            # تشفير البيانات
+            # Encrypt data
             return rsa_encrypt_pkcs(rsaPublicKey, cData)
         catch
-            raise("خطأ في تشفير البيانات باستخدام RSA: " + cCatchError)
+            raise("Error encrypting data using RSA: " + cCatchError)
         }
     }
 
-    # فك تشفير البيانات باستخدام RSA
+    # Decrypt data using RSA
     func decryptRSA cEncryptedData, cPrivateKeyPEM {
         try {
-            # استيراد المفتاح الخاص
+            # Import private key
             rsaKey = rsa_import_pem(cPrivateKeyPEM)
 
-            # التحقق من أن المفتاح هو مفتاح خاص
+            # Check if the key is a private key
             if not rsa_is_privatekey(rsaKey) {
-                raise("المفتاح المقدم ليس مفتاحًا خاصًا")
+                raise("The provided key is not a private key")
             }
 
-            # فك تشفير البيانات
+            # Decrypt data
             return rsa_decrypt_pkcs(rsaKey, cEncryptedData)
         catch
-            raise("خطأ في فك تشفير البيانات باستخدام RSA: " + cCatchError)
+            raise("Error decrypting data using RSA: " + cCatchError)
         }
     }
 
-    # توقيع البيانات باستخدام RSA
+    # Sign data using RSA
     func signRSA cData, cPrivateKeyPEM {
         try {
-            # استيراد المفتاح الخاص
+            # Import private key
             rsaKey = rsa_import_pem(cPrivateKeyPEM)
 
-            # التحقق من أن المفتاح هو مفتاح خاص
+            # Check if the key is a private key
             if not rsa_is_privatekey(rsaKey) {
-                raise("المفتاح المقدم ليس مفتاحًا خاصًا")
+                raise("The provided key is not a private key")
             }
 
-            # حساب تجزئة البيانات
+            # Calculate hash of data
             cHash = SHA256(cData)
 
-            # توقيع التجزئة
+            # Sign the hash
             return rsa_signhash_pkcs(rsaKey, cHash)
         catch
-            raise("خطأ في توقيع البيانات باستخدام RSA: " + cCatchError)
+            raise("Error signing data using RSA: " + cCatchError)
         }
     }
 
-    # التحقق من توقيع البيانات باستخدام RSA
+    # Verify signature using RSA
     func verifyRSA cData, cSignature, cPublicKeyPEM {
         try {
-            # استيراد المفتاح العام
+            # Import public key
             rsaPublicKey = rsa_import_pem(cPublicKeyPEM)
 
-            # حساب تجزئة البيانات
+            # Calculate hash of data
             cHash = SHA256(cData)
 
-            # التحقق من التوقيع
+            # Verify the signature
             return rsa_verifyhash_pkcs(rsaPublicKey, cHash, cSignature)
         catch
-            raise("خطأ في التحقق من توقيع البيانات باستخدام RSA: " + cCatchError)
+            raise("Error verifying signature using RSA: " + cCatchError)
         }
     }
 
-    # تشفير ملف باستخدام AES ثم تشفير مفتاح AES باستخدام RSA
+    # Encrypt file using AES then encrypt AES key using RSA
     func encryptFile cFilePath, cOutputPath, cPublicKeyPEM {
         try {
-            # استيراد المفتاح العام
+            # Import public key
             rsaPublicKey = rsa_import_pem(cPublicKeyPEM)
 
-            # قراءة محتوى الملف
+            # Read file content
             cData = read(cFilePath)
 
-            # توليد مفتاح AES-256 عشوائي
+            # Generate random AES-256 key
             cKey = randbytes(32)
             cIV = randbytes(16)
 
-            # تشفير البيانات باستخدام AES-256
+            # Encrypt data using AES-256
             cEncryptedData = encrypt(cData, cKey, cIV, "aes256")
 
-            # تشفير مفتاح AES باستخدام RSA
+            # Encrypt AES key using RSA
             cEncryptedKey = rsa_encrypt_pkcs(rsaPublicKey, cKey)
 
-            # حساب طول المفتاح المشفر
+            # Calculate length of encrypted key
             nKeyLength = len(cEncryptedKey)
 
-            # تخزين IV وطول المفتاح المشفر والمفتاح المشفر والبيانات المشفرة في ملف
+            # Store IV, encrypted key length, encrypted key, and encrypted data in file
             write(cOutputPath, cIV + char(nKeyLength) + cEncryptedKey + cEncryptedData)
 
             return true
         catch
-            raise("خطأ في تشفير الملف: " + cCatchError)
+            raise("Error encrypting file: " + cCatchError)
         }
     }
 
-    # فك تشفير ملف مشفر باستخدام AES و RSA
+    # Decrypt file using AES and RSA
     func decryptFile cEncryptedFilePath, cOutputPath, cPrivateKeyPEM {
         try {
-            # استيراد المفتاح الخاص
+            # Import private key
             rsaKey = rsa_import_pem(cPrivateKeyPEM)
             
-            # التحقق من أن المفتاح هو مفتاح خاص
+            # Check if the key is a private key
             if not rsa_is_privatekey(rsaKey) {
-                raise("المفتاح المقدم ليس مفتاحًا خاصًا")
+                raise("The provided key is not a private key")
             }
 
-            # قراءة محتوى الملف المشفر
+            # Read encrypted file content
             cEncryptedContent = read(cEncryptedFilePath)
 
-            # استخراج IV (أول 16 بايت)
+            # Extract IV (first 16 bytes)
             cIV = substr(cEncryptedContent, 1, 16)
 
-            # استخراج طول المفتاح المشفر (البايت التالي)
+            # Extract encrypted key length (next byte)
             rsaKeyParams = rsa_export_params(rsaKey)
             nKeyLength = rsaKeyParams[:bits]/ 8
-            # استخراج المفتاح المشفر
+            # Extract encrypted key
             cEncryptedKey = substr(cEncryptedContent, 18, nKeyLength)
 
-            # استخراج البيانات المشفرة
+            # Extract encrypted data
             cEncryptedData = substr(cEncryptedContent, 18 + nKeyLength)
 
-            # فك تشفير مفتاح AES باستخدام RSA
+            # Decrypt AES key using RSA
             cKey = rsa_decrypt_pkcs(rsaKey, cEncryptedKey)
 
-            # فك تشفير البيانات باستخدام AES
+            # Decrypt data using AES
             cPlainData = decrypt(cEncryptedData, cKey, cIV, "aes256")
 
-            # كتابة البيانات المفكوكة إلى ملف
+            # Write decrypted data to file
             write(cOutputPath, cPlainData)
 
             return true
         catch
-            raise("خطأ في فك تشفير الملف: " + cCatchError)
+            raise("Error decrypting file: " + cCatchError)
         }
     }
 
-    # تشفير ملف كبير باستخدام AES ثم تشفير مفتاح AES باستخدام RSA
+    # Encrypt large file using AES then encrypt AES key using RSA
     func encryptLargeFile cFilePath, cOutputPath, cPublicKeyPEM {
         try {
-            # استيراد المفتاح العام
+            # Import public key
             rsaPublicKey = rsa_import_pem(cPublicKeyPEM)
 
-            # توليد مفتاح AES-256 عشوائي
+            # Generate random AES-256 key
             cKey = randbytes(32)
             cIV = randbytes(16)
 
-            # تشفير مفتاح AES باستخدام RSA
+            # Encrypt AES key using RSA
             cEncryptedKey = rsa_encrypt_pkcs(rsaPublicKey, cKey)
 
-            # حساب طول المفتاح المشفر
+            # Calculate length of encrypted key
             nKeyLength = len(cEncryptedKey)
 
-            # فتح الملف المصدر للقراءة
+            # Open source file for reading
             fpSource = fopen(cFilePath, "rb")
             if fpSource = 0 {
                 raise("Failed to open source file: " + cFilePath)
             }
 
-            # فتح الملف الهدف للكتابة
+            # Open destination file for writing
             fpDest = fopen(cOutputPath, "wb")
             if fpDest = 0 {
                 fclose(fpSource)
                 raise("Failed to open destination file: " + cOutputPath)
             }
 
-            # كتابة IV وطول المفتاح المشفر والمفتاح المشفر إلى الملف الهدف
+            # Write IV, encrypted key length, and encrypted key to destination file
             fwrite(fpDest, cIV + char(nKeyLength) + cEncryptedKey)
 
-            # قراءة الملف المصدر وتشفيره على دفعات
-            nChunkSize = 8192  # 8 كيلوبايت
+            # Read source file in chunks and encrypt
+            nChunkSize = 8192  # 8 Kilobytes
             while true {
                 cChunk = fread(fpSource, nChunkSize)
                 if len(cChunk) = 0 {
                     exit
                 }
 
-                # تشفير الدفعة
+                # Encrypt the chunk
                 cEncryptedChunk = encrypt(cChunk, cKey, cIV, "aes256")
 
-                # كتابة طول الدفعة المشفرة والدفعة المشفرة إلى الملف الهدف
+                # Write encrypted chunk length and encrypted chunk to destination file
                 nChunkLength = len(cEncryptedChunk)
                 fwrite(fpDest, char(nChunkLength / 256) + char(nChunkLength % 256) + cEncryptedChunk)
             }
 
-            # إغلاق الملفات
+            # Close files
             fclose(fpSource)
             fclose(fpDest)
 
             return true
         catch
-            # إغلاق الملفات في حالة حدوث خطأ
+            # Close files in case of error
             if fpSource != NULL {
                 fclose(fpSource)
             }
@@ -380,76 +380,76 @@ class EncryptionManager {
                 fclose(fpDest)
             }
 
-            raise("خطأ في تشفير الملف الكبير: " + cCatchError)
+            raise("Error encrypting large file: " + cCatchError)
         }
     }
 
-    # فك تشفير ملف كبير مشفر باستخدام AES و RSA
+    # Decrypt large file encrypted using AES and RSA
     func decryptLargeFile cEncryptedFilePath, cOutputPath, cPrivateKeyPEM {
         try {
-            # استيراد المفتاح الخاص
+            # Import private key
             rsaKey = rsa_import_pem(cPrivateKeyPEM)
 
-            # التحقق من أن المفتاح هو مفتاح خاص
+            # Check if the key is a private key
             if not rsa_is_privatekey(rsaKey) {
-                raise("المفتاح المقدم ليس مفتاحًا خاصًا")
+                raise("The provided key is not a private key")
             }
 
-            # فتح الملف المشفر للقراءة
+            # Open encrypted file for reading
             fpSource = fopen(cEncryptedFilePath, "rb")
             if fpSource = 0 {
                 raise("Failed to open encrypted file: " + cEncryptedFilePath)
             }
 
-            # قراءة IV (أول 16 بايت)
+            # Read IV (first 16 bytes)
             cIV = fread(fpSource, 16)
 
-            # قراءة طول المفتاح المشفر (البايت التالي)
+            # Read encrypted key length (next byte)
             nKeyLength = ascii(fread(fpSource, 1))
 
-            # قراءة المفتاح المشفر
+            # Read encrypted key
             cEncryptedKey = fread(fpSource, nKeyLength)
 
-            # فك تشفير مفتاح AES باستخدام RSA
+            # Decrypt AES key using RSA
             cKey = rsa_decrypt_pkcs(rsaKey, cEncryptedKey)
 
-            # فتح الملف الهدف للكتابة
+            # Open destination file for writing
             fpDest = fopen(cOutputPath, "wb")
             if fpDest = 0 {
                 fclose(fpSource)
                 raise("Failed to open destination file: " + cOutputPath)
             }
 
-            # قراءة وفك تشفير الدفعات
+            # Read and decrypt chunks
             while true {
-                # قراءة طول الدفعة المشفرة (2 بايت)
+                # Read encrypted chunk length (2 bytes)
                 cChunkLengthBytes = fread(fpSource, 2)
                 if len(cChunkLengthBytes) < 2 {
-                    exit  # نهاية الملف
+                    exit  # End of file
                 }
 
                 nChunkLength = ascii(cChunkLengthBytes[1]) * 256 + ascii(cChunkLengthBytes[2])
 
-                # قراءة الدفعة المشفرة
+                # Read encrypted chunk
                 cEncryptedChunk = fread(fpSource, nChunkLength)
                 if len(cEncryptedChunk) < nChunkLength {
                     raise("Unexpected end of file")
                 }
 
-                # فك تشفير الدفعة
+                # Decrypt the chunk
                 cPlainChunk = decrypt(cEncryptedChunk, cKey, cIV, "aes256")
 
-                # كتابة الدفعة المفكوكة إلى الملف الهدف
+                # Write decrypted chunk to destination file
                 fwrite(fpDest, cPlainChunk)
             }
 
-            # إغلاق الملفات
+            # Close files
             fclose(fpSource)
             fclose(fpDest)
 
             return true
         catch
-            # إغلاق الملفات في حالة حدوث خطأ
+            # Close files in case of error
             if fpSource != NULL {
                 fclose(fpSource)
             }
@@ -457,77 +457,77 @@ class EncryptionManager {
                 fclose(fpDest)
             }
 
-            raise("خطأ في فك تشفير الملف الكبير: " + cCatchError)
+            raise("Error decrypting large file: " + cCatchError)
         }
     }
 
-    # توقيع ملف باستخدام RSA
+    # Sign file using RSA
     func signFile cFilePath, cSignatureFilePath, cPrivateKeyPEM {
         try {
-            # استيراد المفتاح الخاص
+            # Import private key
             rsaKey = rsa_import_pem(cPrivateKeyPEM)
 
-            # التحقق من أن المفتاح هو مفتاح خاص
+            # Check if the key is a private key
             if not rsa_is_privatekey(rsaKey) {
-                raise("المفتاح المقدم ليس مفتاحًا خاصًا")
+                raise("The provided key is not a private key")
             }
 
-           # حساب تجزئة SHA256 للملف
+           # Calculate SHA256 hash of the file
             cDigest = calculateSHA256File(cFilePath)
 
-            # توقيع التجزئة باستخدام RSA-PKCS
+            # Sign the hash using RSA-PKCS
             cSignature = rsa_signhash_pkcs(rsaKey, cDigest)
 
-            # كتابة التوقيع إلى ملف
+            # Write the signature to file
             write(cSignatureFilePath, cSignature)
 
             return true
         catch
-            raise("خطأ في توقيع الملف: " + cCatchError)
+            raise("Error signing file: " + cCatchError)
         }
     }
 
-    # التحقق من توقيع ملف باستخدام RSA
+    # Verify file signature using RSA
     func verifyFileSignature cFilePath, cSignatureFilePath, cPublicKeyPEM {
         try {
-            # استيراد المفتاح العام
+            # Import public key
             rsaPublicKey = rsa_import_pem(cPublicKeyPEM)
 
-            # حساب تجزئة SHA256 للملف
+            # Calculate SHA256 hash of the file
             cDigest = calculateSHA256File(cFilePath)
 
-            # قراءة التوقيع من الملف
+            # Read the signature from the file
             cSignature = read(cSignatureFilePath)
 
-            # التحقق من التوقيع باستخدام RSA-PKCS
+            # Verify the signature using RSA-PKCS
             return rsa_verifyhash_pkcs(rsaPublicKey, cDigest, cSignature)
         catch
-            raise("خطأ في التحقق من توقيع الملف: " + cCatchError)
+            raise("Error verifying file signature: " + cCatchError)
         }
     }
 
-    # توقيع ملف كبير باستخدام RSA
+    # Sign large file using RSA
     func signLargeFile cFilePath, cSignatureFilePath, cPrivateKeyPEM {
         try {
-            # استيراد المفتاح الخاص
+            # Import private key
             rsaKey = rsa_import_pem(cPrivateKeyPEM)
 
-            # التحقق من أن المفتاح هو مفتاح خاص
+            # Check if the key is a private key
             if not rsa_is_privatekey(rsaKey) {
-                raise("المفتاح المقدم ليس مفتاحًا خاصًا")
+                raise("The provided key is not a private key")
             }
 
-            # فتح الملف للقراءة
+            # Open the file for reading
             fpSource = fopen(cFilePath, "rb")
             if fpSource = 0 {
                 raise("Failed to open file: " + cFilePath)
             }
 
-            # تهيئة سياق SHA256
+            # Initialize SHA256 context
             ctx = sha256init()
 
-            # قراءة الملف على دفعات وتحديث سياق التجزئة
-            nChunkSize = 8192  # 8 كيلوبايت
+            # Read the file in chunks and update the hash context
+            nChunkSize = 8192  # 8 Kilobytes
             while true {
                 cChunk = fread(fpSource, nChunkSize)
                 if len(cChunk) = 0 {
@@ -537,46 +537,46 @@ class EncryptionManager {
                 sha256update(ctx, cChunk)
             }
 
-            # إغلاق الملف
+            # Close the file
             fclose(fpSource)
 
-            # إنهاء حساب التجزئة
+            # Finalize the hash calculation
             cDigest = sha256final(ctx)
 
-            # توقيع التجزئة باستخدام RSA-PKCS
+            # Sign the hash using RSA-PKCS
             cSignature = rsa_signhash_pkcs(rsaKey, cDigest)
 
-            # كتابة التوقيع إلى ملف
+            # Write the signature to file
             write(cSignatureFilePath, cSignature)
 
             return true
         catch
-            # إغلاق الملف في حالة حدوث خطأ
+            # Close the file in case of error
             if fpSource != NULL {
                 fclose(fpSource)
             }
 
-            raise("خطأ في توقيع الملف الكبير: " + cCatchError)
+            raise("Error signing large file: " + cCatchError)
         }
     }
 
-    # التحقق من توقيع ملف كبير باستخدام RSA
+    # Verify large file signature using RSA
     func verifyLargeFileSignature cFilePath, cSignatureFilePath, cPublicKeyPEM {
         try {
-            # استيراد المفتاح العام
+            # Import public key
             rsaPublicKey = rsa_import_pem(cPublicKeyPEM)
 
-            # فتح الملف للقراءة
+            # Open the file for reading
             fpSource = fopen(cFilePath, "rb")
             if fpSource = 0 {
                 raise("Failed to open file: " + cFilePath)
             }
 
-            # تهيئة سياق SHA256
+            # Initialize SHA256 context
             ctx = sha256init()
 
-            # قراءة الملف على دفعات وتحديث سياق التجزئة
-            nChunkSize = 8192  # 8 كيلوبايت
+            # Read the file in chunks and update the hash context
+            nChunkSize = 8192  # 8 Kilobytes
             while true {
                 cChunk = fread(fpSource, nChunkSize)
                 if len(cChunk) = 0 {
@@ -586,24 +586,24 @@ class EncryptionManager {
                 sha256update(ctx, cChunk)
             }
 
-            # إغلاق الملف
+            # Close the file
             fclose(fpSource)
 
-            # إنهاء حساب التجزئة
+            # Finalize the hash calculation
             cDigest = sha256final(ctx)
 
-            # قراءة التوقيع من الملف
+            # Read the signature from the file
             cSignature = read(cSignatureFilePath)
 
-            # التحقق من التوقيع باستخدام RSA-PKCS
+            # Verify the signature using RSA-PKCS
             return rsa_verifyhash_pkcs(rsaPublicKey, cDigest, cSignature)
         catch
-            # إغلاق الملف في حالة حدوث خطأ
+            # Close the file in case of error
             if fpSource != NULL {
                 fclose(fpSource)
             }
 
-            raise("خطأ في التحقق من توقيع الملف الكبير: " + cCatchError)
+            raise("Error verifying large file signature: " + cCatchError)
         }
     }
 

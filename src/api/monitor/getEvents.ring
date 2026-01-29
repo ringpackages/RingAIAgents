@@ -5,8 +5,8 @@
 */
 
 /*
-الدالة: getEvents
-الوصف: الحصول على سجل الأحداث
+function: getEvents
+description: Get events
 */
 func getEvents
     try {

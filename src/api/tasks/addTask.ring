@@ -5,8 +5,8 @@
 */
 
 /*
-الدالة: addTask
-الوصف: إنشاء مهمة جديدة
+function: addTask
+description: Create a new task
 */
 func addTask
     try {
@@ -16,7 +16,7 @@ func addTask
             setPriority(number(oServer["priority"]))
             setContext(oServer["context"])
 
-            # إضافة مهام فرعية
+            # add subtasks
             if islist(oServer["subtasks"]) {
                 for cSubtask in oServer["subtasks"] {
                     addSubtask(new Task(cSubtask))
@@ -24,7 +24,7 @@ func addTask
             }
         }
 
-        # تعيين المهمة لعميل
+        # assign the task to an agent
         nAgentId = number(oServer["agent_id"])
         if nAgentId > 0 and nAgentId <= len(aAgents) {
             oTask.assignTo(aAgents[nAgentId])
@@ -32,7 +32,7 @@ func addTask
 
         add(aTasks, oTask)
 
-        # حفظ المهمة في قاعدة البيانات
+        # save the task to the database
         if saveTasks() {
             ? logger("addTask function", "Task created and saved successfully", :info)
             oServer.setContent('{"status":"success","message":"Task created successfully","id":"' +

@@ -5,22 +5,22 @@
 */
 
 /*
-الدالة: showAPIKeys
-الوصف: عرض صفحة إدارة مفاتيح API
+Function: showAPIKeys
+Description: Display API keys management page
 */
 import System.Web
 
 func showAPIKeys
     oPage = new BootStrapWebPage {
         Title = "RingAI API Keys Management"
-        # تحميل الستايلات المشتركة
+        # Load common styles
         loadCommonStyles(oPage)
-        # تحميل ستايلات خاصة بالصفحة
+        # Load page-specific styles
         html("<link rel='stylesheet' href='/static/css/api-keys.css'>")
         html("<script src='/static/js/common.js'></script>")
         html("<script src='/static/js/api-keys.js'></script>")
 
-        # إضافة الهيدر
+        # Add header
         getHeader(oPage)
 
         div {
@@ -37,7 +37,7 @@ func showAPIKeys
                     }
                 }
 
-                # قسم مفاتيح API
+                # API keys section
                 div {
                     classname = "row"
                     div {
@@ -87,7 +87,7 @@ func showAPIKeys
                     }
                 }
 
-                # قسم المعلومات
+                # API keys information section
                 div {
                     classname = "row mt-4"
                     div {
@@ -146,7 +146,7 @@ func showAPIKeys
             }
         }
 
-        # Modal لإضافة مفتاح جديد
+        # Modal to add new API key
         div {
             id = "add-key-modal"
             classname = "modal fade"
@@ -249,7 +249,7 @@ func showAPIKeys
             }
         }
 
-        # Modal لتعديل مفتاح
+        # Modal to edit API key
         div {
             id = "edit-key-modal"
             classname = "modal fade"
@@ -351,12 +351,12 @@ func showAPIKeys
             }
         }
 
-        # إضافة الفوتر
+        # Add footer
         getFooter(oPage)
 
-        # إضافة سكريبت لتحميل مفاتيح API
+        # Add script to load API keys
         html("<script>
-            // تنفيذ الكود بعد تحميل الصفحة
+            // Execute code after page load
             $(document).ready(function() {
                 console.log('Document ready');
 
@@ -368,7 +368,7 @@ func showAPIKeys
                     updateModelOptions();
                 });
 
-                // تعيين معالج حدث زر الإضافة بعدة طرق
+                // Set up event handler for add key button
                 $('#add-key-btn').on('click', function(e) {
                     console.log('Add key button clicked via jQuery');
                     e.preventDefault();
@@ -376,13 +376,13 @@ func showAPIKeys
                     return false;
                 });
 
-                // طريقة بديلة لفتح النافذة المنبثقة
+                // Alternative way to open the popup
                 document.getElementById('add-key-btn').addEventListener('click', function(e) {
                     console.log('Add key button clicked via addEventListener');
                     $('#add-key-modal').modal('show');
                 });
 
-                // تعيين معالج حدث زر الحفظ بطريقة مباشرة
+                // Set up event handler for save button directly
                 document.getElementById('save-key-btn').onclick = function() {
                     console.log('Save button clicked directly');
                     alert('Save button clicked');
@@ -390,7 +390,7 @@ func showAPIKeys
                     return false;
                 };
 
-                // تعيين معالج حدث تقديم النموذج بطريقة مباشرة
+                // Set up event handler for form submission directly
                 document.getElementById('add-key-form').onsubmit = function(e) {
                     e.preventDefault();
                     console.log('Form submitted directly');
@@ -398,14 +398,14 @@ func showAPIKeys
                     return false;
                 };
 
-                // تعيين معالج حدث زر التحديث بطريقة مباشرة
+                // Set up event handler for update button directly
                 document.getElementById('update-key-btn').onclick = function() {
                     console.log('Update button clicked directly');
                     updateAPIKey();
                     return false;
                 };
 
-                // تعيين معالج حدث تقديم نموذج التحديث بطريقة مباشرة
+                // Set up event handler for edit form submission directly
                 document.getElementById('edit-key-form').onsubmit = function(e) {
                     e.preventDefault();
                     console.log('Edit form submitted directly');
@@ -413,7 +413,7 @@ func showAPIKeys
                     return false;
                 };
 
-                // محاولة فتح النافذة المنبثقة بعد تحميل الصفحة بفترة قصيرة
+                // Try to open the modal after page load with a short delay
                 setTimeout(function() {
                     console.log('Trying to show modal after timeout');
                     try {
@@ -428,14 +428,14 @@ func showAPIKeys
                 }, 1000);
             });
 
-            // دالة مساعدة لفتح النافذة المنبثقة
+            // Helper function to open the modal
             function openAddKeyModal() {
                 console.log('openAddKeyModal function called');
                 $('#add-key-modal').modal('show');
             }
         </script>")
 
-        # إضافة زر إضافي لفتح النافذة المنبثقة
+        # Add an additional button to open the modal
         html("<div class='container mt-3'>
             <button onclick='openAddKeyModal()' class='btn btn-primary'>
                 <i class='fas fa-plus'></i> Open Add Key Modal (Alternative)

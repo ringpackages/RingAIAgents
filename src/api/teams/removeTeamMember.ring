@@ -5,8 +5,8 @@
 */
 
 /*
-الدالة: removeTeamMember
-الوصف: إزالة عضو من الفريق
+function: removeTeamMember
+description: Remove a member from a team
 */
 func removeTeamMember
     try {
@@ -17,7 +17,7 @@ func removeTeamMember
             oCrew = aTeams[nTeamId]
 
             if nMemberId > 0 and nMemberId <= len(aAgents) {
-                # إزالة العضو
+                # remove the member
                 oCrew.removeMember(aAgents[nMemberId])
 
                 ? logger("removeTeamMember function", "Member removed successfully", :info)

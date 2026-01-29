@@ -1,6 +1,6 @@
 /*
-الكلاس: TaskManagerDialog
-الوصف: نافذة إدارة المهام وعرض تفاصيلها
+the class: TaskManagerDialog
+the description: task manager dialog to manage and display tasks
 */
 class TaskManagerDialog from QDialog
     
@@ -16,11 +16,11 @@ class TaskManagerDialog from QDialog
     # Data
     aTasks
     aFilteredTasks
-    oParent  # مرجع للنافذة الأم
+    oParent  # reference to the parent window
     
     func init oParent {
         super.init(oParent)
-        this.oParent = oParent  # تخزين مرجع للنافذة الأم
+        this.oParent = oParent  # store reference to the parent window
         setWindowTitle("Task Manager")
         resize(900, 700)
         aTasks = []
@@ -30,11 +30,12 @@ class TaskManagerDialog from QDialog
         updateKPIs()
     }
     
-         # دالة للحصول على النافذة الأم
+    # function to get the parent window
     func getParent {
         return this.oParent
     }
     
+    # function to initialize the UI
     func initUI {
         # Create main layout
         oMainLayout = new QHBoxLayout()

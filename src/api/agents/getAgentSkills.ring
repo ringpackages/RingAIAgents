@@ -5,8 +5,8 @@
 */
 
 /*
-الدالة: getAgentSkills
-الوصف: الحصول على مهارات عميل
+Function: getAgentSkills
+Description: Get agent skills
 */
 func getAgentSkills
     try {

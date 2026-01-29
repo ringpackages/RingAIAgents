@@ -5,8 +5,8 @@
 */
 
 /*
-الدالة: addUser
-الوصف: إضافة مستخدم جديد
+function: addUser
+description: Add a new user
 */
 func addUser
     try {

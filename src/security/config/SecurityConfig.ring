@@ -1,46 +1,46 @@
-# تكوين نظام الأمان
+# Security configuration
 
 class SecurityConfig {
-    # إعدادات التشفير
+    # Encryption settings
     cEncryptionAlgorithm = "aes-256-cbc"
     nKeyLength = 32
     nIVLength = 16
     
-    # إعدادات المصادقة
+    # Authentication settings
     nMinPasswordLength = 12
     bRequireSpecialChars = true
     bRequireNumbers = true
     bRequireUpperCase = true
     nMFACodeLength = 6
-    nMFACodeExpiry = 300  # 5 دقائق
+    nMFACodeExpiry = 300  # 5 minutes
     
-    # إعدادات الجلسات
-    nSessionExpiry = 3600  # 1 ساعة
+    # Session settings
+    nSessionExpiry = 3600  # 1 hour
     bSecureCookies = true
     bHttpOnlyCookies = true
     cCookieDomain = ""
     cCookiePath = "/"
     
-    # إعدادات التوكنات
-    cJWTSigningKey = ""  # سيتم توليده تلقائياً إذا كان فارغاً
-    nJWTExpiry = 86400  # 24 ساعة
+    # Token settings
+    cJWTSigningKey = ""  # Will be generated automatically if empty
+    nJWTExpiry = 86400  # 24 hours
     
-    # إعدادات CSRF
-    nCSRFTokenExpiry = 3600  # 1 ساعة
+    # CSRF settings
+    nCSRFTokenExpiry = 3600  # 1 hour
     
-    # إعدادات سجل المراجعة
+    # Audit log settings
     cAuditLogPath = "logs/audit/"
     nLogRetentionDays = 90
     bEncryptLogs = true
     
-    # إعدادات منع الاختراق
+    # Preventing attacks
     nMaxLoginAttempts = 5
-    nLoginBlockDuration = 1800  # 30 دقيقة
+    nLoginBlockDuration = 1800  # 30 minutes
     nRateLimitRequests = 100
-    nRateLimitWindow = 60  # 1 دقيقة
+    nRateLimitWindow = 60  # 1 minute
     aBlockedIPs = []
     
-    # أنماط الطلبات المشبوهة
+    # Suspicious patterns
     aSuspiciousPatterns = [
         "SELECT.*FROM",
         "DROP.*TABLE",
@@ -60,7 +60,7 @@ class SecurityConfig {
         "document\.write"
     ]
     
-    # مستويات الصلاحيات
+    # Permissions levels
     aRoles = [
         "admin" = [
             "permissions" = ["read", "write", "delete", "manage_users", "manage_system"],
@@ -80,16 +80,16 @@ class SecurityConfig {
         ]
     ]
     
-    # إعدادات الاتصال بقاعدة البيانات
+    # Database connection settings
     cDBHost = "localhost"
     cDBName = "ringai_agents"
     cDBUser = "ringai_user"
-    cDBPassword = ""  # يجب تعيينه في بيئة الإنتاج
+    cDBPassword = ""  # Should be set in production environment
     nDBPort = 3306
     
-    # إعدادات البريد الإلكتروني
+    # Email settings
     cEmail = "ringai@ring-framework.com"
-    cPassword = "ringai@ring-framework.com"  # يجب تعيينه في بيئة الإنتاج
+    cPassword = "ringai@ring-framework.com"  # Should be set in production environment
     cSMTPServer = "smtp.gmail.com"
     
 

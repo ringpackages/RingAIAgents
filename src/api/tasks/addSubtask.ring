@@ -5,8 +5,8 @@
 */
 
 /*
-الدالة: addSubtask
-الوصف: إضافة مهمة فرعية
+function: addSubtask
+description: Add a subtask
 */
 func addSubtask
     try {
@@ -14,7 +14,7 @@ func addSubtask
         if nID > 0 and nID <= len(aTasks) {
             oTask = aTasks[nID]
 
-            # إنشاء المهمة الفرعية
+            # create the subtask
             oSubtask = new Task {
                 cTitle = oServer["title"]
                 cDescription = oServer["description"]
@@ -22,7 +22,7 @@ func addSubtask
                 dStartTime = TimeList()[5]
             }
 
-            # إضافة المهمة الفرعية
+            # add the subtask
             oTask.addSubtask(oSubtask)
 
             ? logger("addSubtask function", "Subtask added successfully", :info)

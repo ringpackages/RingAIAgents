@@ -4,48 +4,48 @@ load "G:\RingAIAgents\src\security\config\SecurityConfig.ring" */
 
 /*
 Class: CSRFProtection
-Description: الحماية من هجمات تزوير طلبات المواقع المتقاطعة
+Description: Provides protection against CSRF attacks
 */
 class CSRFProtection {
 
     func init {
         oConfig = new SecurityConfig
 
-        # تحديد مدة صلاحية التوكن (بالثواني)
+        # Set token expiry duration (in seconds)
         nTokenExpiry = oConfig.nCSRFTokenExpiry
 
-        # تهيئة مخزن التوكنات
+        # Initialize token store
         aTokens = []
 
-        # إنشاء كائن Base64
+        # Create Base64 object
         oBase64 = new Base64()
     }
 
-    # إنشاء توكن CSRF
+    # Generate CSRF token
     func generateToken cSessionId {
-        # توليد توكن عشوائي باستخدام randbytes
+        # Generate random token using randbytes
         cToken = oBase64.encode(randbytes(32))
 
-        # تخزين التوكن مع معرف الجلسة
+        # Store the token with session ID
         aTokens + [cToken, cSessionId, date() + " " + time()]
 
         return cToken
     }
 
-    # التحقق من صحة التوكن
+    # Validate CSRF token
     func validateToken cToken, cSessionId {
         if cToken = "" or cSessionId = "" { return false }
 
-        # البحث عن التوكن
+        # Search for the token
         for i = 1 to len(aTokens) {
             if aTokens[i][1] = cToken and aTokens[i][2] = cSessionId {
-                # التحقق من انتهاء صلاحية التوكن
+                # Check if the token has expired
                 if not isTokenExpired(aTokens[i][3]) {
-                    # حذف التوكن بعد الاستخدام
+                    # Remove the token after usage
                     del(aTokens, i)
                     return true
                 else
-                    # حذف التوكن منتهي الصلاحية
+                    # Remove expired token
                     del(aTokens, i)
                     return false
                 }
@@ -55,60 +55,60 @@ class CSRFProtection {
         return false
     }
 
-    # إنشاء حقل مخفي للنموذج
+    # Create hidden form field
     func createFormField cSessionId {
         cToken = generateToken(cSessionId)
         return "<input type='hidden' name='csrf_token' value='" + cToken + "'>"
     }
 
-    # إنشاء توكن CSRF مع توقيع HMAC
+    # Generate CSRF token with HMAC signature
     func generateSignedToken cSessionId, cSecret {
-        # توليد توكن عشوائي
+        # Generate random token
         cRandom = oBase64.encode(randbytes(32))
 
-        # إنشاء البيانات للتوقيع
+        # Create data for signing
         cData = cSessionId + "|" + cRandom + "|" + date() + " " + time()
 
-        # حساب توقيع HMAC
+        # Calculate HMAC signature
         cSignature = hmac_sha256(cData, cSecret)
 
-        # تخزين التوكن مع معرف الجلسة
+        # Store the token with session ID
         aTokens + [cRandom, cSessionId, date() + " " + time()]
 
-        # إرجاع التوكن والتوقيع معًا
+        # Return the token and signature together
         return cRandom + "." + oBase64.encode(cSignature)
     }
 
-    # التحقق من صحة التوكن الموقع
+    # Validate the signed token
     func validateSignedToken cToken, cSessionId, cSecret {
         if cToken = "" or cSessionId = "" { return false }
 
-        # تقسيم التوكن إلى جزأين
+        # Split the token into parts
         aTokenParts = split(cToken, ".")
         if len(aTokenParts) != 2 { return false }
 
         cRandom = aTokenParts[1]
         cSignature = oBase64.decode(aTokenParts[2])
 
-        # البحث عن التوكن
+        # Search for the token
         for i = 1 to len(aTokens) {
             if aTokens[i][1] = cRandom and aTokens[i][2] = cSessionId {
-                # التحقق من انتهاء صلاحية التوكن
+                # Check if the token has expired
                 if not isTokenExpired(aTokens[i][3]) {
-                    # إنشاء البيانات للتحقق من التوقيع
+                    # Create data for signature verification
                     cData = cSessionId + "|" + cRandom + "|" + aTokens[i][3]
 
-                    # حساب توقيع HMAC المتوقع
+                    # Calculate expected HMAC signature
                     cExpectedSignature = hmac_sha256(cData, cSecret)
 
-                    # التحقق من تطابق التوقيع
+                    # Check if the signatures match
                     if cSignature = cExpectedSignature {
-                        # حذف التوكن بعد الاستخدام
+                        # Remove the token after usage
                         del(aTokens, i)
                         return true
                     }
                 else
-                    # حذف التوكن منتهي الصلاحية
+                    # Remove expired token
                     del(aTokens, i)
                 }
 
@@ -119,7 +119,7 @@ class CSRFProtection {
         return false
     }
 
-    # تنظيف التوكنات منتهية الصلاحية
+    # Clean expired tokens
     func cleanExpiredTokens {
         for i = len(aTokens) to 1 step -1 {
             if isTokenExpired(aTokens[i][3]) {
@@ -128,26 +128,26 @@ class CSRFProtection {
         }
     }
 
-    # إضافة رأس CSRF إلى الاستجابة
+    # Add CSRF header to the response
     func addCSRFHeader oServer, cSessionId {
         cToken = generateToken(cSessionId)
         oServer.setHeader("X-CSRF-Token", cToken)
     }
 
-    # تشفير البيانات بترميز Base64
+    # Encode data using Base64
     func base64encode cData {
         if cData = "" { return "" }
 
-        # جدول ترميز Base64
+        # Base64 encoding table
         cBase64Chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
 
-        # تحويل البيانات إلى مصفوفة من البايتات
+        # Convert data to bytes array
         aBytes = []
         for i = 1 to len(cData) {
             add(aBytes, ascii(substr(cData, i, 1)))
         }
 
-        # حساب عدد البايتات المتبقية وعدد علامات = المطلوبة
+        # Calculate the number of bytes remaining and the number of padding characters required
         nRemainder = len(aBytes) % 3
         nPadding = 0
 
@@ -157,33 +157,33 @@ class CSRFProtection {
             nPadding = 1
         }
 
-        # إضافة بايتات صفرية للتكملة إذا لم يكن عدد البايتات من مضاعفات 3
+        # Add zero bytes for completion if the number of bytes is not a multiple of 3
         if nRemainder != 0 {
             for i = 1 to 3 - nRemainder {
                 add(aBytes, 0)
             }
         }
 
-        # تشفير البيانات
+        # Encode the data
         cResult = ""
         for i = 1 to len(aBytes) step 3 {
-            # تجميع 3 بايتات في قيمة 24 بت
+            # Group 3 bytes into a 24-bit value
             nValue = aBytes[i] * 65536 + aBytes[i+1] * 256 + aBytes[i+2]
 
-            # تقسيم القيمة إلى 4 قيم 6 بت
+            # Divide the value into 4 values of 6 bits
             nVal1 = floor(nValue / 262144) % 64
             nVal2 = floor(nValue / 4096) % 64
             nVal3 = floor(nValue / 64) % 64
             nVal4 = nValue % 64
 
-            # إضافة الأحرف المقابلة إلى النتيجة
+            # Add the corresponding characters to the result
             cResult += substr(cBase64Chars, nVal1 + 1, 1)
             cResult += substr(cBase64Chars, nVal2 + 1, 1)
             cResult += substr(cBase64Chars, nVal3 + 1, 1)
             cResult += substr(cBase64Chars, nVal4 + 1, 1)
         }
 
-        # استبدال البايتات الصفرية بعلامة =
+        # Replace zero bytes with the = character
         if nPadding > 0 {
             cResult = left(cResult, len(cResult) - nPadding) + copy("=", nPadding)
         }
@@ -191,14 +191,14 @@ class CSRFProtection {
         return cResult
     }
 
-    # فك تشفير البيانات من ترميز Base64
+    # Decode data from Base64
     func base64decode cData {
         if cData = "" { return "" }
 
-        # جدول ترميز Base64
+        # Base64 encoding table
         cBase64Chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
 
-        # حساب عدد علامات = في نهاية السلسلة
+        # Calculate the number of = characters at the end of the string
         nPadding = 0
         for i = len(cData) to 1 step -1 {
             if substr(cData, i, 1) = "=" {
@@ -208,16 +208,16 @@ class CSRFProtection {
             }
         }
 
-        # إزالة علامات = من نهاية السلسلة
+        # Remove = characters from the end of the string
         cData = substr(cData, 1, len(cData) - nPadding)
 
-        # تحويل الأحرف إلى قيم
+        # Convert characters to values
         aValues = []
         for i = 1 to len(cData) {
             cChar = substr(cData, i, 1)
             nPos = 0
 
-            # البحث عن موقع الحرف في جدول الترميز
+            # Find the position of the character in the encoding table
             for j = 1 to len(cBase64Chars) {
                 if substr(cBase64Chars, j, 1) = cChar {
                     nPos = j - 1
@@ -228,40 +228,40 @@ class CSRFProtection {
             add(aValues, nPos)
         }
 
-        # إضافة قيم صفرية للتكملة
+        # Add zero values for completion
         for i = 1 to (4 - (len(aValues) % 4)) % 4 {
             add(aValues, 0)
         }
 
-        # فك تشفير البيانات
+        # Decode the data
         cResult = ""
         nGroups = floor(len(aValues) / 4)
 
         for i = 1 to nGroups {
-            # الحصول على 4 قيم 6 بت
+            # Get 4 values of 6 bits
             nIdx = (i - 1) * 4 + 1
             nVal1 = aValues[nIdx]
             nVal2 = aValues[nIdx + 1]
             nVal3 = aValues[nIdx + 2]
             nVal4 = aValues[nIdx + 3]
 
-            # تجميع القيم في قيمة 24 بت
+            # Combine the values into a 24-bit value
             nValue = nVal1 * 262144 + nVal2 * 4096 + nVal3 * 64 + nVal4
 
-            # استخراج 3 بايتات من القيمة
+            # Extract 3 bytes from the value
             nByte1 = floor(nValue / 65536) % 256
             nByte2 = floor(nValue / 256) % 256
             nByte3 = nValue % 256
 
-            # إضافة البايتات إلى النتيجة
+            # Add bytes to the result
             cResult += char(nByte1)
 
-            # إضافة البايت الثاني إلا إذا كان هناك علامتي = في نهاية السلسلة
+            # Add the second byte unless there are two = characters at the end of the string
             if nPadding < 2 {
                 cResult += char(nByte2)
             }
 
-            # إضافة البايت الثالث إلا إذا كان هناك علامة = واحدة على الأقل في نهاية السلسلة
+            # Add the third byte unless there is at least one = character at the end of the string
             if nPadding < 1 {
                 cResult += char(nByte3)
             }
@@ -277,16 +277,16 @@ class CSRFProtection {
     aTokens
     oBase64
 
-    # التحقق من انتهاء صلاحية التوكن
+    # Check if the token has expired
     func isTokenExpired cCreatedAt {
-        # حساب الفرق بين الوقت الحالي ووقت إنشاء التوكن
-        # يجب تنفيذ حساب الفرق بشكل صحيح
+        # Calculate the difference between the current time and the token creation time
+        # The difference calculation should be done correctly
         return timeDiff(cCreatedAt, date() + " " + time()) > nTokenExpiry
     }
 
-    # حساب HMAC-SHA256
+    # Calculate HMAC-SHA256
     func hmac_sha256 cData, cKey {
-        # تحضير المفتاح
+        # Prepare the key
         if len(cKey) > 64 {
             cKey = sha256(cKey)
         }
@@ -295,7 +295,7 @@ class CSRFProtection {
             cKey = cKey + copy(char(0), 64 - len(cKey))
         }
 
-        # حساب المفاتيح الداخلية والخارجية
+        # Calculate the inner and outer keys
         cInnerKey = ""
         cOuterKey = ""
 
@@ -304,7 +304,7 @@ class CSRFProtection {
             cOuterKey += char(ascii(substr(cKey, i, 1)) ^ 0x5C)
         }
 
-        # حساب HMAC
+        # Calculate HMAC
         cInnerHash = SHA256(cInnerKey + cData)
         cOuterHash = SHA256(cOuterKey + cInnerHash)
 

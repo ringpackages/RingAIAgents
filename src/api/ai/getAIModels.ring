@@ -5,8 +5,8 @@
 */
 
 /*
-الدالة: getAIModels
-الوصف: الحصول على قائمة نماذج الذكاء الاصطناعي المتاحة
+Function: getAIModels
+Description: Get list of available AI models
 */
 func getAIModels
     try {

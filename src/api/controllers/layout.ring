@@ -5,8 +5,8 @@
 */
 
 /*
-الدالة: loadCommonStyles
-الوصف: تحميل ملفات CSS المشتركة لجميع الصفحات
+Function: loadCommonStyles
+Description: Load common CSS files for all pages
 */
 func loadCommonStyles oPage
     oPage.html("<link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css'>")
@@ -20,8 +20,8 @@ func loadCommonStyles oPage
     oPage.html("<script src='/static/js/common.js'></script>")
 
 /*
-الدالة: getHeader
-الوصف: إنشاء هيدر مشترك لجميع الصفحات
+Function: getHeader
+Description: Create a common header for all pages
 */
 func getHeader oPage
     oPage.html("<header class='main-header compact-header'>
@@ -77,8 +77,8 @@ func getHeader oPage
 
 
 /*
-الدالة: getFooter
-الوصف: إنشاء فوتر مشترك لجميع الصفحات
+Function: getFooter
+Description: Create a common footer for all pages
 */
 func getFooter oPage
     oPage.html("<footer class='main-footer'>

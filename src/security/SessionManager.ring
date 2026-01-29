@@ -4,7 +4,7 @@ load "G:/RingAIAgents/src/security/EncryptionManager.ring"
 //load "G:/RingAIAgents/src/utils/helpers.ring"
 /*
 Class: SessionManager
-Description: مدير جلسات المستخدمين
+Description: Session manager
 */
 class SessionManager {
      oConfig
@@ -18,32 +18,32 @@ class SessionManager {
         oConfig = new SecurityConfig
         oEncryption = new EncryptionManager()
         oBase64 = new Base64()
-        # توليد مفتاح التشفير وvector التهيئة
+        # Generate encryption key and initialization vector
         cSessionKey = this.oEncryption.generateKey(32)
         cSessionIV = this.oEncryption.generateIV(16)
         
-        # تهيئة مخزن الجلسات
+        # Initialize session store
         aActiveSessions = []
         
-        # تحديد مدة صلاحية الجلسة (بالثواني)
+        # Set session expiry duration (in seconds)
         nSessionExpiry = oConfig.nSessionExpiry
         
     }
     
-    # إنشاء جلسة جديدة
+    # Create new session
     func createSession(cUserId, cUserRole, cUserIP) {
         try {
-            # توليد معرف فريد للجلسة
+            # Generate unique session ID
             cSessionId = generateSessionId()
             
-            # الحصول على الوقت الحالي بالتنسيق الصحيح
+            # Get current time in correct format
             aTimeList = timelist()
             cCurrentDateTime = aTimeList[6] + "/" + aTimeList[8] + "/" + aTimeList[19] + " " +
                              padLeft(string(aTimeList[7]), "0", 2) + ":" +
                              padLeft(string(aTimeList[11]), "0", 2) + ":" +
                              padLeft(string(aTimeList[13]), "0", 2)
             
-            # إنشاء بيانات الجلسة كقائمة ترابطية
+            # Create session data as an associative array
             aSessionData = [
                 :user_id = cUserId,
                 :role = cUserRole,
@@ -53,53 +53,53 @@ class SessionManager {
                 :last_activity = cCurrentDateTime
             ]
             
-            # تحويل البيانات إلى JSON
+            # Convert data to JSON
             cJsonData = list2json(aSessionData)
             
-            # تشفير البيانات
+            # Encrypt data
             cEncryptedData = this.oEncryption.encrypte(cJsonData, cSessionKey, cSessionIV)
             
-            # تخزين الجلسة
+            # Store session
             add(aActiveSessions, [cSessionId, cEncryptedData])
             
-            # إنشاء توكن الجلسة
+            # Create session token
             cSessionToken = cSessionId + "." + oBase64.encode(cEncryptedData)
             
             return cSessionToken
         catch
-            ? "خطأ في إنشاء الجلسة: " + cCatchError
+            ? "Error creating session: " + cCatchError
             return ""
         }
     }
     
-    # التحقق من صحة الجلسة
+    # Validate session
     func validateSession cSessionToken {
         try {
             if cSessionToken = "" return false ok
             
-            # تقسيم التوكن إلى معرف وبيانات
+            # Split token into ID and data
             aTokenParts = split(cSessionToken, ".")
             if len(aTokenParts) != 2 return false ok
             
             cSessionId = aTokenParts[1]
             cEncryptedData = oBase64.decode(aTokenParts[2])
             
-            # البحث عن الجلسة
+            # Search for session
             for session in aActiveSessions {
                 if session[1] = cSessionId {
-                    # فك تشفير بيانات الجلسة
+                    # Decrypt session data
                     cDecryptedData = this.oEncryption.decrypte(cEncryptedData, cSessionKey, cSessionIV)
                     
-                    # تحويل البيانات من JSON إلى قائمة
+                    # Convert data from JSON to list
                     aSessionData = json2list(cDecryptedData)
                     
-                    # التحقق من انتهاء صلاحية الجلسة
+                    # Check if session has expired
                     if isSessionExpired(aSessionData[:expires_at]) {
                         destroySession(cSessionId)
                         return false
                     }
                     
-                    # تحديث وقت آخر نشاط
+                    # Update last activity time
                     updateSessionActivity(cSessionId)
                     
                     return aSessionData
@@ -108,12 +108,12 @@ class SessionManager {
             
             return false
         catch
-            ? "خطأ في التحقق من صحة الجلسة: " + cCatchError
+            ? "Error validating session: " + cCatchError
             return false
         }
     }
     
-    # تدمير الجلسة
+    # Destroy session
     func destroySession cSessionId {
         for i = 1 to len(aActiveSessions) {
             if aActiveSessions[i][1] = cSessionId {
@@ -124,63 +124,63 @@ class SessionManager {
         return false
     }
     
-    # تنظيف الجلسات منتهية الصلاحية
+    # Clean expired sessions
     func cleanExpiredSessions {
         for i = len(aActiveSessions) to 1 step -1 {
             cSessionId = aActiveSessions[i][1]
             cEncryptedData = aActiveSessions[i][2]
             
-            # فك تشفير بيانات الجلسة
+            # Decrypt session data
             cDecryptedData = this.oEncryption.decrypte(cEncryptedData, cSessionKey, cSessionIV)
             aSessionData = json2list(cDecryptedData)
             
-            # التحقق من انتهاء صلاحية الجلسة
+            # Check if session has expired
             if isSessionExpired(aSessionData[:expires_at]) {
                 del(aActiveSessions, i)
             }
         }
     }
     
-    # حساب وقت انتهاء صلاحية الجلسة
+    # Calculate session expiry time
     func calculateExpiry {
-        # الحصول على التاريخ والوقت الحالي
+        # Get current date and time
         aTimeList = timelist()
         
-        # تحويل التاريخ إلى التنسيق الكامل (MM/DD/YYYY)
+        # Convert date to full format (MM/DD/YYYY)
         cYear = aTimeList[19]  # Full year (YYYY)
         cMonth = aTimeList[6]  # Month (MM)
         cDay = aTimeList[8]    # Day (DD)
         cCurrentDate = cMonth + "/" + cDay + "/" + cYear
         
-        # الحصول على الوقت الحالي
+        # Get current time
         nCurrentHours = number(aTimeList[7])      # Hours
         nCurrentMinutes = number(aTimeList[11])   # Minutes
         nCurrentSeconds = number(aTimeList[13])   # Seconds
         
-        # حساب إجمالي الثواني
+        # Calculate total seconds
         nTotalSeconds = nCurrentHours * 3600 + nCurrentMinutes * 60 + nCurrentSeconds + nSessionExpiry
         
-        # تحويل الثواني إلى ساعات ودقائق وثواني
+        # Convert seconds to hours, minutes, and seconds
         nHours = floor(nTotalSeconds / 3600)
         nMinutes = floor((nTotalSeconds % 3600) / 60)
         nSeconds = nTotalSeconds % 60
         
-        # معالجة تغيير اليوم إذا تجاوزت الساعات 24
+        # Handle day change if hours exceed 24
         nDaysToAdd = floor(nHours / 24)
         nHours = nHours % 24
         
-        # تنسيق الوقت
+        # Format time
         cExpiryTime = padLeft(string(nHours), "0", 2) + ":" + 
                   padLeft(string(nMinutes), "0", 2) + ":" + 
                   padLeft(string(nSeconds), "0", 2)
         
-        # إضافة الأيام إلى التاريخ إذا لزم الأمر
+        # Add days to date if necessary
         if nDaysToAdd > 0 {
-            # تحويل التاريخ الحالي إلى يوم جوليان
+            # Convert current date to Julian day
             nJulianDate = gregorian2julian(cCurrentDate)
-            # إضافة الأيام
+            # Add days
             nNewJulianDate = nJulianDate + nDaysToAdd
-            # تحويل التاريخ الجديد إلى تاريخ ميلادي
+            # Convert new Julian date to Gregorian date
             cNewDate = julian2gregorian(nNewJulianDate)
             return cNewDate + " " + cExpiryTime
         }
@@ -188,7 +188,7 @@ class SessionManager {
         return cCurrentDate + " " + cExpiryTime
     }
     
-    # التحقق من انتهاء صلاحية الجلسة
+    # Check if session has expired
     func isSessionExpired cExpiry {
         cCurrentDateTime = date() + " " + time()
         nDiff = timeDiff(cExpiry, cCurrentDateTime)
@@ -197,24 +197,24 @@ class SessionManager {
     
     private
     
-    # توليد معرف فريد للجلسة
+    # Generate unique session ID
     func generateSessionId {
         cRandom = randbytes (32)
         cTimestamp = timelist()[5]
         return sha256(cRandom + cTimestamp)
     }
     
-    # تحديث وقت آخر نشاط للجلسة
+    # Update last activity time for session
     func updateSessionActivity cSessionId {
         try {
             for i = 1 to len(aActiveSessions) {
                 if aActiveSessions[i][1] = cSessionId {
-                    # فك تشفير بيانات الجلسة
+                    # Decrypt session data
                     cEncryptedData = aActiveSessions[i][2]
                     cDecryptedData = this.oEncryption.decrypte(cEncryptedData, cSessionKey, cSessionIV)
                     aSessionData = json2list(cDecryptedData)
                     
-                    # تحديث وقت آخر نشاط
+                    # Update last activity time
                     aTimeList = timelist()
                     cCurrentDateTime = aTimeList[6] + "/" + aTimeList[8] + "/" + aTimeList[19] + " " +
                                     padLeft(string(aTimeList[7]), "0", 2) + ":" +
@@ -223,7 +223,7 @@ class SessionManager {
                     
                     aSessionData[:last_activity] = cCurrentDateTime
                     
-                    # إعادة تشفير البيانات
+                    # Re-encrypt data
                     cEncryptedData = this.oEncryption.encrypte(list2json(aSessionData), cSessionKey, cSessionIV)
                     aActiveSessions[i][2] = cEncryptedData
                     
@@ -232,12 +232,12 @@ class SessionManager {
             }
             return false
         catch
-            ? "خطأ في تحديث نشاط الجلسة: " + cCatchError
+            ? "Error updating session activity: " + cCatchError
             return false
         }
     }
     
-    # دالة مساعدة لإضافة أصفار في بداية النص
+    # Helper function to add leading zeros to a string
     func padLeft cStr, cPadChar, nWidth {
         while len(cStr) < nWidth {
             cStr = cPadChar + cStr
@@ -245,7 +245,7 @@ class SessionManager {
         return cStr
     }
     
-    # تحويل يوم جوليان إلى تاريخ ميلادي
+    # Convert Julian day to Gregorian date
     func julian2gregorian nJulian {
         nJulian = floor(nJulian + 0.5)
         
@@ -266,7 +266,7 @@ class SessionManager {
             nYear--
         }
         
-        # تنسيق التاريخ بالشكل MM/DD/YYYY
+        # Format date as MM/DD/YYYY
         return padLeft(string(nMonth), "0", 2) + "/" + 
                padLeft(string(nDay), "0", 2) + "/" + 
                string(nYear)

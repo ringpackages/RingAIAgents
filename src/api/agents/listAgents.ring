@@ -5,8 +5,8 @@
 */
 
 /*
-الدالة: listAgents
-الوصف: الحصول على قائمة العملاء
+Function: listAgents
+Description: Get list of agents
 */
 func listAgents
     try {
@@ -15,11 +15,11 @@ func listAgents
 
         aAgentsList = []
 
-        # تجميع معلومات العملاء من المتغير العام aAgents
+        # Collect agent information from the global variable aAgents
         for i = 1 to len(aAgents) {
             oAgent = aAgents[i]
 
-            # تجميع المعلومات الأساسية
+            # Collect basic information
             aAgentInfo = [
                 :id = oAgent.getID(),
                 :name = oAgent.getName(),
@@ -30,11 +30,11 @@ func listAgents
             add(aAgentsList, aAgentInfo)
         }
 
-        # إذا لم يكن هناك عملاء، إنشاء عملاء افتراضيين
+        # If no agents are found, create default agents
         if len(aAgentsList) = 0 {
             ? logger("listAgents function", "No agents found, creating default agents", :info)
 
-            # إنشاء عميل افتراضي
+            # Create default agent
             oDefaultAgent = new Agent("Default Assistant", "A helpful AI assistant that can answer questions and provide information.")
             oDefaultAgent {
                 setRole("Assistant")
@@ -42,17 +42,17 @@ func listAgents
                 setLanguageModel("gemini-1.5-flash")
             }
 
-            # إضافة العميل الافتراضي إلى القائمة العامة
+            # Add default agent to the global variable
             add(aAgents, oDefaultAgent)
 
-            # إضافة العميل الافتراضي إلى قائمة الاستجابة
+            # Add default agent to the response list
             add(aAgentsList, [
                 :id = oDefaultAgent.getID(),
                 :name = oDefaultAgent.getName(),
                 :role = oDefaultAgent.getRole()
             ])
 
-            # إنشاء عميل للبرمجة
+            # Create coding agent
             oCodingAgent = new Agent("Code Assistant", "A specialized AI assistant for programming and software development.")
             oCodingAgent {
                 setRole("Developer")
@@ -60,28 +60,28 @@ func listAgents
                 setLanguageModel("gemini-1.5-flash")
             }
 
-            # إضافة عميل البرمجة إلى القائمة العامة
+            # Add coding agent to the global variable
             add(aAgents, oCodingAgent)
 
-            # إضافة عميل البرمجة إلى قائمة الاستجابة
+            # Add coding agent to the response list
             add(aAgentsList, [
                 :id = oCodingAgent.getID(),
                 :name = oCodingAgent.getName(),
                 :role = oCodingAgent.getRole()
             ])
 
-            # حفظ العملاء الافتراضيين في قاعدة البيانات
+            # Save default agents to database
             saveAgents()
         }
 
-        # تحويل القائمة إلى JSON بشكل يدوي لضمان التنسيق الصحيح
+        # Convert list to JSON manually to ensure correct formatting
         ? logger("listAgents function", "Creating JSON manually", :info)
 
         cJSON = '{"agents":['
         for i = 1 to len(aAgentsList) {
             oAgent = aAgentsList[i]
 
-            # التأكد من أن المعرف هو نص وليس رقم
+            # Ensure ID is a string
             cId = string(oAgent[:id])
 
             cJSON += '{"id":"' + cId +
@@ -94,7 +94,7 @@ func listAgents
         }
         cJSON += ']}'
 
-        # تسجيل JSON النهائي للتحقق
+        # Log final JSON for debugging
         ? logger("listAgents function", "Final JSON: " + cJSON, :info)
 
         ? logger("listAgents function", "Agents listed successfully", :info)

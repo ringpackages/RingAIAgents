@@ -5,8 +5,8 @@
 */
 
 /*
-الدالة: getPerformance
-الوصف: الحصول على بيانات الأداء
+function: getPerformance
+description: Get performance metrics
 */
 func getPerformance
     try {

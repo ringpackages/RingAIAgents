@@ -6,24 +6,24 @@
 
 
 /*
-الدالة: getAPIKeys
-الوصف: الحصول على مفاتيح API المخزنة
+Function: getAPIKeys
+Description: Get stored API keys
 */
 func getAPIKeys
     try {
-        # استرجاع مفاتيح API من قاعدة البيانات
+        # Retrieve API keys from database
         aKeys = []
 
-        # تحديد مسار قاعدة البيانات
+        # Determine database path
         cDBPath = "G:\RingAIAgents\db\api_keys.db"
 
-        # التحقق من وجود ملف مفاتيح API
+        # Check if API keys file exists
         if !fexists(cDBPath) {
-            # إنشاء قاعدة بيانات جديدة
+            # Create new database
             oDatabase = sqlite_init()
             sqlite_open(oDatabase, cDBPath)
 
-            # إنشاء جدول مفاتيح API
+            # Create API keys table
             cSQL = "CREATE TABLE IF NOT EXISTS api_keys (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     provider TEXT,
@@ -34,19 +34,19 @@ func getAPIKeys
                 )"
             sqlite_execute(oDatabase, cSQL)
 
-            # إغلاق قاعدة البيانات
+            # Close database
             sqlite_close(oDatabase)
         }
 
-        # فتح قاعدة البيانات
+        # Open database
         oDatabase = sqlite_init()
         sqlite_open(oDatabase, cDBPath)
 
-        # استرجاع مفاتيح API
+        # Retrieve API keys
         cSQL = "SELECT * FROM api_keys ORDER BY provider, model"
         aResults = sqlite_execute(oDatabase, cSQL)
 
-        # معالجة النتائج
+        # Process results
         if type(aResults) = "LIST" {
             for aResult in aResults {
                 add(aKeys, [
@@ -60,13 +60,13 @@ func getAPIKeys
             }
         }
 
-        # إغلاق قاعدة البيانات
+        # Close database
         sqlite_close(oDatabase)
 
-        # إرجاع النتائج
+        # Return results
         ? logger("getAPIKeys function", "API keys retrieved successfully", :info)
 
-        # تحويل القائمة إلى JSON بشكل يدوي لضمان التنسيق الصحيح
+        # Convert list to JSON manually to ensure correct formatting
         cJSON = '{"status":"success","keys":['
         for i = 1 to len(aKeys) {
             oKey = aKeys[i]
@@ -92,19 +92,19 @@ func getAPIKeys
     }
 
 /*
-الدالة: addAPIKey
-الوصف: إضافة مفتاح API جديد
+Function: addAPIKey
+Description: Add new API key
 */
 func addAPIKey
     try {
         ? logger("addAPIKey function", "Function called", :info)
 
-        # استخراج البيانات من الطلب
+        # Extract data from request
         cProvider = NULL
         cModel = NULL
         cKey = NULL
 
-        # محاولة استخراج البيانات من معلمات الطلب
+        # Try to extract data from request parameters
         if oServer.request().has_param("provider") {
             cProvider = oServer.request().get_param_value("provider")
             ? logger("addAPIKey function", "Provider from params: " + cProvider, :info)
@@ -120,14 +120,14 @@ func addAPIKey
             ? logger("addAPIKey function", "Key from params: ***", :info)
         }
 
-        # طباعة معلومات الطلب للتشخيص
+        # Print request information for diagnosis
         ? logger("addAPIKey function", "Request received", :info)
 
-        # إذا لم يتم العثور على البيانات، حاول استخراجها من جسم الطلب
+        # If data not found, try extracting from request body
         if cProvider = NULL or cModel = NULL or cKey = NULL {
             ? logger("addAPIKey function", "Trying to extract data from request body", :info)
 
-            # الحصول على محتوى الطلب - استخدام طريقة بديلة
+            # Get request content - alternative method
             try {
                 cBody = oServer["request"]
                 ? logger("addAPIKey function", "Trying to get request content", :info)
@@ -142,9 +142,9 @@ func addAPIKey
             }
 
             if cBody != NULL and trim(cBody) != "" {
-                # محاولة تحليل البيانات بطرق مختلفة
+                # Try to parse data in different ways
 
-                # محاولة 1: تحليل كـ JSON
+                # Try 1: Parse as JSON
                 try {
                     aBody = safeJSON2List(cBody)
                     if isList(aBody) {
@@ -169,7 +169,7 @@ func addAPIKey
                     ? logger("addAPIKey function", "Body is not valid JSON: " + cCatchError, :info)
                 }
 
-                # محاولة 2: تحليل كـ نص مفصول بـ &
+                # Try 2: Parse as form data
                 if cProvider = NULL or cModel = NULL or cKey = NULL {
                     try {
                         aParams = str2list(cBody, "&")
@@ -206,7 +206,7 @@ func addAPIKey
             }
         }
 
-        # إذا لم يتم العثور على البيانات، استخدم قيم افتراضية للاختبار
+        # If data not found, use default values for testing
         if cProvider = NULL or cModel = NULL or cKey = NULL {
             ? logger("addAPIKey function", "Using test values for missing data", :warning)
 
@@ -226,20 +226,20 @@ func addAPIKey
             }
         }
 
-        # فتح قاعدة البيانات
+        # Open database
         oDatabase = sqlite_init()
         ? logger("addAPIKey function", "Database initialized", :info)
 
-        # تحديد مسار قاعدة البيانات
+        # Determine database path
         cDBPath = "db/api_keys.db"
 
-        # التحقق من وجود قاعدة البيانات وإنشائها إذا لم تكن موجودة
+        # Check if database file exists and create it if not
         if !fexists(cDBPath) {
             ? logger("addAPIKey function", "Database file not found, creating new database", :info)
 
             sqlite_open(oDatabase, cDBPath)
 
-            # إنشاء جدول مفاتيح API
+            # Create api_keys table
             cSQL = "CREATE TABLE IF NOT EXISTS api_keys (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     provider TEXT,
@@ -256,12 +256,12 @@ func addAPIKey
 
         ? logger("addAPIKey function", "Database opened", :info)
 
-        # تنظيف البيانات قبل استخدامها في استعلام SQL
+        # Clean data before using it in SQL query
         cProviderSafe = sanitizeSQL(cProvider)
         cModelSafe = sanitizeSQL(cModel)
         cKeySafe = sanitizeSQL(cKey)
 
-        # إضافة مفتاح API
+        # Add API key
         cSQL = "INSERT INTO api_keys (provider, model, key, status) VALUES ('" +
                cProviderSafe + "', '" + cModelSafe + "', '" + cKeySafe + "', 'unknown')"
         ? logger("addAPIKey function", "Executing SQL: INSERT INTO api_keys...", :info)
@@ -269,11 +269,11 @@ func addAPIKey
         sqlite_execute(oDatabase, cSQL)
         ? logger("addAPIKey function", "SQL executed successfully", :info)
 
-        # إغلاق قاعدة البيانات
+        # Close database
         sqlite_close(oDatabase)
         ? logger("addAPIKey function", "Database closed", :info)
 
-        # إرجاع النتائج
+        # Return results
         ? logger("addAPIKey function", "API key added successfully", :info)
         cResponse = '{"status":"success","message":"API key added successfully"}'
         ? logger("addAPIKey function", "Response: " + cResponse, :info)
@@ -288,20 +288,20 @@ func addAPIKey
     }
 
 /*
-الدالة: updateAPIKey
-الوصف: تحديث مفتاح API
+Function: updateAPIKey
+Description: Update API key
 */
 func updateAPIKey
     try {
-        # استخراج البيانات من الطلب
+        # Extract data from request
         cId = oServer["id"]
         cKey = oServer["key"]
 
-        # إذا لم يتم العثور على البيانات، حاول استخراجها من جسم الطلب
+        # If data not found, try extracting it from request body
         if cId = NULL or cKey = NULL {
             ? logger("updateAPIKey function", "Trying to extract data from request body", :info)
 
-            # استخدام oServer["request"] بدلاً من oServer.getContent()
+            # Use oServer["request"] instead of oServer.getContent()
             cBody = oServer["request"]
             ? logger("updateAPIKey function", "Request body: " + cBody, :info)
 
@@ -319,11 +319,11 @@ func updateAPIKey
                 }
             }
 
-            # إذا لم يتم العثور على المعرف، حاول استخراجه من المسار
+            # If ID not found, try extracting it from URL path
             if cId = NULL {
                 ? logger("updateAPIKey function", "Trying to extract ID from URL path", :info)
 
-                # استخراج المعرف من المسار
+                # Extract ID from URL path
                 try {
                     # استخدام دالة match بدلاً من getMatches
                     cId = oServer.match(1)
@@ -334,26 +334,26 @@ func updateAPIKey
             }
         }
 
-        # التحقق من وجود البيانات
+        # Check if data is missing
         if cId = NULL or cKey = NULL {
             raise("Missing required data")
         }
 
-        # تحديد مسار قاعدة البيانات
+        # Determine database path
         cDBPath = "db/api_keys.db"
 
-        # فتح قاعدة البيانات
+        # Open database
         oDatabase = sqlite_init()
         sqlite_open(oDatabase, cDBPath)
 
-        # تحديث مفتاح API
+        # Update API key
         cSQL = "UPDATE api_keys SET key = '" + cKey + "', status = 'unknown' WHERE id = " + cId
         sqlite_execute(oDatabase, cSQL)
 
-        # إغلاق قاعدة البيانات
+        # Close database
         sqlite_close(oDatabase)
 
-        # إرجاع النتائج
+        # Return results
         ? logger("updateAPIKey function", "API key updated successfully", :info)
         oServer.setContent('{"status":"success","message":"API key updated successfully"}',
                           "application/json")
@@ -364,19 +364,19 @@ func updateAPIKey
     }
 
 /*
-الدالة: deleteAPIKey
-الوصف: حذف مفتاح API
+Function: deleteAPIKey
+Description: Delete API key
 */
 func deleteAPIKey
     try {
-        # استخراج البيانات من الطلب
+        # Extract data from request
         cId = oServer["id"]
 
-        # إذا لم يتم العثور على البيانات، حاول استخراجها من المسار
+        # If data not found, try extracting it from URL path
         if cId = NULL {
             ? logger("deleteAPIKey function", "Trying to extract ID from URL path", :info)
 
-            # استخراج المعرف من المسار
+            # Extract ID from URL path
             try {
                 # استخدام دالة match بدلاً من getMatches
                 cId = oServer.match(1)
@@ -386,26 +386,26 @@ func deleteAPIKey
             }
         }
 
-        # التحقق من وجود البيانات
+        # Check if data is missing
         if cId = NULL {
             raise("Missing required data")
         }
 
-        # تحديد مسار قاعدة البيانات
+        # Determine database path
         cDBPath = "db/api_keys.db"
 
-        # فتح قاعدة البيانات
+        # Open database
         oDatabase = sqlite_init()
         sqlite_open(oDatabase, cDBPath)
 
-        # حذف مفتاح API
+        # Delete API key
         cSQL = "DELETE FROM api_keys WHERE id = " + cId
         sqlite_execute(oDatabase, cSQL)
 
-        # إغلاق قاعدة البيانات
+        # Close database
         sqlite_close(oDatabase)
 
-        # إرجاع النتائج
+        # Return results
         ? logger("deleteAPIKey function", "API key deleted successfully", :info)
         oServer.setContent('{"status":"success","message":"API key deleted successfully"}',
                           "application/json")
@@ -416,19 +416,19 @@ func deleteAPIKey
     }
 
 /*
-الدالة: testAPIKey
-الوصف: اختبار مفتاح API
+Function: testAPIKey
+Description: Test API key
 */
 func testAPIKey
     try {
-        # استخراج البيانات من الطلب
+        # Extract data from request
         cId = oServer["id"]
 
-        # إذا لم يتم العثور على البيانات، حاول استخراجها من المسار
+        # If data not found, try extracting it from URL path
         if cId = NULL {
             ? logger("testAPIKey function", "Trying to extract ID from URL path", :info)
 
-            # استخراج المعرف من المسار
+            # Extract ID from URL path
             try {
                 # استخدام دالة match بدلاً من getMatches
                 cId = oServer.match(1)
@@ -438,19 +438,19 @@ func testAPIKey
             }
         }
 
-        # التحقق من وجود البيانات
+        # Check if data is missing
         if cId = NULL {
             raise("Missing required data")
         }
 
-        # تحديد مسار قاعدة البيانات
+        # Determine database path
         cDBPath = "db/api_keys.db"
 
-        # فتح قاعدة البيانات
+        # Open database
         oDatabase = sqlite_init()
         sqlite_open(oDatabase, cDBPath)
 
-        # استرجاع مفتاح API
+        # Retrieve API key
         cSQL = "SELECT * FROM api_keys WHERE id = " + cId
         aResults = sqlite_execute(oDatabase, cSQL)
 
@@ -463,7 +463,7 @@ func testAPIKey
         cModel = aKey[:model]
         cKey = aKey[:key]
 
-        # اختبار المفتاح
+        # Test the key
         bValid = false
 
         if cProvider = "google" {
@@ -478,15 +478,15 @@ func testAPIKey
             bValid = testCohereAPIKey(cKey, cModel)
         }
 
-        # تحديث حالة المفتاح
+        # Update the key status
         cStatus = bValid ? "active" : "expired"
         cSQL = "UPDATE api_keys SET status = '" + cStatus + "' WHERE id = " + cId
         sqlite_execute(oDatabase, cSQL)
 
-        # إغلاق قاعدة البيانات
+        # Close database
         sqlite_close(oDatabase)
 
-        # إرجاع النتائج
+        # Return results
         if bValid {
             ? logger("testAPIKey function", "API key is valid", :info)
             oServer.setContent('{"status":"success","message":"API key is valid"}',
@@ -503,16 +503,16 @@ func testAPIKey
     }
 
 /*
-الدالة: testGoogleAPIKey
-الوصف: اختبار مفتاح API من Google
+Function: testGoogleAPIKey
+Description: Test Google API key
 */
 func testGoogleAPIKey cKey, cModel
     try {
         ? logger("testGoogleAPIKey", "Testing Google API key for model: " + cModel, :info)
 
-        # محاولة اختبار المفتاح بطريقة آمنة
+        # Try testing the key safely
         try {
-            # التحقق من وجود كائن LLM
+            # Check if LLM object exists
             if isNull(oLLM) {
                 ? logger("testGoogleAPIKey", "Creating new LLM object", :info)
                 oTestLLM = new LLM(cModel)
@@ -521,13 +521,13 @@ func testGoogleAPIKey cKey, cModel
                 oTestLLM = oLLM
             }
 
-            # تعيين مفتاح API
+            # Set API key
             oTestLLM.setApiKey(cKey)
 
-            # اختبار المفتاح بإرسال طلب بسيط
+            # Test the key by sending a simple request
             cResponse = oTestLLM.getResponse("Hello, this is a test.", [])
 
-            # التحقق من الاستجابة
+            # Check the response
             if cResponse != NULL and len(cResponse) > 0 {
                 ? logger("testGoogleAPIKey", "API key test successful", :info)
                 return true
@@ -544,16 +544,16 @@ func testGoogleAPIKey cKey, cModel
     }
 
 /*
-الدالة: testOpenAIAPIKey
-الوصف: اختبار مفتاح API من OpenAI
+Function: testOpenAIAPIKey
+Description: Test OpenAI API key
 */
 func testOpenAIAPIKey cKey, cModel
     try {
         ? logger("testOpenAIAPIKey", "Testing OpenAI API key for model: " + cModel, :info)
 
-        # محاولة اختبار المفتاح بطريقة آمنة
+        # Try testing the key safely
         try {
-            # التحقق من وجود كائن LLM
+            # Check if LLM object exists
             if isNull(oLLM) {
                 ? logger("testOpenAIAPIKey", "Creating new LLM object", :info)
                 oTestLLM = new LLM(cModel)
@@ -562,13 +562,13 @@ func testOpenAIAPIKey cKey, cModel
                 oTestLLM = oLLM
             }
 
-            # تعيين مفتاح API
+            # Set API key
             oTestLLM.setApiKey(cKey)
 
-            # اختبار المفتاح بإرسال طلب بسيط
+            # Test the key by sending a simple request
             cResponse = oTestLLM.getResponse("Hello, this is a test.", [])
 
-            # التحقق من الاستجابة
+            # Check the response
             if cResponse != NULL and len(cResponse) > 0 {
                 ? logger("testOpenAIAPIKey", "API key test successful", :info)
                 return true
@@ -585,16 +585,16 @@ func testOpenAIAPIKey cKey, cModel
     }
 
 /*
-الدالة: testAnthropicAPIKey
-الوصف: اختبار مفتاح API من Anthropic
+Function: testAnthropicAPIKey
+Description: Test Anthropic API key
 */
 func testAnthropicAPIKey cKey, cModel
     try {
         ? logger("testAnthropicAPIKey", "Testing Anthropic API key for model: " + cModel, :info)
 
-        # محاولة اختبار المفتاح بطريقة آمنة
+        # Try testing the key safely
         try {
-            # التحقق من وجود كائن LLM
+            # Check if LLM object exists
             if isNull(oLLM) {
                 ? logger("testAnthropicAPIKey", "Creating new LLM object", :info)
                 oTestLLM = new LLM(cModel)
@@ -603,13 +603,13 @@ func testAnthropicAPIKey cKey, cModel
                 oTestLLM = oLLM
             }
 
-            # تعيين مفتاح API
+            # Set API key
             oTestLLM.setApiKey(cKey)
 
-            # اختبار المفتاح بإرسال طلب بسيط
+            # Test the key by sending a simple request
             cResponse = oTestLLM.getResponse("Hello, this is a test.", [])
 
-            # التحقق من الاستجابة
+            # Check the response
             if cResponse != NULL and len(cResponse) > 0 {
                 ? logger("testAnthropicAPIKey", "API key test successful", :info)
                 return true
@@ -626,16 +626,16 @@ func testAnthropicAPIKey cKey, cModel
     }
 
 /*
-الدالة: testMistralAPIKey
-الوصف: اختبار مفتاح API من Mistral
+Function: testMistralAPIKey
+Description: Test Mistral API key
 */
 func testMistralAPIKey cKey, cModel
     try {
         ? logger("testMistralAPIKey", "Testing Mistral API key for model: " + cModel, :info)
 
-        # محاولة اختبار المفتاح بطريقة آمنة
+        # Try testing the key safely
         try {
-            # التحقق من وجود كائن LLM
+            # Check if LLM object exists
             if isNull(oLLM) {
                 ? logger("testMistralAPIKey", "Creating new LLM object", :info)
                 oTestLLM = new LLM(cModel)
@@ -644,13 +644,13 @@ func testMistralAPIKey cKey, cModel
                 oTestLLM = oLLM
             }
 
-            # تعيين مفتاح API
+            # Set API key
             oTestLLM.setApiKey(cKey)
 
-            # اختبار المفتاح بإرسال طلب بسيط
+            # Test the key by sending a simple request
             cResponse = oTestLLM.getResponse("Hello, this is a test.", [])
 
-            # التحقق من الاستجابة
+            # Check the response
             if cResponse != NULL and len(cResponse) > 0 {
                 ? logger("testMistralAPIKey", "API key test successful", :info)
                 return true
@@ -667,16 +667,16 @@ func testMistralAPIKey cKey, cModel
     }
 
 /*
-الدالة: testCohereAPIKey
-الوصف: اختبار مفتاح API من Cohere
+Function: testCohereAPIKey
+Description: Test Cohere API key
 */
 func testCohereAPIKey cKey, cModel
     try {
         ? logger("testCohereAPIKey", "Testing Cohere API key for model: " + cModel, :info)
 
-        # محاولة اختبار المفتاح بطريقة آمنة
+        # Try testing the key safely
         try {
-            # التحقق من وجود كائن LLM
+            # Check if LLM object exists
             if isNull(oLLM) {
                 ? logger("testCohereAPIKey", "Creating new LLM object", :info)
                 oTestLLM = new LLM(cModel)
@@ -685,13 +685,13 @@ func testCohereAPIKey cKey, cModel
                 oTestLLM = oLLM
             }
 
-            # تعيين مفتاح API
+            # Set API key
             oTestLLM.setApiKey(cKey)
 
-            # اختبار المفتاح بإرسال طلب بسيط
+            # Test the key by sending a simple request
             cResponse = oTestLLM.getResponse("Hello, this is a test.", [])
 
-            # التحقق من الاستجابة
+            # Check the response
             if cResponse != NULL and len(cResponse) > 0 {
                 ? logger("testCohereAPIKey", "API key test successful", :info)
                 return true

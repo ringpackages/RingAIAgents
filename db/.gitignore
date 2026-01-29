@@ -1,6 +1,6 @@
-# تجاهل جميع ملفات قواعد البيانات
+# ignore all database files
 *.db
 *.db-journal
 
-# عدم تجاهل ملف README.md
+# do not ignore README.md
 !README.md

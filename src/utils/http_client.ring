@@ -42,13 +42,13 @@ class HttpClient
         
         try {
             if substr(cUrl, ":11434") > 0 {
-                # تنسيق خاص لـ Ollama API
+                # Special format for Ollama API
                 cCommand = 'curl -X POST "' + cUrl + '" -H "Content-Type: application/json" -d ' + "'" + cData + "'"
                 //cCommand = addHeaders(cCommand)
                 ? "Executing command: " + cCommand
                 
                 if substr(cData, '"stream": true') {
-                    # معالجة الاستجابات المتدفقة
+                    # Handle streaming responses
                     cOutput1 = ""
                     pProcess.runCommandAsync(cCommand)
                     while true {
@@ -60,7 +60,7 @@ class HttpClient
                     pProcess.waitForComplete()
                     cError = pProcess.getStderr()
                 else
-                    # معالجة الاستجابات العادية
+                    # Handle normal responses
                     pProcess.runCommand(cCommand)
                     pProcess.waitForComplete()
                     cOutput1 = pProcess.readOutput()

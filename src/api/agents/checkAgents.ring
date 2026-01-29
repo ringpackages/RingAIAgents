@@ -5,8 +5,8 @@
 */
 
 /*
-الدالة: checkAgents
-الوصف: التحقق من حالة العملاء
+Function: checkAgents
+Description: Check agents status
 */
 func checkAgents
     try {
@@ -20,7 +20,7 @@ func checkAgents
             ? logger("checkAgents function", "  Name: " + oAgent.getName(), :info)
             ? logger("checkAgents function", "  Role: " + oAgent.getRole(), :info)
             
-            # التحقق من المهارات
+            # Check skills
             aSkills = oAgent.getSkills()
             ? logger("checkAgents function", "  Skills count: " + len(aSkills), :info)
             for j = 1 to len(aSkills) {

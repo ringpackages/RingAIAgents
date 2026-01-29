@@ -5,22 +5,22 @@
 */
 
 /*
-الدالة: showTeams
-الوصف: عرض قائمة الفرق
+function: showTeams
+description: Display the teams list
 */
 import System.Web
 
 func showTeams
     oPage = New BootStrapWebPage {
         Title = "RingAI Teams List"
-        # تحميل الستايلات المشتركة
+        # load the common styles
         loadCommonStyles(oPage)
-        # تحميل ستايلات خاصة بالصفحة
+        # load the page specific styles
         html("<link rel='stylesheet' href='/static/css/tables.css'>")
         html("<script src='/static/js/common.js'></script>")
         html("<script src='/static/js/teams.js'></script>")
 
-        # إضافة الهيدر
+        # add the header
         getHeader(oPage)
 
         div {
@@ -178,7 +178,7 @@ func showTeams
             }
         }
 
-        # إضافة الفوتر
+        # add the footer
         getFooter(oPage)
 
         noOutput()

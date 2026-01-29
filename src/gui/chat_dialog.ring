@@ -1,8 +1,8 @@
 
 
 /*
-الكلاس: ChatMessage
-الوصف: تمثيل رسالة في المحادثة
+the class: ChatMessage
+the description: represents a message in the conversation
 */
 class ChatMessage
     cId
@@ -36,8 +36,8 @@ class ChatMessage
     }
 
 /*
-الكلاس: ChatDialog
-الوصف: نافذة الدردشة مع العملاء
+the class: ChatDialog
+the description: a dialog for chat with agents
 */
 class ChatDialog from QDialog
 
@@ -50,7 +50,7 @@ class ChatDialog from QDialog
     # Data
     oCurrentAgent
     aMessages
-    oParent  # مرجع للنافذة الأم
+    oParent  # parent window reference
 
     func init oParent {
         super.init(oParent)
@@ -62,7 +62,7 @@ class ChatDialog from QDialog
         loadAgents()
     }
 
-     # دالة للحصول على النافذة الأم
+     # function to get the parent window
     func getParent {
         return this.oParent
     }

@@ -5,20 +5,20 @@
 */
 
 /*
-الدالة: showDashboard
-الوصف: عرض لوحة التحكم الرئيسية
+function: showDashboard
+description: Display the dashboard
 */
 import System.Web
 
 func showDashboard
     oPage = new BootStrapWebPage  {
         Title = "RingAI Agents Dashboard"
-        # تحميل الستايلات المشتركة
+        # load the common styles
         loadCommonStyles(oPage)
-        # تحميل ستايلات خاصة بالصفحة
+        # load the page specific styles
         html("<link rel='stylesheet' href='/static/css/dashboard.css'>")
 
-        # إضافة الهيدر
+        # add the header
         getHeader( oPage )
 
         div {
@@ -56,7 +56,7 @@ func showDashboard
                 div {
                     classname = "row"
 
-                    # إحصائيات النظام
+                    # add the system statistics section
                     div {
                         classname = "col-md-4"
                         div {
@@ -78,7 +78,7 @@ func showDashboard
                         }
                     }
 
-                    # أداء النظام
+                    # add the system performance section
                     div {
                         classname = "col-md-4"
                         div {
@@ -99,7 +99,7 @@ func showDashboard
                         }
                     }
 
-                    # آخر الأحداث
+                    # add the recent events section
                     div {
                         classname = "col-md-4"
                         div {
@@ -192,7 +192,7 @@ func showDashboard
             }
         }
 
-        # إضافة الفوتر
+        # add the footer
         getFooter( oPage )
 
         noOutput()

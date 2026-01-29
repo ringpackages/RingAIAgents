@@ -1,16 +1,16 @@
-# مجلد قواعد البيانات
+# the database folder
 
-هذا المجلد يحتوي على ملفات قواعد البيانات المستخدمة في النظام.
+this folder contains the database files used in the system.
 
-## قواعد البيانات المستخدمة
+## databases used
 
-1. `agents.db` - قاعدة بيانات العملاء
-2. `teams.db` - قاعدة بيانات الفرق
-3. `tasks.db` - قاعدة بيانات المهام
-4. `api_keys.db` - قاعدة بيانات مفاتيح API
+1. `agents.db` - database of agents
+2. `teams.db` - database of teams
+3. `tasks.db` - database of tasks
+4. `api_keys.db` - database of api keys
 
-## ملاحظات
+## notes
 
-- يتم إنشاء قواعد البيانات تلقائيًا إذا لم تكن موجودة
-- يتم حفظ البيانات في قواعد البيانات عند إضافة أو تعديل أو حذف العناصر
-- يتم تحميل البيانات من قواعد البيانات عند بدء تشغيل النظام
+- databases are created automatically if they do not exist
+- data is saved to databases when adding, editing, or deleting items
+- data is loaded from databases when the system starts

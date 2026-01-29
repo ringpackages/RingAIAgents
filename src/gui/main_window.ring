@@ -7,7 +7,7 @@
 oWindow = null
 oApp = null
 
-Load "libAgantAi_gui.ring" # استدعاء ملف النواة المحلي
+Load "libAgantAi_gui.ring" # load the local main window file
 load "add_agent_dialog.ring"
 load "add_crew_dialog.ring"
 load "add_task_dialog.ring"

@@ -2,11 +2,11 @@ load "G:/RingAIAgents/src/security/config/SecurityConfig.ring"
 
 /*
 Class: InputValidator
-Description: مدقق صحة المدخلات
+Description: Validates input data
 */
 class InputValidator {
     
-    # متغيرات الكلاس
+    # Class variables
     oConfig
     nMinPasswordLength
     bRequireSpecialChars
@@ -17,21 +17,21 @@ class InputValidator {
     func init {
         oConfig = new SecurityConfig
         
-        # نسخ الإعدادات من الكائن oConfig مع التحويل الصحيح للقيم
+        # Copy settings from oConfig with correct value conversion
         try {
             nMinPasswordLength = number(oConfig.nMinPasswordLength)
         catch
-            nMinPasswordLength = 8  # قيمة افتراضية
+            nMinPasswordLength = 8  # Default value
         }
         
-        # تحويل القيم المنطقية
+        # Convert boolean values
         bRequireSpecialChars = isTrue(oConfig.bRequireSpecialChars)
         bRequireNumbers = isTrue(oConfig.bRequireNumbers)
         bRequireUpperCase = isTrue(oConfig.bRequireUpperCase)
         aSuspiciousPatterns = oConfig.aSuspiciousPatterns
     }
     
-    # دالة مساعدة للتحويل إلى قيمة منطقية
+    # Helper function to convert to boolean
     func isTrue value {
         if type(value) = "NUMBER" {
             return value = 1
@@ -39,67 +39,67 @@ class InputValidator {
         return false
     }
     
-    # التحقق من صحة البريد الإلكتروني
+    # Validate email
     func validateEmail cEmail {
         if cEmail = "" return false ok
         
-        # التحقق من وجود @ و .
+        # Check for @ and .
         if substr(cEmail, "@") = 0 return false ok
         if substr(cEmail, ".") = 0 return false ok
         
-        # التحقق من عدم وجود مسافات
+        # Check for spaces
         if substr(cEmail, " ") > 0 return false ok
         
-        # التحقق من الطول
+        # Check length
         if len(cEmail) < 5 return false ok
         
-        # التحقق من صحة التنسيق باستخدام تعبير منتظم
-        # يجب تنفيذ التحقق باستخدام تعبير منتظم بشكل صحيح
+        # Validate format using regular expression
+        # Should implement validation using regular expression correctly
         
         return true
     }
     
-    # التحقق من صحة كلمة المرور
+    # Validate password
     func validatePassword cPassword {
         try {
             if cPassword = "" return false ok
             
-            # التحقق من الطول
+            # Check length
             if len(cPassword) < nMinPasswordLength return false ok
             
-            # التحقق من وجود أحرف خاصة
+            # Check for special characters
             if bRequireSpecialChars {
                 if not containsSpecialChars(cPassword) return false ok
             }
             
-            # التحقق من وجود أرقام
+            # Check for numbers
             if bRequireNumbers {
                 if not containsNumbers(cPassword) return false ok
             }
             
-            # التحقق من وجود أحرف كبيرة
+            # Check for uppercase letters
             if bRequireUpperCase {
                 if not containsUpperCase(cPassword) return false ok
             }
             
             return true
         catch
-            ? "خطأ في التحقق من كلمة المرور: " + cCatchError
+            ? "Error validating password: " + cCatchError
             return false
         }
     }
     
-    # التحقق من صحة اسم المستخدم
+    # Validate username
     func validateUsername cUsername {
         if cUsername = "" return false ok
         
-        # التحقق من الطول
+        # Check length
         if len(cUsername) < 3 return false ok
         
-        # التحقق من عدم وجود مسافات
+        # Check for spaces
         if substr(cUsername, " ") > 0 return false ok
         
-        # التحقق من صحة التنسيق (أحرف وأرقام فقط)
+        # Check format (letters, numbers, and underscores only)
         for i = 1 to len(cUsername) {
             c = substr(cUsername, i, 1)
             if not (isalpha(c) or isdigit(c) or c = "_") return false ok
@@ -108,11 +108,11 @@ class InputValidator {
         return true
     }
     
-    # التحقق من صحة النص (منع حقن SQL و XSS)
+    # Validate text (prevent SQL injection and XSS)
     func validateText cText {
         if cText = "" return true ok
         
-        # التحقق من عدم وجود أنماط مشبوهة
+        # Check for suspicious patterns
         for pattern in aSuspiciousPatterns {
             if substr(lower(cText), lower(pattern)) > 0 return false ok
         }
@@ -120,11 +120,11 @@ class InputValidator {
         return true
     }
     
-    # التحقق من صحة الرقم
+    # Validate number
     func validateNumber cNumber {
         if cNumber = "" return false ok
         
-        # التحقق من أن المدخل رقم
+        # Check if input is a number
         for i = 1 to len(cNumber) {
             c = substr(cNumber, i, 1)
             if not (isdigit(c) or c = "." or c = "-") return false ok
@@ -133,21 +133,21 @@ class InputValidator {
         return true
     }
     
-    # التحقق من صحة التاريخ
+    # Validate date
     func validateDate cDate {
         if cDate = "" return false ok
         
-        # التحقق من صحة تنسيق التاريخ
-        # يجب تنفيذ التحقق من صحة التاريخ بشكل صحيح
+        # Check date format
+        # Should implement date validation correctly
         
         return true
     }
     
-    # تنظيف النص (إزالة الأكواد الضارة)
+    # Sanitize text (remove malicious code)
     func sanitizeText cText {
         if cText = "" return "" ok      
         
-        # استبدال الأكواد الضارة
+        # Replace malicious code
         cText = replaceHtmlTags(cText)
         cText = replaceSqlInjection(cText)
         
@@ -156,7 +156,7 @@ class InputValidator {
     
     private
     
-    # التحقق من وجود أحرف خاصة
+    # Check for special characters
     func containsSpecialChars cText {
         cSpecialChars = "!@#$%^&*()_+-=[]{}|;:,.<>?/"
         for i = 1 to len(cSpecialChars) {
@@ -166,7 +166,7 @@ class InputValidator {
         return false 
     }
     
-    # التحقق من وجود أرقام
+    # Check for numbers
     func containsNumbers cText {
         for i = 1 to len(cText) {
             c = substr(cText, i, 1)
@@ -175,7 +175,7 @@ class InputValidator {
         return false 
     }
     
-    # التحقق من وجود أحرف كبيرة
+    # Check for uppercase letters
     func containsUpperCase cText {
         for i = 1 to len(cText) {
             c = substr(cText, i, 1)
@@ -184,7 +184,7 @@ class InputValidator {
         return false 
     }
     
-    # استبدال وسوم HTML
+    # Replace HTML tags
     func replaceHtmlTags cText {
         cText = substr(cText, "<", "&lt;")
         cText = substr(cText, ">", "&gt;")
@@ -193,7 +193,7 @@ class InputValidator {
         return cText
     }
     
-    # استبدال أنماط حقن SQL
+    # Replace SQL injection patterns
     func replaceSqlInjection cText {
         cText = substr(cText, "SELECT", "")
         cText = substr(cText, "INSERT", "")
